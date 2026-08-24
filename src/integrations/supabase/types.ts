@@ -14,16 +14,379 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      business_members: {
+        Row: {
+          business_id: string
+          created_at: string
+          customer_id: string
+          id: string
+          role: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          role?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_members_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_members_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      businesses: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          owner_id: string
+          primary_color: string
+          theme: Database["public"]["Enums"]["profile_theme"]
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          owner_id: string
+          primary_color?: string
+          theme?: Database["public"]["Enums"]["profile_theme"]
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          owner_id?: string
+          primary_color?: string
+          theme?: Database["public"]["Enums"]["profile_theme"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "businesses_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customers: {
+        Row: {
+          active: boolean
+          avatar_url: string | null
+          bio: string | null
+          business_id: string | null
+          button_style: string
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          job_title: string | null
+          location: string | null
+          phone: string | null
+          primary_color: string
+          text_color: string
+          theme: Database["public"]["Enums"]["profile_theme"]
+          updated_at: string
+          user_id: string | null
+          username: string
+          verified: boolean
+          website: string | null
+        }
+        Insert: {
+          active?: boolean
+          avatar_url?: string | null
+          bio?: string | null
+          business_id?: string | null
+          button_style?: string
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          job_title?: string | null
+          location?: string | null
+          phone?: string | null
+          primary_color?: string
+          text_color?: string
+          theme?: Database["public"]["Enums"]["profile_theme"]
+          updated_at?: string
+          user_id?: string | null
+          username: string
+          verified?: boolean
+          website?: string | null
+        }
+        Update: {
+          active?: boolean
+          avatar_url?: string | null
+          bio?: string | null
+          business_id?: string | null
+          button_style?: string
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          job_title?: string | null
+          location?: string | null
+          phone?: string | null
+          primary_color?: string
+          text_color?: string
+          theme?: Database["public"]["Enums"]["profile_theme"]
+          updated_at?: string
+          user_id?: string | null
+          username?: string
+          verified?: boolean
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customers_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      link_clicks: {
+        Row: {
+          created_at: string
+          customer_id: string
+          id: string
+          link_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          id?: string
+          link_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          id?: string
+          link_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "link_clicks_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "link_clicks_link_id_fkey"
+            columns: ["link_id"]
+            isOneToOne: false
+            referencedRelation: "links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      links: {
+        Row: {
+          created_at: string
+          customer_id: string
+          enabled: boolean
+          icon: string | null
+          id: string
+          sort_order: number
+          title: string
+          type: Database["public"]["Enums"]["link_type"]
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          enabled?: boolean
+          icon?: string | null
+          id?: string
+          sort_order?: number
+          title: string
+          type: Database["public"]["Enums"]["link_type"]
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          enabled?: boolean
+          icon?: string | null
+          id?: string
+          sort_order?: number
+          title?: string
+          type?: Database["public"]["Enums"]["link_type"]
+          updated_at?: string
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "links_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile_views: {
+        Row: {
+          created_at: string
+          customer_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_views_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          account_type: Database["public"]["Enums"]["account_type"]
+          auth_user_id: string
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          account_type?: Database["public"]["Enums"]["account_type"]
+          auth_user_id: string
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          account_type?: Database["public"]["Enums"]["account_type"]
+          auth_user_id?: string
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: never; Returns: boolean }
+      owns_business: { Args: { _business_id: string }; Returns: boolean }
+      owns_customer: { Args: { _customer_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      account_type: "personal" | "business"
+      app_role: "admin"
+      link_type:
+        | "whatsapp"
+        | "phone"
+        | "email"
+        | "instagram"
+        | "facebook"
+        | "tiktok"
+        | "youtube"
+        | "linkedin"
+        | "twitter"
+        | "snapchat"
+        | "telegram"
+        | "website"
+        | "maps"
+        | "reviews"
+        | "instapay"
+        | "vodafone_cash"
+        | "custom"
+      profile_theme:
+        | "oshegah_dark"
+        | "oshegah_light"
+        | "midnight"
+        | "minimal"
+        | "glass"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +513,35 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      account_type: ["personal", "business"],
+      app_role: ["admin"],
+      link_type: [
+        "whatsapp",
+        "phone",
+        "email",
+        "instagram",
+        "facebook",
+        "tiktok",
+        "youtube",
+        "linkedin",
+        "twitter",
+        "snapchat",
+        "telegram",
+        "website",
+        "maps",
+        "reviews",
+        "instapay",
+        "vodafone_cash",
+        "custom",
+      ],
+      profile_theme: [
+        "oshegah_dark",
+        "oshegah_light",
+        "midnight",
+        "minimal",
+        "glass",
+      ],
+    },
   },
 } as const
