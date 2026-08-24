@@ -59,7 +59,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+        sans: ['Manrope', 'system-ui', 'sans-serif'],
+        display: ['Sora', 'system-ui', 'sans-serif'],
       },
       letterSpacing: {
         tightest: '-0.03em',
@@ -69,13 +70,15 @@ export default {
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 4px)",
+        sm: "calc(var(--radius) - 8px)",
+        xl: "calc(var(--radius) + 4px)",
+        "2xl": "calc(var(--radius) + 8px)",
       },
       backgroundImage: {
-        'hero-gradient': 'var(--hero-gradient)',
-        'overlay-gradient': 'var(--overlay-gradient)',
+        'gradient-navy': 'var(--gradient-navy)',
       },
+
       boxShadow: {
         'soft': 'var(--soft-shadow)',
         'hover': 'var(--hover-shadow)',
