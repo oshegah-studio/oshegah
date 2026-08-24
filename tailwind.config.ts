@@ -57,7 +57,19 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        navy: {
+          DEFAULT: "hsl(var(--navy))",
+          deep: "hsl(var(--navy-deep))",
+        },
+        sky: {
+          DEFAULT: "hsl(var(--sky))",
+        },
       },
+
       fontFamily: {
         sans: ['Manrope', 'system-ui', 'sans-serif'],
         display: ['Sora', 'system-ui', 'sans-serif'],
