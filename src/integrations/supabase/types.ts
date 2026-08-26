@@ -414,6 +414,10 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       owns_business: { Args: { _business_id: string }; Returns: boolean }
       owns_customer: { Args: { _customer_id: string }; Returns: boolean }
+      owns_customer_row: {
+        Args: { _business_id: string; _user_id: string }
+        Returns: boolean
+      }
       record_profile_view: {
         Args: { _customer_id: string; _visitor_id: string }
         Returns: undefined
