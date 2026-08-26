@@ -2,6 +2,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { PageLoader } from "@/components/states";
+import { Seo } from "@/components/Seo";
 import { useI18n } from "@/i18n";
 
 export function ProtectedRoute({
