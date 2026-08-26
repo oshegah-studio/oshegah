@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { THEME_LIST, BUTTON_STYLES } from "@/lib/themes";
+import { THEME_LIST, BUTTON_STYLES, FONT_STYLES } from "@/lib/themes";
 import { normalizeUsername, validateUsername, RESERVED_USERNAMES } from "@/lib/links";
 import type { CustomerRow } from "@/hooks/useOshegah";
+import { AvatarUploader } from "@/components/AvatarUploader";
+import { ProfileView } from "@/components/ProfileView";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n";
 
