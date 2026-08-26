@@ -12,6 +12,7 @@ import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n";
 import { Seo } from "@/components/Seo";
+import { OAuthButtons } from "@/components/OAuthButtons";
 
 export default function Signup() {
   const { user, profile, isAdmin } = useAuth();
