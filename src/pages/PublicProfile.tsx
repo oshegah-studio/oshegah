@@ -9,6 +9,7 @@ import { recordLinkClick, recordProfileView } from "@/lib/analytics";
 import { downloadVCard, profileUrlFor } from "@/lib/vcard";
 import type { CustomerRow, LinkRow } from "@/hooks/useOshegah";
 import { useI18n } from "@/i18n";
+import { Seo } from "@/components/Seo";
 
 export default function PublicProfile() {
   const { username = "" } = useParams();
