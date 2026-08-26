@@ -3,7 +3,7 @@ import { ArrowRight, BarChart3, Nfc, QrCode, Smartphone, Palette, ShieldCheck } 
 import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
-import { ProfileView, PhoneFrame } from "@/components/ProfileView";
+import { OshegahCard } from "@/components/OshegahCard";
 import { Reveal } from "@/components/Reveal";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n";
@@ -18,13 +18,6 @@ const demoCustomer = {
   verified: true,
   theme: "oshegah_dark",
 };
-
-const demoLinks = [
-  { id: "1", type: "whatsapp", title: "WhatsApp", value: "+201000000000" },
-  { id: "2", type: "instagram", title: "Instagram", value: "oshegah" },
-  { id: "3", type: "website", title: "Website", value: "oshegah.com" },
-  { id: "4", type: "instapay", title: "InstaPay", value: "yahia@instapay" },
-];
 
 const features = [
   { icon: Nfc, key: "nfc" },
@@ -115,9 +108,12 @@ export default function Landing() {
               </div>
             </div>
             <div className="animate-soft-in" style={{ animationDelay: "300ms" }}>
-              <PhoneFrame>
-                <ProfileView customer={demoCustomer} links={demoLinks} compact />
-              </PhoneFrame>
+              <OshegahCard name={demoCustomer.full_name} username={demoCustomer.username} />
+              <div className="mt-6 flex justify-center">
+                <Button asChild variant="ghost" className="text-white/80 hover:bg-white/10 hover:text-white">
+                  <Link to="/leaderboard">{t("leaderboard.viewTop")}</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>
@@ -159,6 +155,7 @@ export default function Landing() {
       <footer className="border-t border-border py-8">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-3 px-5 text-sm text-muted-foreground sm:flex-row sm:justify-between">
           <Wordmark />
+          <Link to="/leaderboard" className="hover:text-foreground">{t("leaderboard.title")}</Link>
           <LanguageSwitcher />
           <p>{t("landing.rights", { year: new Date().getFullYear() })}</p>
         </div>

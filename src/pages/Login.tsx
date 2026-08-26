@@ -11,6 +11,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n";
 import { Seo } from "@/components/Seo";
+import { OAuthButtons } from "@/components/OAuthButtons";
 
 export default function Login() {
   const { user, profile, isAdmin } = useAuth();
@@ -61,6 +62,9 @@ export default function Login() {
             {busy ? t("auth.signingIn") : t("auth.loginTitle")}
           </Button>
         </form>
+        <div className="mt-5">
+          <OAuthButtons />
+        </div>
         <p className="mt-5 text-center text-sm text-muted-foreground">
           {t("auth.noAccount")}{" "}
           <Link to="/signup" className="font-medium text-primary hover:underline">{t("auth.createOne")}</Link>

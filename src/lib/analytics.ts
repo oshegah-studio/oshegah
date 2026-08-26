@@ -1,16 +1,24 @@
 import { supabase } from "@/integrations/supabase/client";
+import { getVisitorId } from "@/lib/visitor";
 
 const seenKey = (customerId: string) => `oshegah:viewed:${customerId}`;
 
-/** Records one profile view per customer per session. Fire-and-forget. */
+/**
+ * Records at most one profile view per visitor per profile.
+ * The frontend short-circuits repeat visits; the database enforces
+ * UNIQUE(customer_id, visitor_id) through a security-definer RPC.
+ */
 export async function recordProfileView(customerId: string) {
   try {
-    if (sessionStorage.getItem(seenKey(customerId))) return;
-    sessionStorage.setItem(seenKey(customerId), "1");
+    if (localStorage.getItem(seenKey(customerId))) return;
+    localStorage.setItem(seenKey(customerId), "1");
   } catch {
-    /* private mode — still record */
+    /* private mode — the DB constraint still de-duplicates */
   }
-  await supabase.from("profile_views").insert({ customer_id: customerId });
+  await supabase.rpc("record_profile_view", {
+    _customer_id: customerId,
+    _visitor_id: getVisitorId(),
+  });
 }
 
 export async function recordLinkClick(customerId: string, linkId: string) {

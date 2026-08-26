@@ -12,6 +12,7 @@ import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n";
 import { Seo } from "@/components/Seo";
+import { OAuthButtons } from "@/components/OAuthButtons";
 
 export default function Signup() {
   const { user, profile, isAdmin } = useAuth();
@@ -92,6 +93,9 @@ export default function Signup() {
             {busy ? t("auth.creating") : t("auth.createAccount")}
           </Button>
         </form>
+        <div className="mt-5">
+          <OAuthButtons />
+        </div>
         <p className="mt-5 text-center text-sm text-muted-foreground">
           {t("auth.haveAccount")}{" "}
           <Link to="/login" className="font-medium text-primary hover:underline">{t("auth.loginTitle")}</Link>

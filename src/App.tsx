@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import BusinessDashboard from "./pages/BusinessDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import PublicProfile from "./pages/PublicProfile";
+import Leaderboard from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,7 +32,9 @@ const App = () => (
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
             <Route
+
               path="/dashboard"
               element={<ProtectedRoute area="personal"><Dashboard /></ProtectedRoute>}
             />
