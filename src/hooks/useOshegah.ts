@@ -141,7 +141,7 @@ export interface LeaderboardEntry {
   username: string;
   full_name: string;
   avatar_url: string | null;
-  unique_views: number;
+  views: number;
 }
 
 /** Public, privacy-safe ranking: no emails, phones or owner identifiers. */
