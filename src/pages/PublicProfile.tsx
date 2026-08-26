@@ -4,12 +4,15 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileView, type ProfileViewLink } from "@/components/ProfileView";
 import { PageLoader } from "@/components/states";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { recordLinkClick, recordProfileView } from "@/lib/analytics";
 import { downloadVCard, profileUrlFor } from "@/lib/vcard";
 import type { CustomerRow, LinkRow } from "@/hooks/useOshegah";
+import { useI18n } from "@/i18n";
 
 export default function PublicProfile() {
   const { username = "" } = useParams();
+  const { t } = useI18n();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["public-profile", username],
@@ -45,16 +48,16 @@ export default function PublicProfile() {
     document.querySelector('meta[name="description"]')?.setAttribute("content", desc.slice(0, 155));
   }, [data?.customer]);
 
-  if (isLoading) return <PageLoader label="Loading profile…" />;
+  if (isLoading) return <PageLoader label={t("publicProfile.loading")} />;
 
   if (isError || !data) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background px-6 text-center">
-        <h1 className="font-display text-2xl font-semibold">Profile not found</h1>
-        <p className="text-sm text-muted-foreground">
-          <span className="font-medium">/{username}</span> isn't available on OSHEGAH.
-        </p>
-        <Link to="/" className="text-sm font-medium text-primary hover:underline">Back to OSHEGAH</Link>
+      <main className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-background px-6 text-center">
+        <h1 className="animate-soft-in font-display text-2xl font-semibold">{t("publicProfile.notFound")}</h1>
+        <p className="text-sm text-muted-foreground">{t("publicProfile.notFoundText", { username })}</p>
+        <Link to="/" className="text-sm font-medium text-primary hover:underline">
+          {t("publicProfile.backHome")}
+        </Link>
       </main>
     );
   }
@@ -77,7 +80,10 @@ export default function PublicProfile() {
     });
 
   return (
-    <main className="min-h-screen">
+    <main className="relative min-h-dvh">
+      <div className="absolute end-4 top-4 z-10">
+        <LanguageSwitcher tone="invert" compact />
+      </div>
       <ProfileView customer={customer} links={links} onLinkClick={onLinkClick} onSaveContact={onSaveContact} />
     </main>
   );
