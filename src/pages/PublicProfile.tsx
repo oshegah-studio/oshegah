@@ -18,13 +18,11 @@ export default function PublicProfile() {
     queryKey: ["public-profile", username],
     enabled: Boolean(username),
     queryFn: async () => {
-      const { data: customer, error } = await supabase
-        .from("customers")
-        .select("*")
-        .eq("username", username.toLowerCase())
-        .eq("active", true)
-        .maybeSingle();
+      const { data: rows, error } = await supabase.rpc("get_public_profile", {
+        _username: username.toLowerCase(),
+      });
       if (error) throw error;
+      const customer = rows?.[0];
       if (!customer) return null;
       const { data: links } = await supabase
         .from("links")
@@ -32,8 +30,9 @@ export default function PublicProfile() {
         .eq("customer_id", customer.id)
         .eq("enabled", true)
         .order("sort_order", { ascending: true });
-      return { customer: customer as CustomerRow, links: (links ?? []) as LinkRow[] };
+      return { customer: customer as unknown as CustomerRow, links: (links ?? []) as LinkRow[] };
     },
+
   });
 
   useEffect(() => {
