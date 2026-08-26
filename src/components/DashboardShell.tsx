@@ -66,6 +66,10 @@ export function DashboardShell({
                 {item.label}
               </NavLink>
             ))}
+            <NavLink to="/leaderboard" className={navLinkClass}>
+              <Trophy className="h-4 w-4" aria-hidden="true" />
+              {t("leaderboard.title")}
+            </NavLink>
           </nav>
         </div>
         <div className="space-y-3 px-2">
