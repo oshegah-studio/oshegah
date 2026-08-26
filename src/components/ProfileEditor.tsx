@@ -121,6 +121,11 @@ export function ProfileEditor({
       primary_color: form.primary_color,
       text_color: form.text_color,
       active: form.active,
+      show_contact_button: form.show_contact_button,
+      background_color: form.background_color || null,
+      muted_text_color: form.muted_text_color || null,
+      button_shadow: form.button_shadow,
+      font_style: form.font_style,
       ...(allowVerified ? { verified: form.verified } : {}),
     };
 
