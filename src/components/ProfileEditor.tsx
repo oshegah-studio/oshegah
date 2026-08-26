@@ -195,19 +195,31 @@ export function ProfileEditor({
               type="button"
               onClick={() => set("theme", theme.id)}
               className={cn(
-                "card-interactive rounded-xl border p-3 text-start",
+                "card-interactive overflow-hidden rounded-xl border p-0 text-start",
                 form.theme === theme.id ? "border-primary ring-2 ring-primary/25" : "border-border",
               )}
+              aria-pressed={form.theme === theme.id}
             >
-              <span className="flex gap-1">
-                {theme.swatch.map((c) => (
-                  <span key={c} className="h-5 w-5 rounded-full border border-border" style={{ background: c }} />
-                ))}
+              {/* Live mini preview of the theme */}
+              <span className="block h-20 w-full p-2.5" style={{ background: theme.background }}>
+                <span
+                  className="mb-1.5 block h-4 w-4 rounded-full"
+                  style={{ background: theme.accent }}
+                />
+                <span
+                  className="mb-1 block h-3 w-full rounded"
+                  style={{ background: theme.surface, border: `1px solid ${theme.surfaceBorder}` }}
+                />
+                <span
+                  className="block h-3 w-2/3 rounded"
+                  style={{ background: theme.surface, border: `1px solid ${theme.surfaceBorder}` }}
+                />
               </span>
-              <span className="mt-2 block text-sm font-medium">{theme.name}</span>
+              <span className="block px-3 py-2 text-sm font-medium">{theme.name}</span>
             </button>
           ))}
         </div>
+
         <div className="flex flex-wrap gap-2">
           {BUTTON_STYLES.map((style) => (
             <Button
@@ -221,6 +233,22 @@ export function ProfileEditor({
             </Button>
           ))}
         </div>
+
+        <div className="flex flex-wrap gap-2">
+          {FONT_STYLES.map((font) => (
+            <Button
+              key={font.id}
+              type="button"
+              variant={form.font_style === font.id ? "default" : "outline"}
+              size="sm"
+              onClick={() => set("font_style", font.id)}
+              style={{ fontFamily: font.stack || undefined }}
+            >
+              {font.name}
+            </Button>
+          ))}
+        </div>
+
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="primary_color">{t("profileEditor.accentColor")}</Label>
@@ -230,8 +258,75 @@ export function ProfileEditor({
             <Label htmlFor="text_color">{t("profileEditor.textColor")}</Label>
             <Input id="text_color" type="color" value={form.text_color} onChange={(e) => set("text_color", e.target.value)} className="h-10 w-20 p-1" />
           </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="background_color">{t("profileEditor.backgroundColor")}</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="background_color"
+                type="color"
+                value={form.background_color || "#162446"}
+                onChange={(e) => set("background_color", e.target.value)}
+                className="h-10 w-20 p-1"
+              />
+              <Button type="button" variant="ghost" size="sm" onClick={() => set("background_color", "")}>
+                {t("profileEditor.useTheme")}
+              </Button>
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="muted_text_color">{t("profileEditor.mutedColor")}</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="muted_text_color"
+                type="color"
+                value={form.muted_text_color || "#BEE3F0"}
+                onChange={(e) => set("muted_text_color", e.target.value)}
+                className="h-10 w-20 p-1"
+              />
+              <Button type="button" variant="ghost" size="sm" onClick={() => set("muted_text_color", "")}>
+                {t("profileEditor.useTheme")}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Switch id="button_shadow" checked={form.button_shadow} onCheckedChange={(v) => set("button_shadow", v)} />
+          <Label htmlFor="button_shadow">{t("profileEditor.buttonShadow")}</Label>
+        </div>
+
+        {/* Live preview of the actual public profile */}
+        <div className="space-y-2">
+          <Label>{t("profileEditor.livePreview")}</Label>
+          <div className="overflow-hidden rounded-2xl border border-border">
+            <ProfileView
+              compact
+              customer={{
+                username: form.username || "yourname",
+                full_name: form.full_name || t("dashboard.user"),
+                job_title: form.job_title,
+                bio: form.bio,
+                avatar_url: form.avatar_url,
+                phone: form.phone,
+                email: form.email,
+                location: form.location,
+                verified: form.verified,
+                theme: form.theme,
+                primary_color: form.primary_color,
+                text_color: form.text_color,
+                button_style: form.button_style,
+                background_color: form.background_color || null,
+                muted_text_color: form.muted_text_color || null,
+                button_shadow: form.button_shadow,
+                font_style: form.font_style,
+                show_contact_button: form.show_contact_button,
+              }}
+              links={previewLinks}
+            />
+          </div>
         </div>
       </section>
+
 
       <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-soft">
         <div className="flex items-center gap-3">
