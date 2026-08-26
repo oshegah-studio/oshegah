@@ -96,3 +96,56 @@ export const BUTTON_STYLES: { id: ButtonStyle; name: string; radius: string }[] 
 
 export const buttonRadius = (style?: string | null) =>
   BUTTON_STYLES.find((s) => s.id === style)?.radius ?? "18px";
+
+export const FONT_STYLES: { id: string; name: string; stack: string }[] = [
+  { id: "default", name: "Modern", stack: "" },
+  { id: "serif", name: "Editorial", stack: "Georgia, 'Times New Roman', serif" },
+  { id: "mono", name: "Technical", stack: "ui-monospace, SFMono-Regular, Menlo, monospace" },
+];
+
+export const fontStack = (id?: string | null) =>
+  FONT_STYLES.find((f) => f.id === id)?.stack || undefined;
+
+export interface ProfileStyleSource {
+  theme?: string | null;
+  primary_color?: string | null;
+  text_color?: string | null;
+  button_style?: string | null;
+  background_color?: string | null;
+  muted_text_color?: string | null;
+  button_shadow?: boolean | null;
+  font_style?: string | null;
+}
+
+export interface ResolvedProfileStyle extends ProfileThemeTokens {
+  radius: string;
+  shadow: string | undefined;
+  fontFamily: string | undefined;
+  /** readable foreground for filled accent buttons */
+  onAccent: string;
+}
+
+const isLight = (hex: string) => {
+  const m = /^#?([\da-f]{6})$/i.exec(hex.trim());
+  if (!m) return false;
+  const int = parseInt(m[1], 16);
+  const r = (int >> 16) & 255, g = (int >> 8) & 255, b = int & 255;
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.62;
+};
+
+/** Merges the chosen preset with the customer's own palette overrides. */
+export function resolveProfileStyle(c: ProfileStyleSource): ResolvedProfileStyle {
+  const base = getTheme(c.theme);
+  const accent = c.primary_color || base.accent;
+  return {
+    ...base,
+    background: c.background_color || base.background,
+    text: c.text_color || base.text,
+    mutedText: c.muted_text_color || base.mutedText,
+    accent,
+    radius: buttonRadius(c.button_style),
+    shadow: c.button_shadow ? "0 12px 28px -14px rgba(0,0,0,0.55)" : undefined,
+    fontFamily: fontStack(c.font_style),
+    onAccent: isLight(accent) ? "#162446" : "#FFFFFF",
+  };
+}
