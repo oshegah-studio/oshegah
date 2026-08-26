@@ -86,6 +86,8 @@ export default function PublicProfile() {
         title={`${customer.full_name} — OSHEGAH`}
         description={profileDescription}
         path={`/${customer.username}`}
+        image={customer.avatar_url?.startsWith("https://") ? customer.avatar_url : undefined}
+        imageAlt={`${customer.full_name} on OSHEGAH`}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "ProfilePage",
