@@ -45,6 +45,11 @@ export default function Signup() {
 
   return (
     <main className="flex min-h-dvh items-center justify-center bg-secondary/25 px-5 py-12">
+      <Seo
+        title="Create your OSHEGAH account"
+        description="Create a free OSHEGAH account and share your contact details instantly with a smart NFC or QR profile."
+        path="/signup"
+      />
       <div className="w-full max-w-sm animate-soft-in rounded-2xl border border-border bg-card p-7 shadow-soft">
         <div className="flex items-center justify-between gap-2">
           <Wordmark />
