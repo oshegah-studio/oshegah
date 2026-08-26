@@ -35,6 +35,11 @@ export default function Login() {
 
   return (
     <main className="flex min-h-dvh items-center justify-center bg-secondary/25 px-5 py-12">
+      <Seo
+        title="Sign in — OSHEGAH digital business cards"
+        description="Sign in to your OSHEGAH account to manage your digital profile, smart NFC card and analytics."
+        path="/login"
+      />
       <div className="w-full max-w-sm animate-soft-in rounded-2xl border border-border bg-card p-7 shadow-soft">
         <div className="flex items-center justify-between gap-2">
           <Wordmark />
