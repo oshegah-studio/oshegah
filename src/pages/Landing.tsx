@@ -3,7 +3,7 @@ import { ArrowRight, BarChart3, Nfc, QrCode, Smartphone, Palette, ShieldCheck } 
 import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
-import { ProfileView, PhoneFrame } from "@/components/ProfileView";
+import { OshegahCard } from "@/components/OshegahCard";
 import { Reveal } from "@/components/Reveal";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n";
@@ -18,13 +18,6 @@ const demoCustomer = {
   verified: true,
   theme: "oshegah_dark",
 };
-
-const demoLinks = [
-  { id: "1", type: "whatsapp", title: "WhatsApp", value: "+201000000000" },
-  { id: "2", type: "instagram", title: "Instagram", value: "oshegah" },
-  { id: "3", type: "website", title: "Website", value: "oshegah.com" },
-  { id: "4", type: "instapay", title: "InstaPay", value: "yahia@instapay" },
-];
 
 const features = [
   { icon: Nfc, key: "nfc" },
