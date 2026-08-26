@@ -135,3 +135,23 @@ export function useBusinessProfiles(businessId?: string | null) {
     },
   });
 }
+
+export interface LeaderboardEntry {
+  rank: number;
+  username: string;
+  full_name: string;
+  avatar_url: string | null;
+  unique_views: number;
+}
+
+/** Public, privacy-safe ranking: no emails, phones or owner identifiers. */
+export function useLeaderboard(limit = 20) {
+  return useQuery({
+    queryKey: ["leaderboard", limit],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_leaderboard", { _limit: limit });
+      if (error) throw error;
+      return (data ?? []) as LeaderboardEntry[];
+    },
+  });
+}
