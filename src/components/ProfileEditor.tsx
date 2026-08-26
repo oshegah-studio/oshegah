@@ -173,11 +173,17 @@ export function ProfileEditor({
             <Label htmlFor="website">{t("profileEditor.website")}</Label>
             <Input id="website" dir="ltr" value={form.website} onChange={(e) => set("website", e.target.value)} />
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="avatar_url">{t("profileEditor.photoUrl")}</Label>
-            <Input id="avatar_url" dir="ltr" value={form.avatar_url} onChange={(e) => set("avatar_url", e.target.value)} />
-          </div>
         </div>
+        <AvatarUploader value={form.avatar_url} onChange={(url) => set("avatar_url", url)} />
+        <div className="flex items-center gap-3 rounded-xl border border-border p-3">
+          <Switch
+            id="show_contact_button"
+            checked={form.show_contact_button}
+            onCheckedChange={(v) => set("show_contact_button", v)}
+          />
+          <Label htmlFor="show_contact_button">{t("profileEditor.showContact")}</Label>
+        </div>
+
       </section>
 
       <section className="animate-soft-in space-y-4 rounded-2xl border border-border bg-card p-5 shadow-soft" style={{ animationDelay: "60ms" }}>
