@@ -41,6 +41,20 @@ export default function Landing() {
 
   return (
     <div className="min-h-dvh bg-background">
+      <Seo
+        title="OSHEGAH — smart NFC business cards & digital profiles"
+        description="Share your identity in one tap. OSHEGAH pairs premium NFC cards with a permanent digital profile, QR code and analytics."
+        path="/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: "OSHEGAH Smart NFC Card",
+          description:
+            "Premium NFC business card linked to a permanent OSHEGAH digital profile with QR sharing and visitor analytics.",
+          url: "https://oshegah.com/",
+          brand: { "@type": "Brand", name: "OSHEGAH" },
+        }}
+      />
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-5 py-4">
           <Wordmark />
