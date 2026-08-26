@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { THEME_LIST, BUTTON_STYLES } from "@/lib/themes";
 import { normalizeUsername, validateUsername, RESERVED_USERNAMES } from "@/lib/links";
 import type { CustomerRow } from "@/hooks/useOshegah";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n";
 
 export interface ProfileEditorProps {
   customer: CustomerRow | null;
@@ -66,7 +68,9 @@ export function ProfileEditor({
 }: ProfileEditorProps) {
   const [form, setForm] = useState<FormState>(() => toForm(customer));
   const [saving, setSaving] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
   const qc = useQueryClient();
+  const { t } = useI18n();
 
   useEffect(() => {
     setForm(toForm(customer));
@@ -79,8 +83,8 @@ export function ProfileEditor({
     const username = normalizeUsername(form.username);
     const usernameError = validateUsername(username);
     if (usernameError) return toast.error(usernameError);
-    if (RESERVED_USERNAMES.has(username)) return toast.error("That username is reserved.");
-    if (!form.full_name.trim()) return toast.error("Please add a display name.");
+    if (RESERVED_USERNAMES.has(username)) return toast.error(t("profileEditor.reserved"));
+    if (!form.full_name.trim()) return toast.error(t("profileEditor.nameRequired"));
 
     setSaving(true);
     const payload = {
@@ -113,68 +117,71 @@ export function ProfileEditor({
     setSaving(false);
 
     if (error) {
-      toast.error(
-        error.code === "23505" ? "That username is already taken." : error.message,
-      );
+      toast.error(error.code === "23505" ? t("profileEditor.usernameTaken") : error.message);
       return;
     }
-    toast.success(customer ? "Profile updated." : "Profile created.");
+    setJustSaved(true);
+    window.setTimeout(() => setJustSaved(false), 1800);
+    toast.success(customer ? t("profileEditor.updated") : t("profileEditor.created"));
     await qc.invalidateQueries();
     onSaved?.(data as CustomerRow);
   };
 
   return (
     <div className="space-y-8">
-      <section className="space-y-4 rounded-2xl border border-border bg-card p-5 shadow-soft">
-        <h2 className="font-display text-lg font-semibold">Profile details</h2>
+      <section className="animate-soft-in space-y-4 rounded-2xl border border-border bg-card p-5 shadow-soft">
+        <h2 className="font-display text-lg font-semibold">{t("profileEditor.details")}</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">{t("profileEditor.username")}</Label>
             <Input
               id="username"
+              dir="ltr"
               value={form.username}
               onChange={(e) => set("username", normalizeUsername(e.target.value))}
-              placeholder="yourname"
+              placeholder={t("profileEditor.usernamePlaceholder")}
             />
-            <p className="text-xs text-muted-foreground">oshegah.com/{form.username || "yourname"}</p>
+            <p className="text-xs text-muted-foreground" dir="ltr">
+              oshegah.com/{form.username || "yourname"}
+            </p>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="full_name">Display name</Label>
+            <Label htmlFor="full_name">{t("profileEditor.displayName")}</Label>
             <Input id="full_name" value={form.full_name} onChange={(e) => set("full_name", e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="job_title">Job title</Label>
+            <Label htmlFor="job_title">{t("profileEditor.jobTitle")}</Label>
             <Input id="job_title" value={form.job_title} onChange={(e) => set("job_title", e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="location">Location</Label>
+            <Label htmlFor="location">{t("profileEditor.location")}</Label>
             <Input id="location" value={form.location} onChange={(e) => set("location", e.target.value)} />
           </div>
           <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="bio">Bio</Label>
+            <Label htmlFor="bio">{t("profileEditor.bio")}</Label>
             <Textarea id="bio" rows={3} value={form.bio} onChange={(e) => set("bio", e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="phone">Phone</Label>
-            <Input id="phone" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+            <Label htmlFor="phone">{t("profileEditor.phone")}</Label>
+            <Input id="phone" dir="ltr" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
+            <Label htmlFor="email">{t("profileEditor.email")}</Label>
+            <Input id="email" dir="ltr" type="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="website">Website</Label>
-            <Input id="website" value={form.website} onChange={(e) => set("website", e.target.value)} />
+            <Label htmlFor="website">{t("profileEditor.website")}</Label>
+            <Input id="website" dir="ltr" value={form.website} onChange={(e) => set("website", e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="avatar_url">Photo URL</Label>
-            <Input id="avatar_url" value={form.avatar_url} onChange={(e) => set("avatar_url", e.target.value)} />
+            <Label htmlFor="avatar_url">{t("profileEditor.photoUrl")}</Label>
+            <Input id="avatar_url" dir="ltr" value={form.avatar_url} onChange={(e) => set("avatar_url", e.target.value)} />
           </div>
         </div>
       </section>
 
-      <section className="space-y-4 rounded-2xl border border-border bg-card p-5 shadow-soft">
-        <h2 className="font-display text-lg font-semibold">Appearance</h2>
+      <section className="animate-soft-in space-y-4 rounded-2xl border border-border bg-card p-5 shadow-soft" style={{ animationDelay: "60ms" }}>
+        <h2 className="font-display text-lg font-semibold">{t("profileEditor.appearance")}</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {THEME_LIST.map((theme) => (
             <button
@@ -182,7 +189,7 @@ export function ProfileEditor({
               type="button"
               onClick={() => set("theme", theme.id)}
               className={cn(
-                "rounded-xl border p-3 text-left transition-colors",
+                "card-interactive rounded-xl border p-3 text-start",
                 form.theme === theme.id ? "border-primary ring-2 ring-primary/25" : "border-border",
               )}
             >
@@ -210,11 +217,11 @@ export function ProfileEditor({
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="primary_color">Accent color</Label>
+            <Label htmlFor="primary_color">{t("profileEditor.accentColor")}</Label>
             <Input id="primary_color" type="color" value={form.primary_color} onChange={(e) => set("primary_color", e.target.value)} className="h-10 w-20 p-1" />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="text_color">Text color</Label>
+            <Label htmlFor="text_color">{t("profileEditor.textColor")}</Label>
             <Input id="text_color" type="color" value={form.text_color} onChange={(e) => set("text_color", e.target.value)} className="h-10 w-20 p-1" />
           </div>
         </div>
@@ -223,16 +230,24 @@ export function ProfileEditor({
       <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-soft">
         <div className="flex items-center gap-3">
           <Switch id="active" checked={form.active} onCheckedChange={(v) => set("active", v)} />
-          <Label htmlFor="active">Published (publicly visible)</Label>
+          <Label htmlFor="active">{t("profileEditor.publishedLabel")}</Label>
         </div>
         {allowVerified && (
           <div className="flex items-center gap-3">
             <Switch id="verified" checked={form.verified} onCheckedChange={(v) => set("verified", v)} />
-            <Label htmlFor="verified">Verified badge</Label>
+            <Label htmlFor="verified">{t("profileEditor.verifiedLabel")}</Label>
           </div>
         )}
-        <Button onClick={save} disabled={saving}>
-          {saving ? "Saving…" : customer ? "Save changes" : "Create profile"}
+        <Button onClick={save} disabled={saving} className="hover-lift">
+          {saving && <Loader2 className="me-2 h-4 w-4 animate-spin" aria-hidden="true" />}
+          {!saving && justSaved && <Check className="me-2 h-4 w-4 animate-soft-in" aria-hidden="true" />}
+          {saving
+            ? t("common.saving")
+            : justSaved
+              ? t("common.saved")
+              : customer
+                ? t("common.save")
+                : t("profileEditor.createProfile")}
         </Button>
       </section>
     </div>
