@@ -7,6 +7,7 @@ import { ProfileView, PhoneFrame } from "@/components/ProfileView";
 import { Reveal } from "@/components/Reveal";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n";
+import { Seo } from "@/components/Seo";
 
 const demoCustomer = {
   username: "yahiahani",
