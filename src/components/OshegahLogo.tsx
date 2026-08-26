@@ -1,7 +1,7 @@
-import logoAsset from "@/assets/oshegah-logo.png.asset.json";
+import logoUrl from "@/assets/oshegah-logo.png";
 import { cn } from "@/lib/utils";
 
-export const OSHEGAH_LOGO_URL = logoAsset.url;
+export const OSHEGAH_LOGO_URL = logoUrl;
 
 /**
  * Official OSHEGAH mark. Never stretched — always square, aspect ratio preserved.
