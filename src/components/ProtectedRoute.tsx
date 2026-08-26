@@ -2,6 +2,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { PageLoader } from "@/components/states";
+import { useI18n } from "@/i18n";
 
 export function ProtectedRoute({
   children,
@@ -12,8 +13,9 @@ export function ProtectedRoute({
 }) {
   const { user, profile, isAdmin, loading } = useAuth();
   const location = useLocation();
+  const { t } = useI18n();
 
-  if (loading) return <PageLoader label="Checking your session…" />;
+  if (loading) return <PageLoader label={t("auth.checkingSession")} />;
   if (!user) return <Navigate to="/login" state={{ from: location.pathname }} replace />;
 
   if (area === "admin" && !isAdmin) {
