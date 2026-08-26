@@ -101,17 +101,22 @@ export type Database = {
         Row: {
           active: boolean
           avatar_url: string | null
+          background_color: string | null
           bio: string | null
           business_id: string | null
+          button_shadow: boolean
           button_style: string
           created_at: string
           email: string | null
+          font_style: string
           full_name: string
           id: string
           job_title: string | null
           location: string | null
+          muted_text_color: string | null
           phone: string | null
           primary_color: string
+          show_contact_button: boolean
           text_color: string
           theme: Database["public"]["Enums"]["profile_theme"]
           updated_at: string
@@ -123,17 +128,22 @@ export type Database = {
         Insert: {
           active?: boolean
           avatar_url?: string | null
+          background_color?: string | null
           bio?: string | null
           business_id?: string | null
+          button_shadow?: boolean
           button_style?: string
           created_at?: string
           email?: string | null
+          font_style?: string
           full_name: string
           id?: string
           job_title?: string | null
           location?: string | null
+          muted_text_color?: string | null
           phone?: string | null
           primary_color?: string
+          show_contact_button?: boolean
           text_color?: string
           theme?: Database["public"]["Enums"]["profile_theme"]
           updated_at?: string
@@ -145,17 +155,22 @@ export type Database = {
         Update: {
           active?: boolean
           avatar_url?: string | null
+          background_color?: string | null
           bio?: string | null
           business_id?: string | null
+          button_shadow?: boolean
           button_style?: string
           created_at?: string
           email?: string | null
+          font_style?: string
           full_name?: string
           id?: string
           job_title?: string | null
           location?: string | null
+          muted_text_color?: string | null
           phone?: string | null
           primary_color?: string
+          show_contact_button?: boolean
           text_color?: string
           theme?: Database["public"]["Enums"]["profile_theme"]
           updated_at?: string
@@ -269,16 +284,19 @@ export type Database = {
           created_at: string
           customer_id: string
           id: string
+          visitor_id: string | null
         }
         Insert: {
           created_at?: string
           customer_id: string
           id?: string
+          visitor_id?: string | null
         }
         Update: {
           created_at?: string
           customer_id?: string
           id?: string
+          visitor_id?: string | null
         }
         Relationships: [
           {
@@ -349,20 +367,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_leaderboard: {
+        Args: { _limit?: number; _since?: string }
+        Returns: {
+          avatar_url: string
+          full_name: string
+          rank: number
+          username: string
+          views: number
+        }[]
+      }
       get_public_profile: {
         Args: { _username: string }
         Returns: {
           active: boolean
           avatar_url: string
+          background_color: string
           bio: string
+          button_shadow: boolean
           button_style: string
           email: string
+          font_style: string
           full_name: string
           id: string
           job_title: string
           location: string
+          muted_text_color: string
           phone: string
           primary_color: string
+          show_contact_button: boolean
           text_color: string
           theme: Database["public"]["Enums"]["profile_theme"]
           username: string
@@ -381,6 +414,10 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       owns_business: { Args: { _business_id: string }; Returns: boolean }
       owns_customer: { Args: { _customer_id: string }; Returns: boolean }
+      record_profile_view: {
+        Args: { _customer_id: string; _visitor_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       account_type: "personal" | "business"
