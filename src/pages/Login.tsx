@@ -61,6 +61,9 @@ export default function Login() {
             {busy ? t("auth.signingIn") : t("auth.loginTitle")}
           </Button>
         </form>
+        <div className="mt-5">
+          <OAuthButtons />
+        </div>
         <p className="mt-5 text-center text-sm text-muted-foreground">
           {t("auth.noAccount")}{" "}
           <Link to="/signup" className="font-medium text-primary hover:underline">{t("auth.createOne")}</Link>

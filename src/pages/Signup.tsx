@@ -92,6 +92,9 @@ export default function Signup() {
             {busy ? t("auth.creating") : t("auth.createAccount")}
           </Button>
         </form>
+        <div className="mt-5">
+          <OAuthButtons />
+        </div>
         <p className="mt-5 text-center text-sm text-muted-foreground">
           {t("auth.haveAccount")}{" "}
           <Link to="/login" className="font-medium text-primary hover:underline">{t("auth.loginTitle")}</Link>
