@@ -349,6 +349,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_public_profile: {
+        Args: { _username: string }
+        Returns: {
+          active: boolean
+          avatar_url: string
+          bio: string
+          button_style: string
+          email: string
+          full_name: string
+          id: string
+          job_title: string
+          location: string
+          phone: string
+          primary_color: string
+          text_color: string
+          theme: Database["public"]["Enums"]["profile_theme"]
+          username: string
+          verified: boolean
+          website: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -356,6 +377,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_active_customer: { Args: { _customer_id: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
       owns_business: { Args: { _business_id: string }; Returns: boolean }
       owns_customer: { Args: { _customer_id: string }; Returns: boolean }
