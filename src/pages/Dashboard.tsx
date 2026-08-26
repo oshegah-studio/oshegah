@@ -1,29 +1,31 @@
 import { useState } from "react";
-import { BarChart3, Eye, LayoutDashboard, Link2, MousePointerClick, QrCode, Share2, User } from "lucide-react";
+import { BarChart3, Eye, LayoutDashboard, Link2, MousePointerClick, QrCode, User } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/DashboardShell";
 import { ProfileEditor } from "@/components/ProfileEditor";
 import { LinksEditor } from "@/components/LinksEditor";
 import { ProfileView, PhoneFrame } from "@/components/ProfileView";
-import { QrDialog, copyText } from "@/components/QrDialog";
+import { QrDialog, CopyButton } from "@/components/QrDialog";
 import { StatCard } from "@/components/StatCard";
-import { PageLoader, EmptyState } from "@/components/states";
+import { SkeletonCards, EmptyState } from "@/components/states";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyCustomer, useLinks, useCustomerStats } from "@/hooks/useOshegah";
 import { linkMeta } from "@/lib/links";
 import { profileUrlFor } from "@/lib/vcard";
-
-const navItems: NavItem[] = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
-];
+import { useI18n } from "@/i18n";
 
 export default function Dashboard() {
   const { profile } = useAuth();
+  const { t } = useI18n();
   const { data: customer, isLoading } = useMyCustomer();
   const { data: links } = useLinks(customer?.id);
   const { data: stats } = useCustomerStats(customer ? [customer.id] : []);
   const [qrOpen, setQrOpen] = useState(false);
+
+  const navItems: NavItem[] = [
+    { to: "/dashboard", label: t("common.dashboard"), icon: LayoutDashboard, end: true },
+  ];
 
   const url = customer ? profileUrlFor(customer.username) : "";
   const topLink = links?.find((l) => l.id === stats?.topLinkId);
@@ -31,52 +33,54 @@ export default function Dashboard() {
   return (
     <DashboardShell
       items={navItems}
-      areaLabel="Personal"
-      title={`Hi, ${profile?.full_name?.split(" ")[0] || "there"}`}
-      subtitle={customer ? url : "Create your digital card to get started."}
+      areaLabel={t("dashboard.areaPersonal")}
+      title={t("dashboard.greeting", { name: profile?.full_name?.split(" ")[0] || t("dashboard.there") })}
+      subtitle={customer ? url : t("dashboard.noProfileYet")}
       actions={
         customer && (
           <>
-            <Button variant="outline" onClick={() => copyText(url)}>
-              <Share2 className="mr-2 h-4 w-4" /> Copy link
-            </Button>
-            <Button onClick={() => setQrOpen(true)}>
-              <QrCode className="mr-2 h-4 w-4" /> QR code
+            <CopyButton value={url} label={t("common.copy")} copiedLabel={t("common.copied")} />
+            <Button onClick={() => setQrOpen(true)} className="hover-lift">
+              <QrCode className="me-2 h-4 w-4" /> {t("dashboard.qrCode")}
             </Button>
           </>
         )
       }
     >
       {isLoading ? (
-        <PageLoader label="Loading your card…" />
+        <SkeletonCards />
       ) : (
         <Tabs defaultValue={customer ? "overview" : "profile"}>
           <TabsList className="mb-6">
-            <TabsTrigger value="overview"><BarChart3 className="mr-2 h-4 w-4" />Overview</TabsTrigger>
-            <TabsTrigger value="profile"><User className="mr-2 h-4 w-4" />Profile</TabsTrigger>
-            <TabsTrigger value="links" disabled={!customer}><Link2 className="mr-2 h-4 w-4" />Links</TabsTrigger>
+            <TabsTrigger value="overview"><BarChart3 className="me-2 h-4 w-4" />{t("dashboard.overview")}</TabsTrigger>
+            <TabsTrigger value="profile"><User className="me-2 h-4 w-4" />{t("dashboard.profile")}</TabsTrigger>
+            <TabsTrigger value="links" disabled={!customer}><Link2 className="me-2 h-4 w-4" />{t("dashboard.links")}</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview">
+          <TabsContent value="overview" className="animate-soft-in">
             {!customer ? (
-              <EmptyState icon={User} title="No profile yet" description="Head to the Profile tab to create your card." />
+              <EmptyState icon={User} title={t("dashboard.emptyProfileTitle")} description={t("dashboard.emptyProfileText")} />
             ) : (
               <div className="grid gap-8 lg:grid-cols-[1fr_auto]">
                 <div className="space-y-4">
                   <div className="grid gap-4 sm:grid-cols-3">
-                    <StatCard label="Profile views" value={stats?.views ?? 0} icon={Eye} />
-                    <StatCard label="Link clicks" value={stats?.clicks ?? 0} icon={MousePointerClick} />
+                    <StatCard label={t("dashboard.profileViews")} value={stats?.views ?? 0} icon={Eye} />
+                    <StatCard label={t("dashboard.linkClicks")} value={stats?.clicks ?? 0} icon={MousePointerClick} />
                     <StatCard
-                      label="Top link"
-                      value={topLink ? topLink.title : "—"}
+                      label={t("dashboard.topLink")}
+                      value={topLink ? topLink.title : t("common.none")}
                       icon={Link2}
-                      hint={topLink ? `${stats?.clicksByLink[topLink.id] ?? 0} clicks` : "No clicks yet"}
+                      hint={
+                        topLink
+                          ? t("common.clicks", { count: stats?.clicksByLink[topLink.id] ?? 0 })
+                          : t("dashboard.noClicksYet")
+                      }
                     />
                   </div>
                   <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-                    <h2 className="font-display text-lg font-semibold">Clicks per link</h2>
+                    <h2 className="font-display text-lg font-semibold">{t("dashboard.clicksPerLink")}</h2>
                     <div className="mt-4 space-y-3">
-                      {(links ?? []).map((link) => {
+                      {links?.map((link) => {
                         const count = stats?.clicksByLink[link.id] ?? 0;
                         const max = Math.max(1, ...Object.values(stats?.clicksByLink ?? { x: 1 }));
                         const lm = linkMeta(link.type);
@@ -85,13 +89,18 @@ export default function Dashboard() {
                             <lm.icon className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
                             <span className="w-32 truncate text-sm">{link.title}</span>
                             <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
-                              <div className="h-full rounded-full bg-primary" style={{ width: `${(count / max) * 100}%` }} />
+                              <div
+                                className="h-full rounded-full bg-primary transition-[width] duration-500 ease-out"
+                                style={{ width: `${(count / max) * 100}%` }}
+                              />
                             </div>
-                            <span className="w-8 text-right text-sm tabular-nums text-muted-foreground">{count}</span>
+                            <span className="w-8 text-end text-sm tabular-nums text-muted-foreground">{count}</span>
                           </div>
                         );
                       })}
-                      {(links?.length ?? 0) === 0 && <p className="text-sm text-muted-foreground">No links yet.</p>}
+                      {(links?.length ?? 0) === 0 && (
+                        <p className="text-sm text-muted-foreground">{t("dashboard.noLinksYet")}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -102,11 +111,11 @@ export default function Dashboard() {
             )}
           </TabsContent>
 
-          <TabsContent value="profile">
+          <TabsContent value="profile" className="animate-soft-in">
             <ProfileEditor customer={customer ?? null} ownerProfileId={profile?.id} />
           </TabsContent>
 
-          <TabsContent value="links">
+          <TabsContent value="links" className="animate-soft-in">
             {customer && <LinksEditor customerId={customer.id} />}
           </TabsContent>
         </Tabs>

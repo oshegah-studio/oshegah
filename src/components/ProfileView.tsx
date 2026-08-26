@@ -1,6 +1,7 @@
 import { BadgeCheck, MapPin, ChevronRight, Download, Phone } from "lucide-react";
 import { getTheme, buttonRadius } from "@/lib/themes";
 import { linkMeta, buildLinkHref } from "@/lib/links";
+import { useI18n } from "@/i18n";
 
 export interface ProfileViewCustomer {
   id?: string;
@@ -40,6 +41,7 @@ const initials = (name: string) =>
   name.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
 
 export function ProfileView({ customer, links, onLinkClick, onSaveContact, compact }: Props) {
+  const { t } = useI18n();
   const theme = getTheme(customer.theme);
   const radius = buttonRadius(customer.button_style);
   const text = customer.text_color || theme.text;
@@ -48,15 +50,12 @@ export function ProfileView({ customer, links, onLinkClick, onSaveContact, compa
   const contactLink = customer.phone ? { href: `tel:${customer.phone.replace(/[^\d+]/g, "")}` } : null;
 
   return (
-    <div
-      className="min-h-full w-full"
-      style={{ background: theme.background, color: text }}
-    >
+    <div className="min-h-full w-full" style={{ background: theme.background, color: text }}>
       <div
         className={`mx-auto flex w-full max-w-md flex-col items-center ${compact ? "px-4 py-8" : "px-5 pb-14 pt-12 sm:pt-16"}`}
       >
         {/* Avatar */}
-        <div className="relative">
+        <div className="relative animate-soft-in">
           <div
             className="flex items-center justify-center overflow-hidden rounded-full"
             style={{
@@ -70,7 +69,7 @@ export function ProfileView({ customer, links, onLinkClick, onSaveContact, compa
             {customer.avatar_url ? (
               <img
                 src={customer.avatar_url}
-                alt={`${customer.full_name} profile photo`}
+                alt={t("publicProfile.photoAlt", { name: customer.full_name })}
                 width={compact ? 76 : 104}
                 height={compact ? 76 : 104}
                 loading="eager"
@@ -85,37 +84,44 @@ export function ProfileView({ customer, links, onLinkClick, onSaveContact, compa
           </div>
         </div>
 
-        {/* Name */}
+        {/* Name — customer content is never translated */}
         <h1
-          className={`mt-4 flex items-center gap-1.5 text-center font-display font-semibold ${compact ? "text-lg" : "text-2xl"}`}
+          className={`mt-4 flex animate-soft-in items-center gap-1.5 text-center font-display font-semibold ${compact ? "text-lg" : "text-2xl"}`}
+          style={{ animationDelay: "60ms" }}
         >
           {customer.full_name}
           {customer.verified && (
             <BadgeCheck
               className={compact ? "h-4 w-4" : "h-5 w-5"}
               style={{ color: accent }}
-              aria-label="Verified profile"
+              aria-label={t("publicProfile.verifiedProfile")}
             />
           )}
         </h1>
 
         {customer.job_title && (
-          <p className="mt-1 text-xs uppercase tracking-[0.18em]" style={{ color: theme.mutedText }}>
+          <p
+            className="mt-1 animate-soft-in text-xs uppercase tracking-[0.18em]"
+            style={{ color: theme.mutedText, animationDelay: "100ms" }}
+          >
             {customer.job_title}
           </p>
         )}
 
         {customer.bio && (
           <p
-            className={`mt-2 max-w-xs text-center ${compact ? "text-xs" : "text-sm"} leading-relaxed`}
-            style={{ color: theme.mutedText }}
+            className={`mt-2 max-w-xs animate-soft-in text-center ${compact ? "text-xs" : "text-sm"} leading-relaxed`}
+            style={{ color: theme.mutedText, animationDelay: "140ms" }}
           >
             {customer.bio}
           </p>
         )}
 
         {customer.location && (
-          <p className="mt-2 flex items-center gap-1 text-xs" style={{ color: theme.mutedText }}>
+          <p
+            className="mt-2 flex animate-soft-in items-center gap-1 text-xs"
+            style={{ color: theme.mutedText, animationDelay: "170ms" }}
+          >
             <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
             {customer.location}
           </p>
@@ -123,7 +129,7 @@ export function ProfileView({ customer, links, onLinkClick, onSaveContact, compa
 
         {/* Links */}
         <div className="mt-7 flex w-full flex-col gap-3">
-          {enabled.map((link) => {
+          {enabled.map((link, index) => {
             const meta = linkMeta(link.type);
             const Icon = meta.icon;
             const href = buildLinkHref(link.type, link.value);
@@ -135,13 +141,14 @@ export function ProfileView({ customer, links, onLinkClick, onSaveContact, compa
                 target={external ? "_blank" : undefined}
                 rel={external ? "noopener noreferrer" : undefined}
                 onClick={() => onLinkClick?.(link)}
-                className="group flex min-h-[56px] items-center gap-3 px-4 py-3.5 transition-transform duration-200 active:scale-[0.985] sm:hover:-translate-y-0.5"
+                className="group flex min-h-[56px] animate-soft-in items-center gap-3 px-4 py-3.5 transition-transform duration-200 active:scale-[0.985] sm:hover:-translate-y-0.5"
                 style={{
                   borderRadius: radius,
                   background: theme.surface,
                   border: `1px solid ${theme.surfaceBorder}`,
                   backdropFilter: theme.blur ? "blur(14px)" : undefined,
                   color: text,
+                  animationDelay: `${180 + Math.min(index, 10) * 45}ms`,
                 }}
               >
                 <span
@@ -151,14 +158,17 @@ export function ProfileView({ customer, links, onLinkClick, onSaveContact, compa
                   <Icon className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <span className="flex-1 truncate text-sm font-medium">{link.title || meta.label}</span>
-                <ChevronRight className="h-4 w-4 opacity-40" aria-hidden="true" />
+                <ChevronRight
+                  className="h-4 w-4 opacity-40 transition-transform duration-200 group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
+                  aria-hidden="true"
+                />
               </a>
             );
           })}
 
           {enabled.length === 0 && (
             <p className="py-6 text-center text-sm" style={{ color: theme.mutedText }}>
-              No links yet.
+              {t("publicProfile.noLinks")}
             </p>
           )}
         </div>
@@ -168,17 +178,17 @@ export function ProfileView({ customer, links, onLinkClick, onSaveContact, compa
           {contactLink && (
             <a
               href={contactLink.href}
-              className="flex min-h-[52px] items-center justify-center gap-2 text-sm font-semibold transition-transform active:scale-[0.985]"
+              className="flex min-h-[52px] items-center justify-center gap-2 text-sm font-semibold transition-transform active:scale-[0.985] sm:hover:-translate-y-0.5"
               style={{ borderRadius: radius, background: accent, color: theme.id === "oshegah_light" || theme.id === "minimal" ? "#FFFFFF" : "#162446" }}
             >
               <Phone className="h-4 w-4" aria-hidden="true" />
-              Contact Me
+              {t("publicProfile.contactMe")}
             </a>
           )}
           <button
             type="button"
             onClick={onSaveContact}
-            className="flex min-h-[52px] items-center justify-center gap-2 text-sm font-semibold transition-transform active:scale-[0.985]"
+            className="flex min-h-[52px] items-center justify-center gap-2 text-sm font-semibold transition-transform active:scale-[0.985] sm:hover:-translate-y-0.5"
             style={{
               borderRadius: radius,
               background: "transparent",
@@ -187,12 +197,12 @@ export function ProfileView({ customer, links, onLinkClick, onSaveContact, compa
             }}
           >
             <Download className="h-4 w-4" aria-hidden="true" />
-            Save Contact
+            {t("publicProfile.saveContact")}
           </button>
         </div>
 
         <p className="mt-10 text-[0.68rem] uppercase tracking-[0.24em]" style={{ color: theme.mutedText }}>
-          Powered by OSHEGAH
+          {t("brand.poweredBy")}
         </p>
       </div>
     </div>

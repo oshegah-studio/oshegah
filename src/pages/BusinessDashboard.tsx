@@ -16,14 +16,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyBusiness, useBusinessProfiles, useCustomerStats, type CustomerRow } from "@/hooks/useOshegah";
 import { profileUrlFor } from "@/lib/vcard";
-
-const navItems: NavItem[] = [
-  { to: "/business", label: "Business", icon: LayoutDashboard, end: true },
-];
+import { useI18n } from "@/i18n";
 
 export default function BusinessDashboard() {
   const { profile } = useAuth();
   const qc = useQueryClient();
+  const { t } = useI18n();
   const { data: business, isLoading } = useMyBusiness();
   const { data: members } = useBusinessProfiles(business?.id);
   const { data: stats } = useCustomerStats((members ?? []).map((m) => m.id));
@@ -32,74 +30,93 @@ export default function BusinessDashboard() {
   const [creating, setCreating] = useState(false);
   const [qrFor, setQrFor] = useState<CustomerRow | null>(null);
 
+  const navItems: NavItem[] = [
+    { to: "/business", label: t("dashboard.areaBusiness"), icon: LayoutDashboard, end: true },
+  ];
+
   const createBusiness = async () => {
-    if (!name.trim() || !profile?.id) return toast.error("Enter a business name.");
+    if (!name.trim() || !profile?.id) return toast.error(t("business.nameRequired"));
     const { error } = await supabase.from("businesses").insert({ name: name.trim(), owner_id: profile.id });
     if (error) return toast.error(error.message);
-    toast.success("Business created.");
+    toast.success(t("business.created"));
     qc.invalidateQueries({ queryKey: ["my-business"] });
   };
 
-  if (isLoading) return <PageLoader label="Loading your business…" />;
+  if (isLoading) return <PageLoader label={t("business.loading")} />;
 
   if (!business) {
     return (
-      <DashboardShell items={navItems} areaLabel="Business" title="Set up your business">
-        <div className="max-w-md space-y-4 rounded-2xl border border-border bg-card p-6 shadow-soft">
+      <DashboardShell items={navItems} areaLabel={t("dashboard.areaBusiness")} title={t("business.setupTitle")}>
+        <div className="max-w-md animate-soft-in space-y-4 rounded-2xl border border-border bg-card p-6 shadow-soft">
           <div className="space-y-1.5">
-            <Label htmlFor="biz">Business name</Label>
+            <Label htmlFor="biz">{t("business.nameLabel")}</Label>
             <Input id="biz" value={name} onChange={(e) => setName(e.target.value)} placeholder="OSHEGAH Studio" />
           </div>
-          <Button onClick={createBusiness}><Building2 className="mr-2 h-4 w-4" /> Create business</Button>
+          <Button onClick={createBusiness} className="hover-lift">
+            <Building2 className="me-2 h-4 w-4" /> {t("business.createBusiness")}
+          </Button>
         </div>
       </DashboardShell>
     );
   }
 
   const editing = creating || selected;
+  const count = members?.length ?? 0;
 
   return (
     <DashboardShell
       items={navItems}
-      areaLabel="Business"
+      areaLabel={t("dashboard.areaBusiness")}
       title={business.name}
-      subtitle={`${members?.length ?? 0} team profile${members?.length === 1 ? "" : "s"}`}
+      subtitle={count === 1 ? t("business.profilesCountOne") : t("business.profilesCount", { count })}
       actions={
-        <Button onClick={() => { setSelected(null); setCreating(true); }}>
-          <Plus className="mr-2 h-4 w-4" /> New profile
+        <Button className="hover-lift" onClick={() => { setSelected(null); setCreating(true); }}>
+          <Plus className="me-2 h-4 w-4" /> {t("business.newProfile")}
         </Button>
       }
     >
       <Tabs value={editing ? "editor" : "team"} onValueChange={(v) => { if (v === "team") { setCreating(false); setSelected(null); } }}>
         <TabsList className="mb-6">
-          <TabsTrigger value="team"><Users className="mr-2 h-4 w-4" />Team</TabsTrigger>
-          <TabsTrigger value="editor" disabled={!editing}>Editor</TabsTrigger>
+          <TabsTrigger value="team"><Users className="me-2 h-4 w-4" />{t("business.team")}</TabsTrigger>
+          <TabsTrigger value="editor" disabled={!editing}>{t("business.editor")}</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="team" className="space-y-6">
+        <TabsContent value="team" className="animate-soft-in space-y-6">
           <div className="grid gap-4 sm:grid-cols-3">
-            <StatCard label="Team profiles" value={members?.length ?? 0} icon={Users} />
-            <StatCard label="Profile views" value={stats?.views ?? 0} icon={Eye} />
-            <StatCard label="Link clicks" value={stats?.clicks ?? 0} icon={MousePointerClick} />
+            <StatCard label={t("business.teamProfiles")} value={count} icon={Users} />
+            <StatCard label={t("dashboard.profileViews")} value={stats?.views ?? 0} icon={Eye} />
+            <StatCard label={t("dashboard.linkClicks")} value={stats?.clicks ?? 0} icon={MousePointerClick} />
           </div>
 
-          {(members?.length ?? 0) === 0 ? (
+          {count === 0 ? (
             <EmptyState
               icon={Users}
-              title="No team profiles yet"
-              description="Create a card for each team member."
-              action={{ label: "New profile", onClick: () => setCreating(true) }}
+              title={t("business.emptyTitle")}
+              description={t("business.emptyText")}
+              action={{ label: t("business.newProfile"), onClick: () => setCreating(true) }}
             />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">
-              {members!.map((m) => (
-                <div key={m.id} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+              {members!.map((m, i) => (
+                <div
+                  key={m.id}
+                  className="card-interactive animate-soft-in rounded-2xl border border-border bg-card p-5 shadow-soft"
+                  style={{ animationDelay: `${Math.min(i, 8) * 45}ms` }}
+                >
                   <p className="font-display text-base font-semibold">{m.full_name}</p>
-                  <p className="text-sm text-muted-foreground">/{m.username} · {m.active ? "Published" : "Draft"}</p>
+                  <p className="text-sm text-muted-foreground">
+                    <span dir="ltr">/{m.username}</span> · {m.active ? t("common.published") : t("common.draft")}
+                  </p>
                   <div className="mt-4 flex flex-wrap gap-2">
-                    <Button size="sm" variant="outline" onClick={() => { setCreating(false); setSelected(m); }}>Edit</Button>
-                    <Button size="sm" variant="ghost" onClick={() => copyText(profileUrlFor(m.username))}>Copy link</Button>
-                    <Button size="sm" variant="ghost" onClick={() => setQrFor(m)}><QrCode className="h-4 w-4" /></Button>
+                    <Button size="sm" variant="outline" onClick={() => { setCreating(false); setSelected(m); }}>
+                      {t("common.edit")}
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => copyText(profileUrlFor(m.username), t("common.copied"))}>
+                      {t("common.copy")}
+                    </Button>
+                    <Button size="sm" variant="ghost" aria-label={t("dashboard.qrCode")} onClick={() => setQrFor(m)}>
+                      <QrCode className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -107,7 +124,7 @@ export default function BusinessDashboard() {
           )}
         </TabsContent>
 
-        <TabsContent value="editor" className="space-y-8">
+        <TabsContent value="editor" className="animate-soft-in space-y-8">
           <ProfileEditor
             key={selected?.id ?? "new"}
             customer={selected}

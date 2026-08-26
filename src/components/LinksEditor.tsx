@@ -10,17 +10,24 @@ import { Switch } from "@/components/ui/switch";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { EmptyState, InlineLoader } from "@/components/states";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { EmptyState, SkeletonRows } from "@/components/states";
 import { LINK_TYPE_LIST, linkMeta, type LinkType } from "@/lib/links";
 import { useLinks, type LinkRow } from "@/hooks/useOshegah";
+import { useI18n } from "@/i18n";
 
 export function LinksEditor({ customerId }: { customerId: string }) {
   const { data: links, isLoading } = useLinks(customerId);
   const qc = useQueryClient();
+  const { t } = useI18n();
   const [type, setType] = useState<LinkType>("whatsapp");
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
   const [busy, setBusy] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<LinkRow | null>(null);
 
   const meta = linkMeta(type);
   const refresh = () => qc.invalidateQueries({ queryKey: ["links", customerId] });
@@ -40,7 +47,7 @@ export function LinksEditor({ customerId }: { customerId: string }) {
     if (dbError) return toast.error(dbError.message);
     setTitle("");
     setValue("");
-    toast.success("Link added.");
+    toast.success(t("linksEditor.added"));
     refresh();
   };
 
@@ -53,7 +60,7 @@ export function LinksEditor({ customerId }: { customerId: string }) {
   const remove = async (link: LinkRow) => {
     const { error } = await supabase.from("links").delete().eq("id", link.id);
     if (error) return toast.error(error.message);
-    toast.success("Link removed.");
+    toast.success(t("linksEditor.removed"));
     refresh();
   };
 
@@ -70,14 +77,14 @@ export function LinksEditor({ customerId }: { customerId: string }) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <section className="space-y-4 rounded-2xl border border-border bg-card p-5 shadow-soft">
-        <h2 className="font-display text-lg font-semibold">Add a link</h2>
+        <h2 className="font-display text-lg font-semibold">{t("linksEditor.addTitle")}</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-1.5">
-            <Label>Type</Label>
+            <Label htmlFor="link-type">{t("linksEditor.type")}</Label>
             <Select value={type} onValueChange={(v) => setType(v as LinkType)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger id="link-type"><SelectValue /></SelectTrigger>
               <SelectContent className="max-h-72">
                 {LINK_TYPE_LIST.map((l) => (
                   <SelectItem key={l.type} value={l.type}>{l.label}</SelectItem>
@@ -86,58 +93,86 @@ export function LinksEditor({ customerId }: { customerId: string }) {
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="link-title">Label</Label>
+            <Label htmlFor="link-title">{t("linksEditor.label")}</Label>
             <Input id="link-title" value={title} placeholder={meta.label} onChange={(e) => setTitle(e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="link-value">Value</Label>
+            <Label htmlFor="link-value">{t("linksEditor.value")}</Label>
             <Input id="link-value" value={value} placeholder={meta.placeholder} onChange={(e) => setValue(e.target.value)} />
             <p className="text-xs text-muted-foreground">{meta.hint}</p>
           </div>
         </div>
         <Button onClick={add} disabled={busy}>
-          <Plus className="mr-2 h-4 w-4" /> Add link
+          <Plus className="me-2 h-4 w-4" /> {busy ? t("common.saving") : t("linksEditor.addLink")}
         </Button>
       </section>
 
       <section className="space-y-3">
-        {isLoading && <InlineLoader label="Loading links…" />}
+        {isLoading && <SkeletonRows count={3} />}
         {!isLoading && (links?.length ?? 0) === 0 && (
-          <EmptyState icon={Link2} title="No links yet" description="Add your first link above to start sharing." />
+          <EmptyState icon={Link2} title={t("linksEditor.emptyTitle")} description={t("linksEditor.emptyText")} />
         )}
         {links?.map((link, index) => {
           const lm = linkMeta(link.type);
           return (
-            <div key={link.id} className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-soft">
+            <div
+              key={link.id}
+              className="card-interactive flex animate-soft-in flex-wrap items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-soft"
+              style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}
+            >
               <span className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: `${lm.tint}22`, color: lm.tint }}>
                 <lm.icon className="h-4 w-4" aria-hidden="true" />
               </span>
               <div className="min-w-[160px] flex-1">
                 <Input
                   value={link.title}
+                  aria-label={t("linksEditor.label")}
                   onChange={(e) => update(link, { title: e.target.value })}
                   className="h-8 border-0 px-0 font-medium shadow-none focus-visible:ring-0"
                 />
                 <Input
                   value={link.value}
+                  aria-label={t("linksEditor.value")}
                   onChange={(e) => update(link, { value: e.target.value })}
                   className="h-7 border-0 px-0 text-xs text-muted-foreground shadow-none focus-visible:ring-0"
                 />
               </div>
-              <Switch checked={link.enabled} onCheckedChange={(v) => update(link, { enabled: v })} aria-label="Enable link" />
-              <Button variant="ghost" size="icon" aria-label="Move up" disabled={index === 0} onClick={() => move(index, -1)}>
+              <Switch checked={link.enabled} onCheckedChange={(v) => update(link, { enabled: v })} aria-label={t("linksEditor.enableLink")} />
+              <Button variant="ghost" size="icon" aria-label={t("linksEditor.moveUp")} disabled={index === 0} onClick={() => move(index, -1)}>
                 <ArrowUp className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" aria-label="Move down" disabled={index === (links.length - 1)} onClick={() => move(index, 1)}>
+              <Button variant="ghost" size="icon" aria-label={t("linksEditor.moveDown")} disabled={index === (links.length - 1)} onClick={() => move(index, 1)}>
                 <ArrowDown className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" aria-label="Delete link" onClick={() => remove(link)}>
+              <Button variant="ghost" size="icon" aria-label={t("linksEditor.deleteLink")} onClick={() => setPendingDelete(link)}>
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
             </div>
           );
         })}
       </section>
+
+      <AlertDialog open={Boolean(pendingDelete)} onOpenChange={(v) => !v && setPendingDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("linksEditor.deleteConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("linksEditor.deleteConfirmText", { title: pendingDelete?.title ?? "" })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (pendingDelete) void remove(pendingDelete);
+                setPendingDelete(null);
+              }}
+            >
+              {t("common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
