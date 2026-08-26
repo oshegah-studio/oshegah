@@ -10,6 +10,7 @@ import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n";
+import { Seo } from "@/components/Seo";
 
 export default function Login() {
   const { user, profile, isAdmin } = useAuth();
