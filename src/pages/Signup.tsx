@@ -11,6 +11,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n";
+import { Seo } from "@/components/Seo";
 
 export default function Signup() {
   const { user, profile, isAdmin } = useAuth();
