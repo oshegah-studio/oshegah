@@ -115,9 +115,14 @@ export default function Landing() {
               </div>
             </div>
             <div className="animate-soft-in" style={{ animationDelay: "300ms" }}>
-              <PhoneFrame>
-                <ProfileView customer={demoCustomer} links={demoLinks} compact />
-              </PhoneFrame>
+              <OshegahCard name={demoCustomer.full_name} username={demoCustomer.username} />
+              <div className="mt-6 flex justify-center">
+                <Button asChild variant="ghost" className="text-white/80 hover:bg-white/10 hover:text-white">
+                  <Link to="/leaderboard">{t("leaderboard.viewTop")}</Link>
+                </Button>
+              </div>
+            </div>
+
             </div>
           </div>
         </section>
