@@ -41,6 +41,11 @@ type FormState = {
   text_color: string;
   active: boolean;
   verified: boolean;
+  show_contact_button: boolean;
+  background_color: string;
+  muted_text_color: string;
+  button_shadow: boolean;
+  font_style: string;
 };
 
 const toForm = (c: CustomerRow | null): FormState => ({
@@ -59,7 +64,19 @@ const toForm = (c: CustomerRow | null): FormState => ({
   text_color: c?.text_color ?? "#FFFFFF",
   active: c?.active ?? true,
   verified: c?.verified ?? false,
+  show_contact_button: c?.show_contact_button ?? true,
+  background_color: c?.background_color ?? "",
+  muted_text_color: c?.muted_text_color ?? "",
+  button_shadow: c?.button_shadow ?? false,
+  font_style: c?.font_style ?? "default",
 });
+
+const previewLinks = [
+  { id: "preview-1", type: "whatsapp", title: "WhatsApp", value: "+201000000000", enabled: true },
+  { id: "preview-2", type: "website", title: "Website", value: "https://oshegah.com", enabled: true },
+];
+
+
 
 export function ProfileEditor({
   customer,
