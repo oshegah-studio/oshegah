@@ -30,5 +30,28 @@ export function ProtectedRoute({
     return <Navigate to="/business" replace />;
   }
 
-  return <>{children}</>;
+  const seo = {
+    personal: {
+      path: "/dashboard",
+      title: "My dashboard — OSHEGAH",
+      description: "Manage your OSHEGAH digital profile, links, QR code and visitor analytics.",
+    },
+    business: {
+      path: "/business",
+      title: "Business workspace — OSHEGAH",
+      description: "Manage your team's OSHEGAH profiles, NFC cards and shared analytics.",
+    },
+    admin: {
+      path: "/admin",
+      title: "Admin console — OSHEGAH",
+      description: "Administer OSHEGAH accounts, profiles and platform analytics.",
+    },
+  }[area];
+
+  return (
+    <>
+      <Seo title={seo.title} description={seo.description} path={seo.path} noindex />
+      {children}
+    </>
+  );
 }
