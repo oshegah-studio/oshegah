@@ -39,7 +39,10 @@
 
     --radius: 1rem;
 
-    /* brand */
+    /* brand — OSHEGAH core palette: navy #162446 / sky #BEE3F0 / white #FFFFFF */
+    --oshegah-navy: 222 52% 18%;
+    --oshegah-blue: 196 62% 84%;
+    --oshegah-white: 0 0% 100%;
     --navy: 222 52% 18%;
     --navy-deep: 222 54% 11%;
     --sky: 196 62% 84%;
