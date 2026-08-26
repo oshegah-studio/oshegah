@@ -39,19 +39,17 @@ export default function PublicProfile() {
     if (data?.customer) void recordProfileView(data.customer.id);
   }, [data?.customer?.id]);
 
-  useEffect(() => {
-    if (!data?.customer) return;
-    const c = data.customer;
-    document.title = `${c.full_name} — OSHEGAH`;
-    const desc = c.bio || `${c.full_name}${c.job_title ? ` · ${c.job_title}` : ""} on OSHEGAH.`;
-    document.querySelector('meta[name="description"]')?.setAttribute("content", desc.slice(0, 155));
-  }, [data?.customer]);
-
   if (isLoading) return <PageLoader label={t("publicProfile.loading")} />;
 
   if (isError || !data) {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-background px-6 text-center">
+        <Seo
+          title="Profile not found — OSHEGAH"
+          description="This OSHEGAH profile is not available."
+          path={`/${username}`}
+          noindex
+        />
         <h1 className="animate-soft-in font-display text-2xl font-semibold">{t("publicProfile.notFound")}</h1>
         <p className="text-sm text-muted-foreground">{t("publicProfile.notFoundText", { username })}</p>
         <Link to="/" className="text-sm font-medium text-primary hover:underline">
