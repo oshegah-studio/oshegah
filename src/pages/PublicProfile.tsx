@@ -76,8 +76,28 @@ export default function PublicProfile() {
       profileUrl: profileUrlFor(customer.username),
     });
 
+  const profileDescription =
+    customer.bio || `${customer.full_name}${customer.job_title ? ` · ${customer.job_title}` : ""} on OSHEGAH.`;
+
   return (
     <main className="relative min-h-dvh">
+      <Seo
+        title={`${customer.full_name} — OSHEGAH`}
+        description={profileDescription}
+        path={`/${customer.username}`}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "ProfilePage",
+          url: profileUrlFor(customer.username),
+          mainEntity: {
+            "@type": "Person",
+            name: customer.full_name,
+            ...(customer.job_title ? { jobTitle: customer.job_title } : {}),
+            ...(customer.bio ? { description: customer.bio } : {}),
+            ...(customer.website ? { url: customer.website } : {}),
+          },
+        }}
+      />
       <div className="absolute end-4 top-4 z-10">
         <LanguageSwitcher tone="invert" compact />
       </div>
