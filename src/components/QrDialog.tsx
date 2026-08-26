@@ -1,18 +1,14 @@
 import { useEffect, useState } from "react";
-import QRCode from "qrcode";
 import { Check, Copy, Download, ExternalLink, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { OshegahLogo } from "@/components/OshegahLogo";
+import { renderBrandedQr } from "@/lib/qr";
 import { toast } from "sonner";
 import { useI18n } from "@/i18n";
 
 export async function renderQrDataUrl(url: string) {
-  return QRCode.toDataURL(url, {
-    width: 900,
-    margin: 2,
-    errorCorrectionLevel: "M",
-    color: { dark: "#162446", light: "#FFFFFF" },
-  });
+  return renderBrandedQr(url);
 }
 
 export function downloadDataUrl(dataUrl: string, filename: string) {
@@ -89,7 +85,7 @@ export function QrDialog({
   useEffect(() => {
     if (!open) return;
     let active = true;
-    renderQrDataUrl(url).then((d) => active && setDataUrl(d));
+    renderBrandedQr(url).then((d) => active && setDataUrl(d));
     return () => {
       active = false;
     };
@@ -97,26 +93,31 @@ export function QrDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
-          <DialogTitle>{t("qr.title")}</DialogTitle>
-          <DialogDescription className="break-all">{url}</DialogDescription>
+      <DialogContent className="w-[calc(100vw-2rem)] max-w-sm overflow-hidden">
+        <DialogHeader className="items-center text-center">
+          <OshegahLogo size={40} />
+          <DialogTitle className="mt-2 font-display tracking-[0.18em]">OSHEGAH</DialogTitle>
+          <DialogDescription className="break-all" dir="ltr">
+            {url}
+          </DialogDescription>
         </DialogHeader>
+
         <div className="flex justify-center rounded-2xl border border-border bg-white p-4">
           {dataUrl ? (
             <img
               src={dataUrl}
               alt={t("qr.alt", { username })}
-              className="h-56 w-56 animate-soft-in"
+              className="h-56 w-56 max-w-full animate-soft-in"
               loading="lazy"
             />
           ) : (
-            <div className="flex h-56 w-56 flex-col items-center justify-center gap-2 rounded-xl bg-muted text-sm text-muted-foreground">
+            <div className="flex h-56 w-56 max-w-full flex-col items-center justify-center gap-2 rounded-xl bg-muted text-sm text-muted-foreground">
               <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
               {t("qr.generating")}
             </div>
           )}
         </div>
+
         <div className="grid gap-2">
           <Button
             onClick={() => {
