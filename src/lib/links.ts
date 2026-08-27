@@ -64,9 +64,10 @@ export const LINK_TYPES: Record<LinkType, LinkTypeMeta> = {
   },
   email: {
     type: "email", label: "Email", icon: Mail, tint: "#EA4335",
-    placeholder: "you@example.com", hint: "Opens the mail app",
-    buildHref: (v) => `mailto:${v.trim()}`,
-    validate: (v) => (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? null : "Enter a valid email address"),
+    placeholder: "you@example.com", hint: "Opens Gmail on desktop, the mail app on mobile",
+    buildHref: (v) => buildEmailHref(v),
+    validate: (v) => (EMAIL_RE.test(v.trim()) ? null : "Enter a valid email address"),
+    normalize: (v) => v.trim(),
   },
   instagram: {
     type: "instagram", label: "Instagram", icon: Instagram, tint: "#E1306C",
