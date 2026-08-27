@@ -15,6 +15,8 @@ import BusinessDashboard from "./pages/BusinessDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import PublicProfile from "./pages/PublicProfile";
 import Leaderboard from "./pages/Leaderboard";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
