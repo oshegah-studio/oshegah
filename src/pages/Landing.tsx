@@ -72,7 +72,7 @@ export default function Landing() {
           />
           <div className="relative mx-auto grid w-full max-w-6xl items-center gap-12 px-5 py-16 lg:grid-cols-2 lg:py-24">
             <div>
-              <p className="eyebrow animate-soft-in text-sky/80">{t("brand.tagline")}</p>
+              <p className="eyebrow animate-soft-in text-sky/80">{t("brand.slogan")}</p>
               <h1
                 className="mt-4 animate-soft-in font-display text-4xl font-semibold leading-tight sm:text-5xl"
                 style={{ animationDelay: "80ms" }}
@@ -98,12 +98,12 @@ export default function Landing() {
                   asChild
                   className="border-white/25 bg-transparent text-white hover:bg-white/10 hover:text-white"
                 >
-                  <Link to="/yahiahani">{t("landing.seeLive")}</Link>
+                  <Link to={`/${topUsername}`}>{t("landing.seeLive")}</Link>
                 </Button>
               </div>
             </div>
             <div className="animate-soft-in" style={{ animationDelay: "300ms" }}>
-              <OshegahCard name={demoCustomer.full_name} username={demoCustomer.username} />
+              <OshegahCard />
               <div className="mt-6 flex justify-center">
                 <Button asChild variant="ghost" className="text-white/80 hover:bg-white/10 hover:text-white">
                   <Link to="/leaderboard">{t("leaderboard.viewTop")}</Link>
