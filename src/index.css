@@ -46,6 +46,9 @@
     --navy: 222 52% 18%;
     --navy-deep: 222 54% 11%;
     --sky: 196 62% 84%;
+    /* logo cyan — used on the physical card artwork */
+    --brand-cyan: 194 76% 45%;
+
 
     --surface-elevated: 0 0% 100%;
     --shadow-soft: 0 1px 2px hsl(222 52% 18% / 0.04), 0 8px 24px -12px hsl(222 52% 18% / 0.12);
