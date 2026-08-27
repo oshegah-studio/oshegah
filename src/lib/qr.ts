@@ -34,16 +34,20 @@ export async function renderBrandedQr(url: string, size = 1024): Promise<string>
 
   const logo = await loadLogo();
   if (logo) {
-    // Logo occupies ~19% of the QR — well inside the 30% recovery budget of level H.
-    const plate = Math.round(size * 0.24);
-    const inner = Math.round(size * 0.175);
+    /**
+     * The mark sits directly inside the modules — only a hairline knockout ring
+     * (no white box) keeps the edge crisp. ~20% coverage stays well within the
+     * 30% recovery budget of error-correction level H, so scanning is unaffected.
+     */
+    const inner = Math.round(size * 0.2);
+    const knockout = Math.round(inner * 1.06);
     const cx = size / 2;
     const cy = size / 2;
 
     ctx.save();
     ctx.fillStyle = "#FFFFFF";
     ctx.beginPath();
-    ctx.arc(cx, cy, plate / 2, 0, Math.PI * 2);
+    ctx.arc(cx, cy, knockout / 2, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
 
