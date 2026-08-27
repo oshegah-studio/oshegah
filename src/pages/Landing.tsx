@@ -147,14 +147,7 @@ export default function Landing() {
         </section>
       </main>
 
-      <footer className="border-t border-border py-8">
-        <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-3 px-5 text-sm text-muted-foreground sm:flex-row sm:justify-between">
-          <Wordmark />
-          <Link to="/leaderboard" className="hover:text-foreground">{t("leaderboard.title")}</Link>
-          <LanguageSwitcher />
-          <p>{t("landing.rights", { year: new Date().getFullYear() })}</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
