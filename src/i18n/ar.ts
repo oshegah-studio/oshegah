@@ -4,6 +4,7 @@ type DeepPartialSame<T> = { [K in keyof T]: T[K] extends object ? DeepPartialSam
 
 export const ar: DeepPartialSame<Dictionary> = {
   brand: {
+    slogan: "المس المستقبل",
     name: "OSHEGAH",
     home: "الصفحة الرئيسية لـ OSHEGAH",
     poweredBy: "بدعم من OSHEGAH",
@@ -229,8 +230,8 @@ export const ar: DeepPartialSame<Dictionary> = {
     signedOut: "سجّل الدخول مرة أخرى للرفع.",
   },
   card: {
-    tagline: "المس. شارك. تم.",
-    nfc: "NFC · QR · ملف تعريفي بدون تلامس",
+    tagline: "المس المستقبل",
+    nfc: "NFC · ملف تعريفي بدون تلامس",
   },
   leaderboard: {
     eyebrow: "المجتمع",
@@ -249,5 +250,37 @@ export const ar: DeepPartialSame<Dictionary> = {
     title: "404",
     text: "عذرًا! الصفحة غير موجودة",
     home: "العودة إلى الرئيسية",
+  },
+  footer: {
+    about: "بطاقات NFC ذكية وملف رقمي دائم لكل هوية.",
+    social: "التواصل الاجتماعي",
+    contact: "اتصل بنا",
+    legal: "قانوني",
+    privacy: "سياسة الخصوصية",
+    terms: "الشروط والأحكام",
+  },
+  legal: {
+    updated: "آخر تحديث: يتولى فريق أوشيجه تحديث هذه الصفحة.",
+    contactLine: "لديك سؤال؟ تواصل معنا عبر إنستجرام أو تيك توك أو الهاتف الموجود في التذييل.",
+    privacyTitle: "سياسة الخصوصية",
+    termsTitle: "الشروط والأحكام",
+    privacy: {
+      collectTitle: "ما الذي نجمعه",
+      collectText: "بيانات الحساب التي تقدمها (الاسم، البريد، الهاتف، محتوى الملف) والصور التي ترفعها لملفك.",
+      useTitle: "كيف نستخدمها",
+      useText: "نستخدم بياناتك لتشغيل ملفك في أوشيجه وعرضه لمن تشاركه معهم والحفاظ على أمان حسابك.",
+      analyticsTitle: "تحليلات الملف",
+      analyticsText: "نحسب الزيارات الفريدة ونقرات الروابط لتعرف أداء بطاقتك، ولا نكشف هوية الزوار لأصحاب الملفات.",
+      controlTitle: "تحكمك",
+      controlText: "يمكنك تعديل محتوى ملفك أو حذفه في أي وقت من لوحة التحكم، وطلب حذف حسابك.",
+    },
+    terms: {
+      accountTitle: "حسابك",
+      accountText: "أنت مسؤول عن دقة المعلومات في ملفك وعن الحفاظ على بيانات دخولك.",
+      contentTitle: "محتواك",
+      contentText: "تبقى ملكية ما تنشره لك. لا تنشر محتوى مخالفًا للقانون أو مضللًا أو منتهكًا للحقوق على ملف أوشيجه.",
+      serviceTitle: "الخدمة",
+      serviceText: "توفر أوشيجه بطاقات NFC وملفات رقمية مستضافة، وقد نحدّث المزايا بمرور الوقت لتحسين المنتج.",
+    },
   },
 };

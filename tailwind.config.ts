@@ -68,6 +68,7 @@ export default {
         sky: {
           DEFAULT: "hsl(var(--sky))",
         },
+        "brand-cyan": "hsl(var(--brand-cyan))",
       },
 
       fontFamily: {

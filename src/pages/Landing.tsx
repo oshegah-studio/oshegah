@@ -4,20 +4,15 @@ import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { OshegahCard } from "@/components/OshegahCard";
+import { SiteFooter } from "@/components/SiteFooter";
 import { Reveal } from "@/components/Reveal";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
+import { useLeaderboard } from "@/hooks/useOshegah";
 import { useI18n } from "@/i18n";
 import { Seo } from "@/components/Seo";
 
-const demoCustomer = {
-  username: "yahiahani",
-  full_name: "Yahia Hani",
-  job_title: "Founder, OSHEGAH",
-  bio: "One tap. Every way to reach me.",
-  location: "Cairo, Egypt",
-  verified: true,
-  theme: "oshegah_dark",
-};
+/** Fallback demo profile used only when the leaderboard is still empty. */
+const DEMO_USERNAME = "yahiahani";
 
 const features = [
   { icon: Nfc, key: "nfc" },
@@ -32,6 +27,8 @@ export default function Landing() {
   const { user, profile, isAdmin } = useAuth();
   const { t } = useI18n();
   const home = homeRouteFor(profile, isAdmin);
+  const { data: topProfiles } = useLeaderboard(1);
+  const topUsername = topProfiles?.[0]?.username ?? DEMO_USERNAME;
 
   return (
     <div className="min-h-dvh bg-background">
@@ -77,7 +74,7 @@ export default function Landing() {
           />
           <div className="relative mx-auto grid w-full max-w-6xl items-center gap-12 px-5 py-16 lg:grid-cols-2 lg:py-24">
             <div>
-              <p className="eyebrow animate-soft-in text-sky/80">{t("brand.tagline")}</p>
+              <p className="eyebrow animate-soft-in text-sky/80">{t("brand.slogan")}</p>
               <h1
                 className="mt-4 animate-soft-in font-display text-4xl font-semibold leading-tight sm:text-5xl"
                 style={{ animationDelay: "80ms" }}
@@ -103,12 +100,12 @@ export default function Landing() {
                   asChild
                   className="border-white/25 bg-transparent text-white hover:bg-white/10 hover:text-white"
                 >
-                  <Link to="/yahiahani">{t("landing.seeLive")}</Link>
+                  <Link to={`/${topUsername}`}>{t("landing.seeLive")}</Link>
                 </Button>
               </div>
             </div>
             <div className="animate-soft-in" style={{ animationDelay: "300ms" }}>
-              <OshegahCard name={demoCustomer.full_name} username={demoCustomer.username} />
+              <OshegahCard />
               <div className="mt-6 flex justify-center">
                 <Button asChild variant="ghost" className="text-white/80 hover:bg-white/10 hover:text-white">
                   <Link to="/leaderboard">{t("leaderboard.viewTop")}</Link>
@@ -152,14 +149,7 @@ export default function Landing() {
         </section>
       </main>
 
-      <footer className="border-t border-border py-8">
-        <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-3 px-5 text-sm text-muted-foreground sm:flex-row sm:justify-between">
-          <Wordmark />
-          <Link to="/leaderboard" className="hover:text-foreground">{t("leaderboard.title")}</Link>
-          <LanguageSwitcher />
-          <p>{t("landing.rights", { year: new Date().getFullYear() })}</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 export const en = {
   brand: {
+    slogan: "Touch The Future",
     name: "OSHEGAH",
     home: "OSHEGAH home",
     poweredBy: "Powered by OSHEGAH",
@@ -225,8 +226,8 @@ export const en = {
     signedOut: "Please sign in again to upload.",
   },
   card: {
-    tagline: "TAP. SHARE. DONE.",
-    nfc: "NFC · QR · Contactless profile",
+    tagline: "TOUCH THE FUTURE",
+    nfc: "NFC · Contactless profile",
   },
   leaderboard: {
     eyebrow: "Community",
@@ -245,6 +246,38 @@ export const en = {
     title: "404",
     text: "Oops! Page not found",
     home: "Return to Home",
+  },
+  footer: {
+    about: "Smart NFC cards and a permanent digital profile for every identity.",
+    social: "Social",
+    contact: "Contact",
+    legal: "Legal",
+    privacy: "Privacy Policy",
+    terms: "Terms & Conditions",
+  },
+  legal: {
+    updated: "Last updated: this page is maintained by the OSHEGAH team.",
+    contactLine: "Questions? Reach us on Instagram, TikTok or by phone using the details in the footer.",
+    privacyTitle: "Privacy Policy",
+    termsTitle: "Terms & Conditions",
+    privacy: {
+      collectTitle: "What we collect",
+      collectText: "Account details you provide (name, email, phone, profile content) and the images you upload for your profile.",
+      useTitle: "How we use it",
+      useText: "Your information is used to run your OSHEGAH profile, show it to visitors you share it with, and keep your account secure.",
+      analyticsTitle: "Profile analytics",
+      analyticsText: "We count unique profile views and link clicks so you can see how your card performs. We do not show visitor identities to profile owners.",
+      controlTitle: "Your control",
+      controlText: "You can edit or remove your profile content at any time from your dashboard, and request deletion of your account.",
+    },
+    terms: {
+      accountTitle: "Your account",
+      accountText: "You are responsible for the accuracy of the information on your profile and for keeping your login credentials safe.",
+      contentTitle: "Your content",
+      contentText: "You keep ownership of what you publish. Do not publish unlawful, misleading or infringing content on an OSHEGAH profile.",
+      serviceTitle: "The service",
+      serviceText: "OSHEGAH provides NFC cards and hosted digital profiles. We may update features over time to improve the product.",
+    },
   },
 } as const;
 
