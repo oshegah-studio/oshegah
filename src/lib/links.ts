@@ -24,6 +24,22 @@ export interface LinkTypeMeta {
 
 const digits = (v: string) => v.replace(/[^\d+]/g, "");
 
+export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+const isMobileUa = () =>
+  typeof navigator !== "undefined" && /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+
+/**
+ * Best Gmail experience: compose in Gmail on desktop, fall back to the device's
+ * mail handler (Gmail app included) on mobile so nothing breaks without Gmail.
+ */
+export const buildEmailHref = (value: string) => {
+  const email = value.trim();
+  if (!EMAIL_RE.test(email)) return `mailto:${encodeURIComponent(email)}`;
+  if (isMobileUa()) return `mailto:${email}`;
+  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`;
+};
+
 const stripped = (v: string) => v.trim().replace(/^@/, "").replace(/\/+$/, "");
 
 const asUrl = (v: string) => {
