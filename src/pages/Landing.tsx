@@ -4,20 +4,15 @@ import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { OshegahCard } from "@/components/OshegahCard";
+import { SiteFooter } from "@/components/SiteFooter";
 import { Reveal } from "@/components/Reveal";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
+import { useLeaderboard } from "@/hooks/useOshegah";
 import { useI18n } from "@/i18n";
 import { Seo } from "@/components/Seo";
 
-const demoCustomer = {
-  username: "yahiahani",
-  full_name: "Yahia Hani",
-  job_title: "Founder, OSHEGAH",
-  bio: "One tap. Every way to reach me.",
-  location: "Cairo, Egypt",
-  verified: true,
-  theme: "oshegah_dark",
-};
+/** Fallback demo profile used only when the leaderboard is still empty. */
+const DEMO_USERNAME = "yahiahani";
 
 const features = [
   { icon: Nfc, key: "nfc" },
