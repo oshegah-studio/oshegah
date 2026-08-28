@@ -323,6 +323,38 @@ export function ProfileEditor({
           ))}
         </div>
 
+        {/* Auto Customize — palette generated from the profile photo (logo untouched) */}
+        <div className="space-y-2 rounded-xl border border-border p-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={autoBusy || !form.avatar_url}
+              onClick={() => void autoCustomize()}
+            >
+              {autoBusy ? (
+                <Loader2 className="me-2 h-4 w-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Sparkles className="me-2 h-4 w-4" aria-hidden="true" />
+              )}
+              {t("profileEditor.autoCustomize")}
+            </Button>
+            {autoPrev && (
+              <Button type="button" variant="ghost" size="sm" onClick={revertAuto}>
+                {t("profileEditor.revertPalette")}
+              </Button>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {form.avatar_url ? t("profileEditor.autoCustomizeHint") : t("profileEditor.autoCustomizeNeedsPhoto")}
+          </p>
+          {autoPrev && (
+            <p className="text-xs text-primary">{t("profileEditor.autoCustomizeApplied")}</p>
+          )}
+        </div>
+
+
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="primary_color">{t("profileEditor.accentColor")}</Label>
