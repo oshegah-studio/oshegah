@@ -91,15 +91,48 @@ export function ProfileEditor({
   const [form, setForm] = useState<FormState>(() => toForm(customer));
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
+  const [autoBusy, setAutoBusy] = useState(false);
+  const [autoPrev, setAutoPrev] = useState<Pick<
+    FormState,
+    "theme" | "background_color" | "primary_color" | "text_color" | "muted_text_color"
+  > | null>(null);
   const qc = useQueryClient();
   const { t } = useI18n();
 
   useEffect(() => {
     setForm(toForm(customer));
+    setAutoPrev(null);
   }, [customer?.id]);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
+
+  const autoCustomize = async () => {
+    if (!form.avatar_url) return;
+    setAutoBusy(true);
+    try {
+      const palette = await paletteFromImage(form.avatar_url);
+      setAutoPrev({
+        theme: form.theme,
+        background_color: form.background_color,
+        primary_color: form.primary_color,
+        text_color: form.text_color,
+        muted_text_color: form.muted_text_color,
+      });
+      setForm((f) => ({ ...f, ...palette }));
+      toast.success(t("profileEditor.autoCustomizeDone"));
+    } catch {
+      toast.error(t("profileEditor.autoCustomizeFailed"));
+    } finally {
+      setAutoBusy(false);
+    }
+  };
+
+  const revertAuto = () => {
+    if (!autoPrev) return;
+    setForm((f) => ({ ...f, ...autoPrev }));
+    setAutoPrev(null);
+  };
 
   const save = async () => {
     const username = normalizeUsername(form.username);
@@ -426,6 +459,7 @@ export function ProfileEditor({
                 button_shadow: form.button_shadow,
                 font_style: form.font_style,
                 show_contact_button: form.show_contact_button,
+                show_save_contact: form.show_save_contact,
               }}
               links={previewLinks}
             />
