@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n";
 import { Seo } from "@/components/Seo";
@@ -48,6 +49,7 @@ export default function Login() {
       <div className="w-full max-w-sm animate-soft-in rounded-2xl border border-border bg-card p-7 shadow-soft">
         <div className="flex items-center justify-between gap-2">
           <Wordmark />
+          <ThemeToggle />
           <LanguageSwitcher compact />
         </div>
         <h1 className="mt-6 font-display text-2xl font-semibold">

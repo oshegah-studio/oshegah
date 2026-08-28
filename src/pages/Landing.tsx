@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, BarChart3, Nfc, QrCode, Smartphone, Palette, ShieldCheck } from "lucide-react";
 import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { OshegahCard } from "@/components/OshegahCard";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -50,6 +51,7 @@ export default function Landing() {
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-5 py-4">
           <Wordmark />
           <nav className="flex items-center gap-2" aria-label={t("nav.main")}>
+            <ThemeToggle />
             <LanguageSwitcher className="hidden sm:inline-flex" />
             <LanguageSwitcher className="sm:hidden" compact />
             {user ? (
