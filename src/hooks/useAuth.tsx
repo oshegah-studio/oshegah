@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 import type { User, Session } from "@supabase/supabase-js";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { listAccounts, rememberAccount, forgetAccount, type ParkedAccount } from "@/lib/accounts";
+import { listAccounts, rememberAccount, forgetAccount, MAX_ACCOUNTS, type ParkedAccount } from "@/lib/accounts";
 
 export type AccountType = "personal" | "business";
 
@@ -55,11 +56,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAdmin(Boolean(roles?.some((r) => r.role === "admin")));
 
     if (activeSession) {
-      await rememberAccount(activeSession, {
+      const result = await rememberAccount(activeSession, {
         name: typed?.full_name,
         accountType: typed?.account_type,
         avatarUrl: typed?.avatar_url,
       });
+      if (result === "limit") {
+        toast.message(`You can have up to ${MAX_ACCOUNTS} accounts in the account switcher.`);
+      }
       await refreshAccounts();
     }
   }, [refreshAccounts]);
