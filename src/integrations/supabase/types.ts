@@ -117,6 +117,7 @@ export type Database = {
           phone: string | null
           primary_color: string
           show_contact_button: boolean
+          show_save_contact: boolean
           text_color: string
           theme: Database["public"]["Enums"]["profile_theme"]
           updated_at: string
@@ -144,6 +145,7 @@ export type Database = {
           phone?: string | null
           primary_color?: string
           show_contact_button?: boolean
+          show_save_contact?: boolean
           text_color?: string
           theme?: Database["public"]["Enums"]["profile_theme"]
           updated_at?: string
@@ -171,6 +173,7 @@ export type Database = {
           phone?: string | null
           primary_color?: string
           show_contact_button?: boolean
+          show_save_contact?: boolean
           text_color?: string
           theme?: Database["public"]["Enums"]["profile_theme"]
           updated_at?: string
@@ -317,6 +320,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          last_profile_type_change_at: string | null
           updated_at: string
         }
         Insert: {
@@ -327,6 +331,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          last_profile_type_change_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -337,6 +342,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          last_profile_type_change_at?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -377,6 +383,16 @@ export type Database = {
           views: number
         }[]
       }
+      get_leaderboard_period: {
+        Args: { _limit?: number; _period?: string }
+        Returns: {
+          avatar_url: string
+          full_name: string
+          rank: number
+          username: string
+          views: number
+        }[]
+      }
       get_public_profile: {
         Args: { _username: string }
         Returns: {
@@ -396,6 +412,7 @@ export type Database = {
           phone: string
           primary_color: string
           show_contact_button: boolean
+          show_save_contact: boolean
           text_color: string
           theme: Database["public"]["Enums"]["profile_theme"]
           username: string
@@ -421,6 +438,13 @@ export type Database = {
       record_profile_view: {
         Args: { _customer_id: string; _visitor_id: string }
         Returns: undefined
+      }
+      switch_profile_type: {
+        Args: { _next: Database["public"]["Enums"]["account_type"] }
+        Returns: {
+          account_type: Database["public"]["Enums"]["account_type"]
+          last_profile_type_change_at: string
+        }[]
       }
     }
     Enums: {

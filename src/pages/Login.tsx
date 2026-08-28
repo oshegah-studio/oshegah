@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n";
 import { Seo } from "@/components/Seo";
@@ -16,13 +17,17 @@ import { OAuthButtons } from "@/components/OAuthButtons";
 export default function Login() {
   const { user, profile, isAdmin } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation() as { state?: { from?: string } };
+  const location = useLocation() as { state?: { from?: string; addAccount?: boolean } };
   const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
-  if (user) return <Navigate to={location.state?.from || homeRouteFor(profile, isAdmin)} replace />;
+  const addingAccount = Boolean(location.state?.addAccount);
+
+  if (user && !addingAccount) {
+    return <Navigate to={location.state?.from || homeRouteFor(profile, isAdmin)} replace />;
+  }
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,10 +49,15 @@ export default function Login() {
       <div className="w-full max-w-sm animate-soft-in rounded-2xl border border-border bg-card p-7 shadow-soft">
         <div className="flex items-center justify-between gap-2">
           <Wordmark />
+          <ThemeToggle />
           <LanguageSwitcher compact />
         </div>
-        <h1 className="mt-6 font-display text-2xl font-semibold">{t("auth.loginTitle")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t("auth.loginSubtitle")}</p>
+        <h1 className="mt-6 font-display text-2xl font-semibold">
+          {addingAccount ? t("accounts.addTitle") : t("auth.loginTitle")}
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {addingAccount ? t("accounts.addSubtitle") : t("auth.loginSubtitle")}
+        </p>
         <form onSubmit={submit} className="mt-6 space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="email">{t("auth.email")}</Label>

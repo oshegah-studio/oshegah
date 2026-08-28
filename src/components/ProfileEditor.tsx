@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { THEME_LIST, BUTTON_STYLES, FONT_STYLES } from "@/lib/themes";
+import { paletteFromImage } from "@/lib/palette";
 import { normalizeUsername, validateUsername, RESERVED_USERNAMES } from "@/lib/links";
 import type { CustomerRow } from "@/hooks/useOshegah";
 import { AvatarUploader } from "@/components/AvatarUploader";
@@ -42,6 +43,7 @@ type FormState = {
   active: boolean;
   verified: boolean;
   show_contact_button: boolean;
+  show_save_contact: boolean;
   background_color: string;
   muted_text_color: string;
   button_shadow: boolean;
@@ -65,6 +67,7 @@ const toForm = (c: CustomerRow | null): FormState => ({
   active: c?.active ?? true,
   verified: c?.verified ?? false,
   show_contact_button: c?.show_contact_button ?? true,
+  show_save_contact: c?.show_save_contact ?? true,
   background_color: c?.background_color ?? "",
   muted_text_color: c?.muted_text_color ?? "",
   button_shadow: c?.button_shadow ?? false,
@@ -88,15 +91,48 @@ export function ProfileEditor({
   const [form, setForm] = useState<FormState>(() => toForm(customer));
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
+  const [autoBusy, setAutoBusy] = useState(false);
+  const [autoPrev, setAutoPrev] = useState<Pick<
+    FormState,
+    "theme" | "background_color" | "primary_color" | "text_color" | "muted_text_color"
+  > | null>(null);
   const qc = useQueryClient();
   const { t } = useI18n();
 
   useEffect(() => {
     setForm(toForm(customer));
+    setAutoPrev(null);
   }, [customer?.id]);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
+
+  const autoCustomize = async () => {
+    if (!form.avatar_url) return;
+    setAutoBusy(true);
+    try {
+      const palette = await paletteFromImage(form.avatar_url);
+      setAutoPrev({
+        theme: form.theme,
+        background_color: form.background_color,
+        primary_color: form.primary_color,
+        text_color: form.text_color,
+        muted_text_color: form.muted_text_color,
+      });
+      setForm((f) => ({ ...f, ...palette }));
+      toast.success(t("profileEditor.autoCustomizeDone"));
+    } catch {
+      toast.error(t("profileEditor.autoCustomizeFailed"));
+    } finally {
+      setAutoBusy(false);
+    }
+  };
+
+  const revertAuto = () => {
+    if (!autoPrev) return;
+    setForm((f) => ({ ...f, ...autoPrev }));
+    setAutoPrev(null);
+  };
 
   const save = async () => {
     const username = normalizeUsername(form.username);
@@ -122,6 +158,7 @@ export function ProfileEditor({
       text_color: form.text_color,
       active: form.active,
       show_contact_button: form.show_contact_button,
+      show_save_contact: form.show_save_contact,
       background_color: form.background_color || null,
       muted_text_color: form.muted_text_color || null,
       button_shadow: form.button_shadow,
@@ -147,7 +184,11 @@ export function ProfileEditor({
     setJustSaved(true);
     window.setTimeout(() => setJustSaved(false), 1800);
     toast.success(customer ? t("profileEditor.updated") : t("profileEditor.created"));
-    await qc.invalidateQueries();
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ["my-customer"] }),
+      qc.invalidateQueries({ queryKey: ["business-profiles"] }),
+      qc.invalidateQueries({ queryKey: ["admin-customers"] }),
+    ]);
     onSaved?.(data as CustomerRow);
   };
 
@@ -199,49 +240,91 @@ export function ProfileEditor({
           </div>
         </div>
         <AvatarUploader value={form.avatar_url} onChange={(url) => set("avatar_url", url)} />
-        <div className="flex items-center gap-3 rounded-xl border border-border p-3">
-          <Switch
-            id="show_contact_button"
-            checked={form.show_contact_button}
-            onCheckedChange={(v) => set("show_contact_button", v)}
-          />
-          <Label htmlFor="show_contact_button">{t("profileEditor.showContact")}</Label>
+        <div className="space-y-3 rounded-xl border border-border p-4">
+          <p className="text-sm font-medium">{t("profileEditor.contactOptions")}</p>
+          <div className="flex items-center gap-3">
+            <Switch
+              id="show_contact_button"
+              checked={form.show_contact_button}
+              onCheckedChange={(v) => set("show_contact_button", v)}
+            />
+            <Label htmlFor="show_contact_button">{t("profileEditor.showContact")}</Label>
+          </div>
+          <div className="flex items-center gap-3">
+            <Switch
+              id="show_save_contact"
+              checked={form.show_save_contact}
+              onCheckedChange={(v) => set("show_save_contact", v)}
+            />
+            <Label htmlFor="show_save_contact">{t("profileEditor.showSaveContact")}</Label>
+          </div>
+          <p className="text-xs text-muted-foreground">{t("profileEditor.contactOptionsHint")}</p>
         </div>
 
       </section>
 
       <section className="animate-soft-in space-y-4 rounded-2xl border border-border bg-card p-5 shadow-soft" style={{ animationDelay: "60ms" }}>
         <h2 className="font-display text-lg font-semibold">{t("profileEditor.appearance")}</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {THEME_LIST.map((theme) => (
-            <button
-              key={theme.id}
-              type="button"
-              onClick={() => set("theme", theme.id)}
-              className={cn(
-                "card-interactive overflow-hidden rounded-xl border p-0 text-start",
-                form.theme === theme.id ? "border-primary ring-2 ring-primary/25" : "border-border",
-              )}
-              aria-pressed={form.theme === theme.id}
-            >
-              {/* Live mini preview of the theme */}
-              <span className="block h-20 w-full p-2.5" style={{ background: theme.background }}>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {THEME_LIST.map((theme) => {
+            const selected = form.theme === theme.id;
+            return (
+              <button
+                key={theme.id}
+                type="button"
+                onClick={() => set("theme", theme.id)}
+                className={cn(
+                  "card-interactive overflow-hidden rounded-xl border p-0 text-start",
+                  selected ? "border-primary ring-2 ring-primary/30" : "border-border",
+                )}
+                aria-pressed={selected}
+              >
+                {/* Everything inside the swatch is painted with the theme's own
+                    foreground tokens, so each preview stays readable. */}
                 <span
-                  className="mb-1.5 block h-4 w-4 rounded-full"
-                  style={{ background: theme.accent }}
-                />
-                <span
-                  className="mb-1 block h-3 w-full rounded"
-                  style={{ background: theme.surface, border: `1px solid ${theme.surfaceBorder}` }}
-                />
-                <span
-                  className="block h-3 w-2/3 rounded"
-                  style={{ background: theme.surface, border: `1px solid ${theme.surfaceBorder}` }}
-                />
-              </span>
-              <span className="block px-3 py-2 text-sm font-medium">{theme.name}</span>
-            </button>
-          ))}
+                  className="block w-full p-3"
+                  style={{ background: theme.background, color: theme.text }}
+                >
+                  <span className="flex items-center justify-between gap-2">
+                    <span className="truncate text-sm font-semibold" style={{ color: theme.text }}>
+                      {theme.name}
+                    </span>
+                    {selected && (
+                      <span
+                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+                        style={{ background: theme.accent, color: theme.onAccent }}
+                      >
+                        <Check className="h-3 w-3" aria-hidden="true" />
+                      </span>
+                    )}
+                  </span>
+                  <span className="mt-1 block text-[0.7rem] leading-snug" style={{ color: theme.mutedText }}>
+                    {theme.description}
+                  </span>
+                  <span
+                    className="mt-2.5 flex items-center gap-2 rounded-lg px-2.5 py-1.5"
+                    style={{
+                      background: theme.surface,
+                      border: `1px solid ${theme.surfaceBorder}`,
+                      backdropFilter: theme.blur ? "blur(10px)" : undefined,
+                      color: theme.text,
+                    }}
+                  >
+                    <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: theme.accent }} />
+                    <span className="truncate text-[0.7rem] font-medium" style={{ color: theme.text }}>
+                      {t("profileEditor.sampleLink")}
+                    </span>
+                  </span>
+                  <span
+                    className="mt-1.5 flex items-center justify-center rounded-lg px-2.5 py-1.5 text-[0.7rem] font-semibold"
+                    style={{ background: theme.accent, color: theme.onAccent }}
+                  >
+                    {t("publicProfile.contactMe")}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -272,6 +355,38 @@ export function ProfileEditor({
             </Button>
           ))}
         </div>
+
+        {/* Auto Customize — palette generated from the profile photo (logo untouched) */}
+        <div className="space-y-2 rounded-xl border border-border p-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={autoBusy || !form.avatar_url}
+              onClick={() => void autoCustomize()}
+            >
+              {autoBusy ? (
+                <Loader2 className="me-2 h-4 w-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Sparkles className="me-2 h-4 w-4" aria-hidden="true" />
+              )}
+              {t("profileEditor.autoCustomize")}
+            </Button>
+            {autoPrev && (
+              <Button type="button" variant="ghost" size="sm" onClick={revertAuto}>
+                {t("profileEditor.revertPalette")}
+              </Button>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {form.avatar_url ? t("profileEditor.autoCustomizeHint") : t("profileEditor.autoCustomizeNeedsPhoto")}
+          </p>
+          {autoPrev && (
+            <p className="text-xs text-primary">{t("profileEditor.autoCustomizeApplied")}</p>
+          )}
+        </div>
+
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
@@ -344,6 +459,7 @@ export function ProfileEditor({
                 button_shadow: form.button_shadow,
                 font_style: form.font_style,
                 show_contact_button: form.show_contact_button,
+                show_save_contact: form.show_save_contact,
               }}
               links={previewLinks}
             />

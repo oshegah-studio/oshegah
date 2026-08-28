@@ -144,12 +144,21 @@ export interface LeaderboardEntry {
   views: number;
 }
 
-/** Public, privacy-safe ranking: no emails, phones or owner identifiers. */
-export function useLeaderboard(limit = 20) {
+export type LeaderboardPeriod = "all_time" | "monthly" | "weekly";
+
+/**
+ * Public, privacy-safe ranking by UNIQUE profile views.
+ * Aggregation happens in the database (RPC) — no raw view rows reach the browser.
+ */
+export function useLeaderboard(period: LeaderboardPeriod = "all_time", limit = 20) {
   return useQuery({
-    queryKey: ["leaderboard", limit],
+    queryKey: ["leaderboard", period, limit],
+    staleTime: 60_000,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_leaderboard", { _limit: limit });
+      const { data, error } = await supabase.rpc("get_leaderboard_period", {
+        _period: period,
+        _limit: limit,
+      });
       if (error) throw error;
       return (data ?? []) as LeaderboardEntry[];
     },

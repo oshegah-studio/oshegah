@@ -1,11 +1,13 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Crown, Eye, Medal, Trophy } from "lucide-react";
 import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/Reveal";
 import { PageLoader, ErrorState } from "@/components/states";
-import { useLeaderboard } from "@/hooks/useOshegah";
+import { useLeaderboard, type LeaderboardPeriod } from "@/hooks/useOshegah";
 import { useI18n } from "@/i18n";
 import { Seo } from "@/components/Seo";
 import { cn } from "@/lib/utils";
@@ -21,7 +23,14 @@ const initials = (name: string) =>
 
 export default function Leaderboard() {
   const { t } = useI18n();
-  const { data, isLoading, isError } = useLeaderboard(20);
+  const [period, setPeriod] = useState<LeaderboardPeriod>("all_time");
+  const { data, isLoading, isError } = useLeaderboard(period, 20);
+
+  const PERIODS: { id: LeaderboardPeriod; label: string }[] = [
+    { id: "all_time", label: t("leaderboard.allTime") },
+    { id: "monthly", label: t("leaderboard.monthly") },
+    { id: "weekly", label: t("leaderboard.weekly") },
+  ];
 
   return (
     <div className="min-h-dvh bg-background">
@@ -34,6 +43,7 @@ export default function Leaderboard() {
         <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-3 px-5 py-4">
           <Wordmark />
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <LanguageSwitcher compact />
             <Button asChild variant="ghost" size="sm">
               <Link to="/">{t("common.back")}</Link>
@@ -48,6 +58,29 @@ export default function Leaderboard() {
           <h1 className="mt-2 font-display text-3xl font-semibold">{t("leaderboard.title")}</h1>
           <p className="mt-2 max-w-xl text-sm text-muted-foreground">{t("leaderboard.subtitle")}</p>
         </Reveal>
+
+        <div
+          role="tablist"
+          aria-label={t("leaderboard.period")}
+          className="mt-6 inline-flex flex-wrap items-center gap-1 rounded-full border border-border bg-muted/60 p-1"
+        >
+          {PERIODS.map((p) => (
+            <button
+              key={p.id}
+              role="tab"
+              aria-selected={period === p.id}
+              onClick={() => setPeriod(p.id)}
+              className={cn(
+                "min-h-9 rounded-full px-4 text-sm font-medium transition-colors duration-200",
+                period === p.id
+                  ? "bg-background text-foreground shadow-soft"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
 
         {isLoading && <PageLoader label={t("common.loading")} />}
         {isError && <ErrorState />}

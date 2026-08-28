@@ -13,6 +13,10 @@ export interface ProfileThemeTokens {
   mutedText: string;
   /** accent used for the verified badge / highlights */
   accent: string;
+  /** readable foreground on top of `accent` */
+  onAccent: string;
+  /** short, human description used in the appearance picker */
+  description: string;
   blur: boolean;
   /** preview swatch for pickers */
   swatch: string[];
@@ -22,60 +26,70 @@ export const PROFILE_THEMES: Record<ThemeId, ProfileThemeTokens> = {
   oshegah_dark: {
     id: "oshegah_dark",
     name: "OSHEGAH Dark",
+    description: "Navy gradient, sky accents — the signature OSHEGAH look.",
     background: "linear-gradient(170deg, #162446 0%, #0d1730 60%, #0a1226 100%)",
     surface: "rgba(255,255,255,0.07)",
     surfaceBorder: "rgba(190,227,240,0.16)",
     text: "#FFFFFF",
     mutedText: "rgba(226,240,248,0.66)",
     accent: "#BEE3F0",
+    onAccent: "#162446",
     blur: false,
     swatch: ["#162446", "#BEE3F0", "#FFFFFF"],
   },
   oshegah_light: {
     id: "oshegah_light",
     name: "OSHEGAH Light",
+    description: "Airy sky-to-white gradient with deep navy text.",
     background: "linear-gradient(170deg, #BEE3F0 0%, #E4F3F9 55%, #FFFFFF 100%)",
     surface: "#FFFFFF",
     surfaceBorder: "rgba(22,36,70,0.08)",
     text: "#162446",
     mutedText: "rgba(22,36,70,0.6)",
     accent: "#162446",
+    onAccent: "#FFFFFF",
     blur: false,
     swatch: ["#BEE3F0", "#FFFFFF", "#162446"],
   },
   midnight: {
     id: "midnight",
     name: "Midnight",
+    description: "Near-black canvas with soft silver typography.",
     background: "linear-gradient(180deg, #08080C 0%, #0E0E14 100%)",
     surface: "rgba(255,255,255,0.05)",
     surfaceBorder: "rgba(255,255,255,0.1)",
     text: "#F5F5F7",
     mutedText: "rgba(245,245,247,0.55)",
     accent: "#C7C9D1",
+    onAccent: "#0E0E14",
     blur: false,
     swatch: ["#08080C", "#2A2A33", "#F5F5F7"],
   },
   minimal: {
     id: "minimal",
     name: "Minimal",
+    description: "Plain light paper, pure black type, no distractions.",
     background: "#FAFAFA",
     surface: "#FFFFFF",
     surfaceBorder: "rgba(0,0,0,0.08)",
     text: "#111111",
     mutedText: "rgba(17,17,17,0.55)",
     accent: "#111111",
+    onAccent: "#FFFFFF",
     blur: false,
     swatch: ["#FAFAFA", "#FFFFFF", "#111111"],
   },
   glass: {
     id: "glass",
     name: "Glass",
+    description: "Frosted translucent cards over a blue gradient.",
     background: "linear-gradient(150deg, #1b2b52 0%, #33578a 45%, #8fc6dd 100%)",
     surface: "rgba(255,255,255,0.14)",
     surfaceBorder: "rgba(255,255,255,0.28)",
     text: "#FFFFFF",
     mutedText: "rgba(255,255,255,0.72)",
     accent: "#FFFFFF",
+    onAccent: "#162446",
     blur: true,
     swatch: ["#33578a", "rgba(255,255,255,0.6)", "#FFFFFF"],
   },

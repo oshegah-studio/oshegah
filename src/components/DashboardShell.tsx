@@ -3,6 +3,8 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { LogOut, Menu, Trophy, X, type LucideIcon } from "lucide-react";
 import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { AccountSwitcher } from "@/components/AccountSwitcher";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
@@ -30,7 +32,7 @@ export function DashboardShell({
   children: ReactNode;
   areaLabel: string;
 }) {
-  const { profile, signOut } = useAuth();
+  const { signOut } = useAuth();
   const navigate = useNavigate();
   const { t } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -74,12 +76,8 @@ export function DashboardShell({
         </div>
         <div className="space-y-3 px-2">
           <LanguageSwitcher tone="invert" className="w-full justify-center" />
-          <div className="rounded-xl bg-sidebar-accent/50 p-3">
-            <p className="truncate text-sm font-medium text-sidebar-foreground">
-              {profile?.full_name || t("dashboard.user")}
-            </p>
-            <p className="truncate text-xs text-sidebar-foreground/60">{profile?.email}</p>
-          </div>
+          <ThemeToggle tone="invert" className="w-full justify-center" />
+          <AccountSwitcher />
           <button
             onClick={handleSignOut}
             className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
@@ -95,6 +93,7 @@ export function DashboardShell({
         <header className="sticky top-0 z-40 flex items-center justify-between gap-2 border-b border-sidebar-border bg-sidebar px-4 py-3 lg:hidden">
           <Wordmark invert />
           <div className="flex items-center gap-2">
+            <ThemeToggle tone="invert" />
             <LanguageSwitcher tone="invert" compact />
             <Button
               variant="ghost"
@@ -114,6 +113,9 @@ export function DashboardShell({
             aria-label={t("nav.mobile")}
           >
             <div className="flex flex-col gap-1">
+              <div className="mb-2">
+                <AccountSwitcher />
+              </div>
               {items.map((item) => (
                 <NavLink
                   key={item.to}

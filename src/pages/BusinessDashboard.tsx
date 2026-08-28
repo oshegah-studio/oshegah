@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { Building2, Eye, LayoutDashboard, MousePointerClick, Plus, QrCode, Users } from "lucide-react";
+import { Building2, Eye, LayoutDashboard, MousePointerClick, Plus, QrCode, Settings, Users } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/DashboardShell";
 import { ProfileEditor } from "@/components/ProfileEditor";
+import { AccountSettings } from "@/components/AccountSettings";
 import { LinksEditor } from "@/components/LinksEditor";
 import { QrDialog, copyText } from "@/components/QrDialog";
 import { StatCard } from "@/components/StatCard";
@@ -29,6 +30,7 @@ export default function BusinessDashboard() {
   const [selected, setSelected] = useState<CustomerRow | null>(null);
   const [creating, setCreating] = useState(false);
   const [qrFor, setQrFor] = useState<CustomerRow | null>(null);
+  const [tab, setTab] = useState("team");
 
   const navItems: NavItem[] = [
     { to: "/business", label: t("dashboard.areaBusiness"), icon: LayoutDashboard, end: true },
@@ -70,15 +72,19 @@ export default function BusinessDashboard() {
       title={business.name}
       subtitle={count === 1 ? t("business.profilesCountOne") : t("business.profilesCount", { count })}
       actions={
-        <Button className="hover-lift" onClick={() => { setSelected(null); setCreating(true); }}>
+        <Button className="hover-lift" onClick={() => { setTab("editor"); setSelected(null); setCreating(true); }}>
           <Plus className="me-2 h-4 w-4" /> {t("business.newProfile")}
         </Button>
       }
     >
-      <Tabs value={editing ? "editor" : "team"} onValueChange={(v) => { if (v === "team") { setCreating(false); setSelected(null); } }}>
+      <Tabs
+        value={tab === "settings" ? "settings" : editing ? "editor" : "team"}
+        onValueChange={(v) => { setTab(v); if (v === "team") { setCreating(false); setSelected(null); } }}
+      >
         <TabsList className="mb-6">
           <TabsTrigger value="team"><Users className="me-2 h-4 w-4" />{t("business.team")}</TabsTrigger>
           <TabsTrigger value="editor" disabled={!editing}>{t("business.editor")}</TabsTrigger>
+          <TabsTrigger value="settings"><Settings className="me-2 h-4 w-4" />{t("dashboard.settings")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="team" className="animate-soft-in space-y-6">
@@ -93,7 +99,7 @@ export default function BusinessDashboard() {
               icon={Users}
               title={t("business.emptyTitle")}
               description={t("business.emptyText")}
-              action={{ label: t("business.newProfile"), onClick: () => setCreating(true) }}
+              action={{ label: t("business.newProfile"), onClick: () => { setTab("editor"); setCreating(true); } }}
             />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">
@@ -108,7 +114,7 @@ export default function BusinessDashboard() {
                     <span dir="ltr">/{m.username}</span> · {m.active ? t("common.published") : t("common.draft")}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
-                    <Button size="sm" variant="outline" onClick={() => { setCreating(false); setSelected(m); }}>
+                    <Button size="sm" variant="outline" onClick={() => { setTab("editor"); setCreating(false); setSelected(m); }}>
                       {t("common.edit")}
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => copyText(profileUrlFor(m.username), t("common.copied"))}>
@@ -129,9 +135,13 @@ export default function BusinessDashboard() {
             key={selected?.id ?? "new"}
             customer={selected}
             businessId={business.id}
-            onSaved={(c) => { setCreating(false); setSelected(c); }}
+            onSaved={(c) => { setCreating(false); setSelected(c); setTab("editor"); }}
           />
           {selected && <LinksEditor customerId={selected.id} />}
+        </TabsContent>
+
+        <TabsContent value="settings" className="animate-soft-in">
+          <AccountSettings />
         </TabsContent>
       </Tabs>
 
