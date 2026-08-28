@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { BarChart3, Eye, LayoutDashboard, Link2, MousePointerClick, QrCode, User } from "lucide-react";
+import { BarChart3, Eye, LayoutDashboard, Link2, MousePointerClick, QrCode, Settings, User } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/DashboardShell";
 import { ProfileEditor } from "@/components/ProfileEditor";
+import { AccountSettings } from "@/components/AccountSettings";
 import { LinksEditor } from "@/components/LinksEditor";
 import { ProfileView, PhoneFrame } from "@/components/ProfileView";
 import { QrDialog, CopyButton } from "@/components/QrDialog";
@@ -55,6 +56,7 @@ export default function Dashboard() {
             <TabsTrigger value="overview"><BarChart3 className="me-2 h-4 w-4" />{t("dashboard.overview")}</TabsTrigger>
             <TabsTrigger value="profile"><User className="me-2 h-4 w-4" />{t("dashboard.profile")}</TabsTrigger>
             <TabsTrigger value="links" disabled={!customer}><Link2 className="me-2 h-4 w-4" />{t("dashboard.links")}</TabsTrigger>
+            <TabsTrigger value="settings"><Settings className="me-2 h-4 w-4" />{t("dashboard.settings")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="animate-soft-in">
@@ -117,6 +119,10 @@ export default function Dashboard() {
 
           <TabsContent value="links" className="animate-soft-in">
             {customer && <LinksEditor customerId={customer.id} />}
+          </TabsContent>
+
+          <TabsContent value="settings" className="animate-soft-in">
+            <AccountSettings />
           </TabsContent>
         </Tabs>
       )}

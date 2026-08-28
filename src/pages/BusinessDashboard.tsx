@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { Building2, Eye, LayoutDashboard, MousePointerClick, Plus, QrCode, Users } from "lucide-react";
+import { Building2, Eye, LayoutDashboard, MousePointerClick, Plus, QrCode, Settings, Users } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/DashboardShell";
 import { ProfileEditor } from "@/components/ProfileEditor";
+import { AccountSettings } from "@/components/AccountSettings";
 import { LinksEditor } from "@/components/LinksEditor";
 import { QrDialog, copyText } from "@/components/QrDialog";
 import { StatCard } from "@/components/StatCard";
@@ -29,6 +30,7 @@ export default function BusinessDashboard() {
   const [selected, setSelected] = useState<CustomerRow | null>(null);
   const [creating, setCreating] = useState(false);
   const [qrFor, setQrFor] = useState<CustomerRow | null>(null);
+  const [tab, setTab] = useState("team");
 
   const navItems: NavItem[] = [
     { to: "/business", label: t("dashboard.areaBusiness"), icon: LayoutDashboard, end: true },
@@ -75,10 +77,11 @@ export default function BusinessDashboard() {
         </Button>
       }
     >
-      <Tabs value={editing ? "editor" : "team"} onValueChange={(v) => { if (v === "team") { setCreating(false); setSelected(null); } }}>
+      <Tabs value={tab} onValueChange={(v) => { setTab(v); if (v === "team") { setCreating(false); setSelected(null); } }}>
         <TabsList className="mb-6">
           <TabsTrigger value="team"><Users className="me-2 h-4 w-4" />{t("business.team")}</TabsTrigger>
           <TabsTrigger value="editor" disabled={!editing}>{t("business.editor")}</TabsTrigger>
+          <TabsTrigger value="settings"><Settings className="me-2 h-4 w-4" />{t("dashboard.settings")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="team" className="animate-soft-in space-y-6">
@@ -132,6 +135,10 @@ export default function BusinessDashboard() {
             onSaved={(c) => { setCreating(false); setSelected(c); }}
           />
           {selected && <LinksEditor customerId={selected.id} />}
+        </TabsContent>
+
+        <TabsContent value="settings" className="animate-soft-in">
+          <AccountSettings />
         </TabsContent>
       </Tabs>
 

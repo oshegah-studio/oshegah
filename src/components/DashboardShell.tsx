@@ -32,7 +32,7 @@ export function DashboardShell({
   children: ReactNode;
   areaLabel: string;
 }) {
-  const { profile, signOut } = useAuth();
+  const { signOut } = useAuth();
   const navigate = useNavigate();
   const { t } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -113,6 +113,9 @@ export function DashboardShell({
             aria-label={t("nav.mobile")}
           >
             <div className="flex flex-col gap-1">
+              <div className="mb-2">
+                <AccountSwitcher />
+              </div>
               {items.map((item) => (
                 <NavLink
                   key={item.to}
