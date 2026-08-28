@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowDown, ArrowUp, Link2, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, Link2, Loader2, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,121 @@ import { LINK_TYPE_LIST, linkMeta, type LinkType } from "@/lib/links";
 import { useLinks, type LinkRow } from "@/hooks/useOshegah";
 import { useI18n } from "@/i18n";
 
+const AUTOSAVE_MS = 700;
+
+/**
+ * One editable row. Typing only touches local state; the database is written
+ * once the user pauses (debounced) or leaves the field — never per keystroke.
+ */
+const LinkRowEditor = memo(function LinkRowEditor({
+  link,
+  index,
+  isFirst,
+  isLast,
+  onPatch,
+  onMove,
+  onDelete,
+}: {
+  link: LinkRow;
+  index: number;
+  isFirst: boolean;
+  isLast: boolean;
+  onPatch: (id: string, patch: Partial<LinkRow>) => Promise<void>;
+  onMove: (index: number, dir: -1 | 1) => void;
+  onDelete: (link: LinkRow) => void;
+}) {
+  const { t } = useI18n();
+  const [title, setTitle] = useState(link.title);
+  const [value, setValue] = useState(link.value);
+  const [state, setState] = useState<"idle" | "saving" | "saved">("idle");
+  const timer = useRef<ReturnType<typeof setTimeout>>();
+  const pending = useRef<Partial<LinkRow>>({});
+
+  // Adopt server values only when this row actually changed elsewhere.
+  useEffect(() => {
+    if (!timer.current) {
+      setTitle(link.title);
+      setValue(link.value);
+    }
+  }, [link.title, link.value]);
+
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  const flush = useCallback(async () => {
+    clearTimeout(timer.current);
+    timer.current = undefined;
+    const patch = pending.current;
+    pending.current = {};
+    if (!Object.keys(patch).length) return;
+    setState("saving");
+    await onPatch(link.id, patch);
+    setState("saved");
+    setTimeout(() => setState("idle"), 1200);
+  }, [link.id, onPatch]);
+
+  const queue = (patch: Partial<LinkRow>) => {
+    pending.current = { ...pending.current, ...patch };
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => void flush(), AUTOSAVE_MS);
+  };
+
+  const lm = linkMeta(link.type);
+
+  return (
+    <div
+      className="card-interactive flex animate-soft-in flex-wrap items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-soft"
+      style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}
+    >
+      <span
+        className="flex h-9 w-9 items-center justify-center rounded-full"
+        style={{ background: `${lm.tint}22`, color: lm.tint }}
+      >
+        <lm.icon className="h-4 w-4" aria-hidden="true" />
+      </span>
+      <div className="min-w-[160px] flex-1">
+        <Input
+          value={title}
+          aria-label={t("linksEditor.label")}
+          onChange={(e) => {
+            setTitle(e.target.value);
+            queue({ title: e.target.value });
+          }}
+          onBlur={() => void flush()}
+          className="h-8 border-0 px-0 font-medium shadow-none focus-visible:ring-0"
+        />
+        <Input
+          value={value}
+          aria-label={t("linksEditor.value")}
+          onChange={(e) => {
+            setValue(e.target.value);
+            queue({ value: e.target.value });
+          }}
+          onBlur={() => void flush()}
+          className="h-7 border-0 px-0 text-xs text-muted-foreground shadow-none focus-visible:ring-0"
+        />
+      </div>
+      <span className="w-4 shrink-0 text-muted-foreground" aria-live="polite">
+        {state === "saving" && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-label={t("common.saving")} />}
+        {state === "saved" && <Check className="h-3.5 w-3.5 text-success" aria-label={t("common.saved")} />}
+      </span>
+      <Switch
+        checked={link.enabled}
+        onCheckedChange={(v) => void onPatch(link.id, { enabled: v })}
+        aria-label={t("linksEditor.enableLink")}
+      />
+      <Button variant="ghost" size="icon" aria-label={t("linksEditor.moveUp")} disabled={isFirst} onClick={() => onMove(index, -1)}>
+        <ArrowUp className="h-4 w-4" />
+      </Button>
+      <Button variant="ghost" size="icon" aria-label={t("linksEditor.moveDown")} disabled={isLast} onClick={() => onMove(index, 1)}>
+        <ArrowDown className="h-4 w-4" />
+      </Button>
+      <Button variant="ghost" size="icon" aria-label={t("linksEditor.deleteLink")} onClick={() => onDelete(link)}>
+        <Trash2 className="h-4 w-4 text-destructive" />
+      </Button>
+    </div>
+  );
+});
+
 export function LinksEditor({ customerId }: { customerId: string }) {
   const { data: links, isLoading } = useLinks(customerId);
   const qc = useQueryClient();
@@ -30,51 +145,90 @@ export function LinksEditor({ customerId }: { customerId: string }) {
   const [pendingDelete, setPendingDelete] = useState<LinkRow | null>(null);
 
   const meta = linkMeta(type);
-  const refresh = () => qc.invalidateQueries({ queryKey: ["links", customerId] });
+  const key = ["links", customerId];
+
+  /** Writes straight into the cached list — no refetch of links, stats or profile. */
+  const setCache = useCallback(
+    (updater: (rows: LinkRow[]) => LinkRow[]) => {
+      qc.setQueryData<LinkRow[]>(key, (rows) => updater(rows ?? []));
+    },
+    [qc, customerId], // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
   const add = async () => {
     const error = meta.validate(value);
     if (error) return toast.error(error);
     setBusy(true);
-    const { error: dbError } = await supabase.from("links").insert({
-      customer_id: customerId,
-      type,
-      title: title.trim() || meta.label,
-      value: meta.normalize ? meta.normalize(value) : value.trim(),
-      sort_order: (links?.length ?? 0) + 1,
-    });
+    const { data, error: dbError } = await supabase
+      .from("links")
+      .insert({
+        customer_id: customerId,
+        type,
+        title: title.trim() || meta.label,
+        value: meta.normalize ? meta.normalize(value) : value.trim(),
+        sort_order: (links?.length ?? 0) + 1,
+      })
+      .select("*")
+      .single();
     setBusy(false);
     if (dbError) return toast.error(dbError.message);
     setTitle("");
     setValue("");
+    setCache((rows) => [...rows, data as LinkRow]);
     toast.success(t("linksEditor.added"));
-    refresh();
   };
 
-  const update = async (link: LinkRow, patch: Partial<LinkRow>) => {
-    const { error } = await supabase.from("links").update(patch).eq("id", link.id);
-    if (error) return toast.error(error.message);
-    refresh();
-  };
+  /** Optimistic patch: UI first, rollback + toast if the write fails. */
+  const patch = useCallback(
+    async (id: string, values: Partial<LinkRow>) => {
+      const previous = qc.getQueryData<LinkRow[]>(key);
+      setCache((rows) => rows.map((r) => (r.id === id ? { ...r, ...values } : r)));
+      const { error } = await supabase.from("links").update(values).eq("id", id);
+      if (error) {
+        if (previous) qc.setQueryData(key, previous);
+        toast.error(error.message);
+      }
+    },
+    [qc, setCache], // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
   const remove = async (link: LinkRow) => {
+    const previous = qc.getQueryData<LinkRow[]>(key);
+    setCache((rows) => rows.filter((r) => r.id !== link.id));
     const { error } = await supabase.from("links").delete().eq("id", link.id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      if (previous) qc.setQueryData(key, previous);
+      return toast.error(error.message);
+    }
     toast.success(t("linksEditor.removed"));
-    refresh();
   };
 
-  const move = async (index: number, dir: -1 | 1) => {
-    if (!links) return;
-    const target = links[index + dir];
-    const current = links[index];
-    if (!target) return;
-    await Promise.all([
-      supabase.from("links").update({ sort_order: target.sort_order }).eq("id", current.id),
-      supabase.from("links").update({ sort_order: current.sort_order }).eq("id", target.id),
-    ]);
-    refresh();
-  };
+  const move = useCallback(
+    (index: number, dir: -1 | 1) => {
+      const rows = qc.getQueryData<LinkRow[]>(key) ?? [];
+      const current = rows[index];
+      const target = rows[index + dir];
+      if (!current || !target) return;
+
+      const previous = rows;
+      const next = [...rows];
+      next[index] = { ...target, sort_order: current.sort_order };
+      next[index + dir] = { ...current, sort_order: target.sort_order };
+      qc.setQueryData(key, next);
+
+      void (async () => {
+        const [a, b] = await Promise.all([
+          supabase.from("links").update({ sort_order: target.sort_order }).eq("id", current.id),
+          supabase.from("links").update({ sort_order: current.sort_order }).eq("id", target.id),
+        ]);
+        if (a.error || b.error) {
+          qc.setQueryData(key, previous);
+          toast.error((a.error ?? b.error)!.message);
+        }
+      })();
+    },
+    [qc], // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
   return (
     <div className="space-y-8">
@@ -112,44 +266,18 @@ export function LinksEditor({ customerId }: { customerId: string }) {
         {!isLoading && (links?.length ?? 0) === 0 && (
           <EmptyState icon={Link2} title={t("linksEditor.emptyTitle")} description={t("linksEditor.emptyText")} />
         )}
-        {links?.map((link, index) => {
-          const lm = linkMeta(link.type);
-          return (
-            <div
-              key={link.id}
-              className="card-interactive flex animate-soft-in flex-wrap items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-soft"
-              style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}
-            >
-              <span className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: `${lm.tint}22`, color: lm.tint }}>
-                <lm.icon className="h-4 w-4" aria-hidden="true" />
-              </span>
-              <div className="min-w-[160px] flex-1">
-                <Input
-                  value={link.title}
-                  aria-label={t("linksEditor.label")}
-                  onChange={(e) => update(link, { title: e.target.value })}
-                  className="h-8 border-0 px-0 font-medium shadow-none focus-visible:ring-0"
-                />
-                <Input
-                  value={link.value}
-                  aria-label={t("linksEditor.value")}
-                  onChange={(e) => update(link, { value: e.target.value })}
-                  className="h-7 border-0 px-0 text-xs text-muted-foreground shadow-none focus-visible:ring-0"
-                />
-              </div>
-              <Switch checked={link.enabled} onCheckedChange={(v) => update(link, { enabled: v })} aria-label={t("linksEditor.enableLink")} />
-              <Button variant="ghost" size="icon" aria-label={t("linksEditor.moveUp")} disabled={index === 0} onClick={() => move(index, -1)}>
-                <ArrowUp className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" aria-label={t("linksEditor.moveDown")} disabled={index === (links.length - 1)} onClick={() => move(index, 1)}>
-                <ArrowDown className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" aria-label={t("linksEditor.deleteLink")} onClick={() => setPendingDelete(link)}>
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
-            </div>
-          );
-        })}
+        {links?.map((link, index) => (
+          <LinkRowEditor
+            key={link.id}
+            link={link}
+            index={index}
+            isFirst={index === 0}
+            isLast={index === links.length - 1}
+            onPatch={patch}
+            onMove={move}
+            onDelete={setPendingDelete}
+          />
+        ))}
       </section>
 
       <AlertDialog open={Boolean(pendingDelete)} onOpenChange={(v) => !v && setPendingDelete(null)}>
