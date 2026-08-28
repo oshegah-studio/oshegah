@@ -115,6 +115,16 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* App light/dark switch — subtle, no layout shift. Public profile pages use
+     inline theme styles and are intentionally excluded. */
+  html.theme-anim body,
+  html.theme-anim header,
+  html.theme-anim aside,
+  html.theme-anim main,
+  html.theme-anim nav {
+    transition: background-color 240ms ease, color 240ms ease, border-color 240ms ease;
+  }
+
   h1, h2, h3, h4 {
     @apply font-display tracking-tight;
   }

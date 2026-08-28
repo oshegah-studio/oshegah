@@ -56,7 +56,12 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
     return () => mq.removeEventListener("change", onChange);
   }, [theme]);
 
-  const setTheme = useCallback((next: AppTheme) => setThemeState(next), []);
+  const setTheme = useCallback((next: AppTheme) => {
+    const root = document.documentElement;
+    root.classList.add("theme-anim");
+    window.setTimeout(() => root.classList.remove("theme-anim"), 320);
+    setThemeState(next);
+  }, []);
   const value = useMemo(() => ({ theme, resolved, setTheme }), [theme, resolved, setTheme]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
