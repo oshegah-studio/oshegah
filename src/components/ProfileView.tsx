@@ -20,6 +20,7 @@ export interface ProfileViewCustomer {
   text_color?: string | null;
   button_style?: string | null;
   show_contact_button?: boolean | null;
+  show_save_contact?: boolean | null;
   background_color?: string | null;
   muted_text_color?: string | null;
   button_shadow?: boolean | null;
@@ -57,6 +58,9 @@ export function ProfileView({ customer, links, onLinkClick, onSaveContact, compa
   const contactEnabled = customer.show_contact_button !== false && Boolean(phone || email);
   const contactHref = phone ? `tel:${phone.replace(/[^\d+]/g, "")}` : `mailto:${email}`;
   const ContactIcon = phone ? Phone : Mail;
+  // Save Contact needs the toggle ON and at least one detail worth saving.
+  const saveEnabled =
+    customer.show_save_contact !== false && Boolean(phone || email || customer.website);
 
   return (
     <div
@@ -186,33 +190,46 @@ export function ProfileView({ customer, links, onLinkClick, onSaveContact, compa
           )}
         </div>
 
-        {/* Actions */}
-        <div className="mt-6 flex w-full min-w-0 flex-col gap-3">
-          {contactEnabled && (
-            <a
-              href={contactHref}
-              className="flex min-h-[52px] w-full items-center justify-center gap-2 px-4 text-sm font-semibold transition-transform active:scale-[0.985] sm:hover:-translate-y-0.5"
-              style={{ borderRadius: radius, background: accent, color: s.onAccent, boxShadow: s.shadow }}
-            >
-              <ContactIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
-              <span className="truncate">{t("publicProfile.contactMe")}</span>
-            </a>
-          )}
-          <button
-            type="button"
-            onClick={onSaveContact}
-            className="flex min-h-[52px] w-full items-center justify-center gap-2 px-4 text-sm font-semibold transition-transform active:scale-[0.985] sm:hover:-translate-y-0.5"
+        {/* Unified contact area — one place, both actions */}
+        {(contactEnabled || saveEnabled) && (
+          <div
+            className="mt-6 flex w-full min-w-0 flex-col gap-2 p-2"
             style={{
               borderRadius: radius,
-              background: "transparent",
+              background: s.surface,
               border: `1px solid ${s.surfaceBorder}`,
-              color: text,
+              backdropFilter: s.blur ? "blur(14px)" : undefined,
             }}
           >
-            <Download className="h-4 w-4 shrink-0" aria-hidden="true" />
-            <span className="truncate">{t("publicProfile.saveContact")}</span>
-          </button>
-        </div>
+            {contactEnabled && (
+              <a
+                href={contactHref}
+                className="flex min-h-[52px] w-full items-center justify-center gap-2 px-4 text-sm font-semibold transition-transform active:scale-[0.985] sm:hover:-translate-y-0.5"
+                style={{ borderRadius: radius, background: accent, color: s.onAccent, boxShadow: s.shadow }}
+              >
+                <ContactIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span className="truncate">{t("publicProfile.contactMe")}</span>
+              </a>
+            )}
+            {saveEnabled && (
+              <button
+                type="button"
+                onClick={onSaveContact}
+                className="flex min-h-[52px] w-full items-center justify-center gap-2 px-4 text-sm font-semibold transition-transform active:scale-[0.985] sm:hover:-translate-y-0.5"
+                style={{
+                  borderRadius: radius,
+                  background: contactEnabled ? "transparent" : accent,
+                  border: contactEnabled ? `1px solid ${s.surfaceBorder}` : "none",
+                  color: contactEnabled ? text : s.onAccent,
+                  boxShadow: contactEnabled ? undefined : s.shadow,
+                }}
+              >
+                <Download className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span className="truncate">{t("publicProfile.saveContact")}</span>
+              </button>
+            )}
+          </div>
+        )}
 
         <p className="mt-10 text-center text-[0.68rem] uppercase tracking-[0.24em]" style={{ color: s.mutedText }}>
           {t("brand.poweredBy")}
