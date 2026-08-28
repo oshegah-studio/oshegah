@@ -25,10 +25,11 @@ export function buildVCard(input: VCardInput): string {
   if (input.title) lines.push(`TITLE:${esc(input.title)}`);
   if (input.phone) lines.push(`TEL;TYPE=CELL:${input.phone.replace(/[^\d+]/g, "")}`);
   if (input.email) lines.push(`EMAIL;TYPE=INTERNET:${esc(input.email)}`);
-  if (input.website) lines.push(`URL:${esc(input.website)}`);
-  if (input.profileUrl) lines.push(`URL;TYPE=OSHEGAH:${esc(input.profileUrl)}`);
+  if (input.profileUrl) lines.push(`URL:${esc(input.profileUrl)}`);
+  if (input.website && input.website !== input.profileUrl) lines.push(`URL:${esc(input.website)}`);
   if (input.location) lines.push(`ADR;TYPE=WORK:;;${esc(input.location)};;;;`);
   lines.push(`NOTE:${esc(`OSHEGAH digital profile${input.profileUrl ? ` — ${input.profileUrl}` : ""}`)}`);
+  lines.push(`REV:${new Date().toISOString().replace(/[-:]/g, "").split(".")[0]}Z`);
   lines.push("END:VCARD");
 
   return lines.join("\r\n");

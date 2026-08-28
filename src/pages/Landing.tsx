@@ -27,7 +27,7 @@ export default function Landing() {
   const { user, profile, isAdmin } = useAuth();
   const { t } = useI18n();
   const home = homeRouteFor(profile, isAdmin);
-  const { data: topProfiles } = useLeaderboard(1);
+  const { data: topProfiles } = useLeaderboard("all_time", 1);
   const topUsername = topProfiles?.[0]?.username ?? DEMO_USERNAME;
 
   return (
