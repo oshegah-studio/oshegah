@@ -43,7 +43,7 @@ export default function Leaderboard() {
         <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-3 px-5 py-4">
           <Wordmark />
           <div className="flex items-center gap-2">
-            <ThemeToggle />
+            <ThemeToggle className="hidden sm:inline-flex" />
             <LanguageSwitcher compact />
             <Button asChild variant="ghost" size="sm">
               <Link to="/">{t("common.back")}</Link>

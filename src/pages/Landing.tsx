@@ -48,22 +48,23 @@ export default function Landing() {
         }}
       />
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-5 py-4">
-          <Wordmark />
-          <nav className="flex items-center gap-2" aria-label={t("nav.main")}>
-            <ThemeToggle />
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:gap-3 sm:px-5">
+          <Wordmark className="min-w-0 flex-1" />
+          <nav className="flex shrink-0 items-center gap-1.5 sm:gap-2" aria-label={t("nav.main")}>
+            <ThemeToggle className="hidden sm:inline-flex" />
             <LanguageSwitcher className="hidden sm:inline-flex" />
             <LanguageSwitcher className="sm:hidden" compact />
             {user ? (
-              <Button asChild className="hover-lift"><Link to={home}>{t("common.dashboard")}</Link></Button>
+              <Button asChild size="sm" className="hover-lift sm:h-10 sm:px-4"><Link to={home}>{t("common.dashboard")}</Link></Button>
             ) : (
               <>
-                <Button variant="ghost" asChild><Link to="/login">{t("nav.login")}</Link></Button>
-                <Button asChild className="hover-lift"><Link to="/signup">{t("nav.signup")}</Link></Button>
+                <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex sm:h-10 sm:px-4"><Link to="/login">{t("nav.login")}</Link></Button>
+                <Button asChild size="sm" className="hover-lift sm:h-10 sm:px-4"><Link to="/signup">{t("nav.signup")}</Link></Button>
               </>
             )}
           </nav>
         </div>
+
       </header>
 
       <main>
