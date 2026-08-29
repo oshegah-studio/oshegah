@@ -141,14 +141,15 @@ export function DashboardShell({
         )}
 
         <main className="flex-1 px-4 pb-24 pt-6 sm:px-8 sm:pb-12 lg:pt-10">
-          <div className="mx-auto w-full max-w-5xl">
+          <div className="mx-auto w-full min-w-0 max-w-5xl">
             <div className="flex animate-soft-in flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
+              <div className="min-w-0">
                 <h1 className="font-display text-2xl font-semibold sm:text-3xl">{title}</h1>
-                {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
+                {subtitle && <p className="mt-1 break-all text-sm text-muted-foreground">{subtitle}</p>}
               </div>
               {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
             </div>
+
             <div className="mt-7 animate-soft-in" style={{ animationDelay: "80ms" }}>
               {children}
             </div>
@@ -157,7 +158,7 @@ export function DashboardShell({
 
         {/* Mobile bottom nav */}
         <nav
-          className="fixed bottom-0 start-0 end-0 z-40 flex items-stretch gap-1 overflow-x-auto border-t border-sidebar-border bg-sidebar px-2 py-1.5 no-scrollbar sm:hidden"
+          className="fixed bottom-0 start-0 end-0 z-40 flex w-full items-stretch gap-1 border-t border-sidebar-border bg-sidebar px-2 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] sm:hidden"
           aria-label={t("nav.quick")}
         >
           {items.slice(0, 5).map((item) => (
@@ -167,14 +168,16 @@ export function DashboardShell({
               end={item.end}
               className={({ isActive }) =>
                 cn(
-                  "flex min-h-11 min-w-[64px] flex-1 flex-col items-center gap-1 rounded-lg px-2 py-2 text-[0.65rem] font-medium transition-colors",
+                  "flex min-h-11 min-w-0 flex-1 flex-col items-center gap-1 rounded-lg px-1 py-2 text-[0.65rem] font-medium transition-colors",
                   isActive ? "text-sidebar-primary" : "text-sidebar-foreground/60",
                 )
               }
             >
+
               <item.icon className="h-5 w-5" aria-hidden="true" />
-              <span className="truncate">{item.label}</span>
+              <span className="w-full truncate text-center">{item.label}</span>
             </NavLink>
+
           ))}
         </nav>
       </div>
