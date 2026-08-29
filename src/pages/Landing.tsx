@@ -51,7 +51,7 @@ export default function Landing() {
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-5 py-4">
           <Wordmark />
           <nav className="flex items-center gap-2" aria-label={t("nav.main")}>
-            <ThemeToggle />
+            <ThemeToggle className="hidden sm:inline-flex" />
             <LanguageSwitcher className="hidden sm:inline-flex" />
             <LanguageSwitcher className="sm:hidden" compact />
             {user ? (

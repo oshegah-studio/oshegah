@@ -49,7 +49,7 @@ export default function Login() {
       <div className="w-full max-w-sm animate-soft-in rounded-2xl border border-border bg-card p-7 shadow-soft">
         <div className="flex items-center justify-between gap-2">
           <Wordmark />
-          <ThemeToggle />
+          <ThemeToggle className="hidden sm:inline-flex" />
           <LanguageSwitcher compact />
         </div>
         <h1 className="mt-6 font-display text-2xl font-semibold">
