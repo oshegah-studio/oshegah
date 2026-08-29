@@ -11,15 +11,21 @@ const seenKey = (customerId: string) => `oshegah:viewed:${customerId}`;
 export async function recordProfileView(customerId: string) {
   try {
     if (localStorage.getItem(seenKey(customerId))) return;
-    localStorage.setItem(seenKey(customerId), "1");
   } catch {
-    /* private mode — the DB constraint still de-duplicates */
+    /* private mode — the DB unique index still de-duplicates */
   }
-  await supabase.rpc("record_profile_view", {
+  const { error } = await supabase.rpc("record_profile_view", {
     _customer_id: customerId,
     _visitor_id: getVisitorId(),
   });
+  if (error) return; // keep no local flag so the view is retried next visit
+  try {
+    localStorage.setItem(seenKey(customerId), "1");
+  } catch {
+    /* ignore */
+  }
 }
+
 
 export async function recordLinkClick(customerId: string, linkId: string) {
   await supabase.from("link_clicks").insert({ customer_id: customerId, link_id: linkId });

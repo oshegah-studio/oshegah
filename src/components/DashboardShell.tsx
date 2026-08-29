@@ -90,10 +90,11 @@ export function DashboardShell({
       {/* Main */}
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile top bar */}
-        <header className="sticky top-0 z-40 flex items-center justify-between gap-2 border-b border-sidebar-border bg-sidebar px-4 py-3 lg:hidden">
-          <Wordmark invert />
-          <div className="flex items-center gap-2">
-            <ThemeToggle tone="invert" />
+        <header className="sticky top-0 z-40 flex w-full items-center justify-between gap-2 border-b border-sidebar-border bg-sidebar px-3 py-3 lg:hidden">
+          <div className="min-w-0 flex-1">
+            <Wordmark invert />
+          </div>
+          <div className="flex shrink-0 items-center gap-1">
             <LanguageSwitcher tone="invert" compact />
             <Button
               variant="ghost"
@@ -106,6 +107,7 @@ export function DashboardShell({
             </Button>
           </div>
         </header>
+
 
         {menuOpen && (
           <nav
