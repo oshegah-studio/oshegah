@@ -135,12 +135,21 @@ export function ProfileEditor({
 
   const autoCustomize = async () => {
     if (!form.avatar_url) return;
+    // Re-applying an already generated palette is instant (it stays saved in the
+    // background even after the user picks another preset theme).
+    if (autoPalette) {
+      setAutoPrev(snapshot());
+      setForm((f) => ({ ...f, ...autoPalette }));
+      toast.success(t("profileEditor.autoCustomizeDone"));
+      return;
+    }
     setAutoBusy(true);
     try {
       const palette = await paletteFromImage(form.avatar_url);
       setAutoPrev(snapshot());
       setAutoPalette(palette as PaletteFields);
       setForm((f) => ({ ...f, ...palette }));
+
       toast.success(t("profileEditor.autoCustomizeDone"));
     } catch {
       toast.error(t("profileEditor.autoCustomizeFailed"));
