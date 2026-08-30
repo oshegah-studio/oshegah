@@ -368,6 +368,35 @@ export type Database = {
         }
         Relationships: []
       }
+      username_history: {
+        Row: {
+          created_at: string
+          customer_id: string
+          id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          id?: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          id?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "username_history_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -420,6 +449,7 @@ export type Database = {
           website: string
         }[]
       }
+      get_username_by_card: { Args: { _customer_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -439,6 +469,7 @@ export type Database = {
         Args: { _customer_id: string; _visitor_id: string }
         Returns: undefined
       }
+      resolve_username: { Args: { _username: string }; Returns: string }
       switch_profile_type: {
         Args: { _next: Database["public"]["Enums"]["account_type"] }
         Returns: {
