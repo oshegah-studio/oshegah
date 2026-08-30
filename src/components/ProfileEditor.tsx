@@ -108,6 +108,11 @@ export function ProfileEditor({
     setAutoPalette(null);
   }, [customer?.id]);
 
+  // A new photo invalidates the stored generated palette.
+  useEffect(() => {
+    setAutoPalette(null);
+  }, [form.avatar_url]);
+
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
 
