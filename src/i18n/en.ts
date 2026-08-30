@@ -148,6 +148,8 @@ export const en = {
     appearance: "Appearance",
     username: "Username",
     usernamePlaceholder: "yourname",
+    usernameLocked: "Your username is permanent and cannot be changed.",
+    usernameLockedLong: "Your username is permanent and cannot be changed. It is used as your unique OSHEGAH profile address and may be connected to your NFC card and QR code.",
     displayName: "Display name",
     jobTitle: "Job title",
     location: "Location",

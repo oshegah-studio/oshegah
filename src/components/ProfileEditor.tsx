@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, Loader2, Sparkles } from "lucide-react";
+import { Check, Loader2, Lock, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,8 @@ export interface ProfileEditorProps {
   businessId?: string | null;
   onSaved?: (customer: CustomerRow) => void;
   allowVerified?: boolean;
+  /** Admin-only escape hatch: usernames are otherwise permanent. */
+  allowUsernameEdit?: boolean;
 }
 
 type FormState = {

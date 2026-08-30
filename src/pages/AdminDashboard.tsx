@@ -119,6 +119,7 @@ export default function AdminDashboard() {
               key={selected?.id ?? "new"}
               customer={selected}
               allowVerified
+              allowUsernameEdit
               onSaved={(c) => { setCreating(false); setSelected(c); }}
             />
             {selected && <LinksEditor customerId={selected.id} />}
