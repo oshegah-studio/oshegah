@@ -76,8 +76,20 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
+const fallback: I18nValue = {
+  lang: "en",
+  dir: "ltr",
+  isRtl: false,
+  setLang: () => {},
+  t: (key, vars) => {
+    const raw = lookup(en, key) ?? key;
+    if (!vars) return raw;
+    return raw.replace(/\{(\w+)\}/g, (m, name: string) =>
+      vars[name] !== undefined ? String(vars[name]) : m,
+    );
+  },
+};
+
 export function useI18n(): I18nValue {
-  const ctx = useContext(I18nContext);
-  if (!ctx) throw new Error("useI18n must be used within LanguageProvider");
-  return ctx;
+  return useContext(I18nContext) ?? fallback;
 }
