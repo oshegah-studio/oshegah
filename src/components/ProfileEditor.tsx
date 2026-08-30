@@ -234,17 +234,37 @@ export function ProfileEditor({
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="username">{t("profileEditor.username")}</Label>
-            <Input
-              id="username"
-              dir="ltr"
-              value={form.username}
-              onChange={(e) => set("username", normalizeUsername(e.target.value))}
-              placeholder={t("profileEditor.usernamePlaceholder")}
-            />
-            <p className="text-xs text-muted-foreground" dir="ltr">
-              oshegah.com/{form.username || "yourname"}
-            </p>
+            {usernameLocked ? (
+              <>
+                <div
+                  dir="ltr"
+                  aria-readonly="true"
+                  className="flex h-10 w-full items-center gap-2 rounded-md border border-border bg-muted/60 px-3 text-sm text-foreground/80"
+                >
+                  <Lock className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  <span className="truncate font-medium">{form.username}</span>
+                </div>
+                <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                  <Lock className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
+                  <span>{t("profileEditor.usernameLockedLong")}</span>
+                </p>
+              </>
+            ) : (
+              <>
+                <Input
+                  id="username"
+                  dir="ltr"
+                  value={form.username}
+                  onChange={(e) => set("username", normalizeUsername(e.target.value))}
+                  placeholder={t("profileEditor.usernamePlaceholder")}
+                />
+                <p className="text-xs text-muted-foreground" dir="ltr">
+                  oshegah.com/{form.username || "yourname"}
+                </p>
+              </>
+            )}
           </div>
+
           <div className="space-y-1.5">
             <Label htmlFor="full_name">{t("profileEditor.displayName")}</Label>
             <Input id="full_name" value={form.full_name} onChange={(e) => set("full_name", e.target.value)} />
