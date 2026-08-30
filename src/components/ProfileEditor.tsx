@@ -171,14 +171,15 @@ export function ProfileEditor({
 
   const save = async () => {
     const username = normalizeUsername(form.username);
-    const usernameError = validateUsername(username);
-    if (usernameError) return toast.error(usernameError);
-    if (RESERVED_USERNAMES.has(username)) return toast.error(t("profileEditor.reserved"));
+    if (!usernameLocked) {
+      const usernameError = validateUsername(username);
+      if (usernameError) return toast.error(usernameError);
+      if (RESERVED_USERNAMES.has(username)) return toast.error(t("profileEditor.reserved"));
+    }
     if (!form.full_name.trim()) return toast.error(t("profileEditor.nameRequired"));
 
     setSaving(true);
     const payload = {
-      username,
       full_name: form.full_name.trim(),
       job_title: form.job_title.trim() || null,
       bio: form.bio.trim() || null,
@@ -199,7 +200,10 @@ export function ProfileEditor({
       button_shadow: form.button_shadow,
       font_style: form.font_style,
       ...(allowVerified ? { verified: form.verified } : {}),
+      // Usernames are permanent: only sent when creating or when explicitly allowed (admin).
+      ...(usernameLocked ? {} : { username }),
     };
+
 
     const query = customer
       ? supabase.from("customers").update(payload).eq("id", customer.id).select("*").single()
