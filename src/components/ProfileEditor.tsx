@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, Loader2, Sparkles } from "lucide-react";
+import { Check, Loader2, Lock, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,8 @@ export interface ProfileEditorProps {
   businessId?: string | null;
   onSaved?: (customer: CustomerRow) => void;
   allowVerified?: boolean;
+  /** Admin-only escape hatch: usernames are otherwise permanent. */
+  allowUsernameEdit?: boolean;
 }
 
 type FormState = {
@@ -87,8 +89,12 @@ export function ProfileEditor({
   businessId,
   onSaved,
   allowVerified,
+  allowUsernameEdit = false,
 }: ProfileEditorProps) {
+  /** Usernames are permanent once the profile exists (admins keep the override). */
+  const usernameLocked = Boolean(customer) && !allowUsernameEdit;
   const [form, setForm] = useState<FormState>(() => toForm(customer));
+
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
   const [autoBusy, setAutoBusy] = useState(false);
@@ -171,14 +177,15 @@ export function ProfileEditor({
 
   const save = async () => {
     const username = normalizeUsername(form.username);
-    const usernameError = validateUsername(username);
-    if (usernameError) return toast.error(usernameError);
-    if (RESERVED_USERNAMES.has(username)) return toast.error(t("profileEditor.reserved"));
+    if (!usernameLocked) {
+      const usernameError = validateUsername(username);
+      if (usernameError) return toast.error(usernameError);
+      if (RESERVED_USERNAMES.has(username)) return toast.error(t("profileEditor.reserved"));
+    }
     if (!form.full_name.trim()) return toast.error(t("profileEditor.nameRequired"));
 
     setSaving(true);
     const payload = {
-      username,
       full_name: form.full_name.trim(),
       job_title: form.job_title.trim() || null,
       bio: form.bio.trim() || null,
@@ -199,13 +206,16 @@ export function ProfileEditor({
       button_shadow: form.button_shadow,
       font_style: form.font_style,
       ...(allowVerified ? { verified: form.verified } : {}),
+      // Usernames are permanent: only sent when creating or when explicitly allowed (admin).
+      ...(usernameLocked ? {} : { username }),
     };
+
 
     const query = customer
       ? supabase.from("customers").update(payload).eq("id", customer.id).select("*").single()
       : supabase
           .from("customers")
-          .insert({ ...payload, user_id: ownerProfileId ?? null, business_id: businessId ?? null })
+          .insert({ ...payload, username, user_id: ownerProfileId ?? null, business_id: businessId ?? null })
           .select("*")
           .single();
 
@@ -234,17 +244,37 @@ export function ProfileEditor({
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="username">{t("profileEditor.username")}</Label>
-            <Input
-              id="username"
-              dir="ltr"
-              value={form.username}
-              onChange={(e) => set("username", normalizeUsername(e.target.value))}
-              placeholder={t("profileEditor.usernamePlaceholder")}
-            />
-            <p className="text-xs text-muted-foreground" dir="ltr">
-              oshegah.com/{form.username || "yourname"}
-            </p>
+            {usernameLocked ? (
+              <>
+                <div
+                  dir="ltr"
+                  aria-readonly="true"
+                  className="flex h-10 w-full items-center gap-2 rounded-md border border-border bg-muted/60 px-3 text-sm text-foreground/80"
+                >
+                  <Lock className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  <span className="truncate font-medium">{form.username}</span>
+                </div>
+                <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                  <Lock className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
+                  <span>{t("profileEditor.usernameLockedLong")}</span>
+                </p>
+              </>
+            ) : (
+              <>
+                <Input
+                  id="username"
+                  dir="ltr"
+                  value={form.username}
+                  onChange={(e) => set("username", normalizeUsername(e.target.value))}
+                  placeholder={t("profileEditor.usernamePlaceholder")}
+                />
+                <p className="text-xs text-muted-foreground" dir="ltr">
+                  oshegah.com/{form.username || "yourname"}
+                </p>
+              </>
+            )}
           </div>
+
           <div className="space-y-1.5">
             <Label htmlFor="full_name">{t("profileEditor.displayName")}</Label>
             <Input id="full_name" value={form.full_name} onChange={(e) => set("full_name", e.target.value)} />

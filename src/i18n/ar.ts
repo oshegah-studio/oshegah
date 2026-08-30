@@ -152,6 +152,8 @@ export const ar: DeepPartialSame<Dictionary> = {
     appearance: "المظهر",
     username: "اسم المستخدم",
     usernamePlaceholder: "اسمك",
+    usernameLocked: "اسم المستخدم الخاص بك دائم ولا يمكن تغييره.",
+    usernameLockedLong: "اسم المستخدم الخاص بك دائم ولا يمكن تغييره. يتم استخدامه كعنوان فريد لملفك الشخصي على OSHEGAH وقد يكون مرتبطًا ببطاقة NFC ورمز QR الخاصين بك.",
     displayName: "الاسم المعروض",
     jobTitle: "المسمى الوظيفي",
     location: "الموقع",
