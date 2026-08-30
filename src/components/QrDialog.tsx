@@ -72,11 +72,15 @@ export function QrDialog({
   open,
   onOpenChange,
   url,
+  qrUrl,
   username,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
+  /** Human-readable profile URL shown/copied. */
   url: string;
+  /** Permanent card URL actually encoded in the QR (defaults to `url`). */
+  qrUrl?: string;
   username: string;
 }) {
   const { t } = useI18n();
@@ -85,11 +89,11 @@ export function QrDialog({
   useEffect(() => {
     if (!open) return;
     let active = true;
-    renderBrandedQr(url).then((d) => active && setDataUrl(d));
+    renderBrandedQr(qrUrl ?? url).then((d) => active && setDataUrl(d));
     return () => {
       active = false;
     };
-  }, [open, url]);
+  }, [open, url, qrUrl]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

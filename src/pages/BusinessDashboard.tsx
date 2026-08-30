@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyBusiness, useBusinessProfiles, useCustomerStats, type CustomerRow } from "@/hooks/useOshegah";
-import { profileUrlFor } from "@/lib/vcard";
+import { cardUrlFor, profileUrlFor } from "@/lib/vcard";
 import { useI18n } from "@/i18n";
 
 export default function BusinessDashboard() {
@@ -150,6 +150,7 @@ export default function BusinessDashboard() {
           open={Boolean(qrFor)}
           onOpenChange={(v) => !v && setQrFor(null)}
           url={profileUrlFor(qrFor.username)}
+          qrUrl={cardUrlFor(qrFor.id)}
           username={qrFor.username}
         />
       )}
