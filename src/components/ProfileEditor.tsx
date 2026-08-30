@@ -87,8 +87,12 @@ export function ProfileEditor({
   businessId,
   onSaved,
   allowVerified,
+  allowUsernameEdit = false,
 }: ProfileEditorProps) {
+  /** Usernames are permanent once the profile exists (admins keep the override). */
+  const usernameLocked = Boolean(customer) && !allowUsernameEdit;
   const [form, setForm] = useState<FormState>(() => toForm(customer));
+
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
   const [autoBusy, setAutoBusy] = useState(false);
