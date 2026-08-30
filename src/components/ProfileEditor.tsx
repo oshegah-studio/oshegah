@@ -215,7 +215,7 @@ export function ProfileEditor({
       ? supabase.from("customers").update(payload).eq("id", customer.id).select("*").single()
       : supabase
           .from("customers")
-          .insert({ ...payload, user_id: ownerProfileId ?? null, business_id: businessId ?? null })
+          .insert({ ...payload, username, user_id: ownerProfileId ?? null, business_id: businessId ?? null })
           .select("*")
           .single();
 
