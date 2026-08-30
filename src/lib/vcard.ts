@@ -48,3 +48,6 @@ export function downloadVCard(input: VCardInput) {
 }
 
 export const profileUrlFor = (username: string) => `${window.location.origin}/${username}`;
+
+/** Permanent NFC/QR destination — never changes when the username changes. */
+export const cardUrlFor = (customerId: string) => `${window.location.origin}/c/${customerId}`;

@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyCustomer, useLinks, useCustomerStats } from "@/hooks/useOshegah";
 import { linkMeta } from "@/lib/links";
-import { profileUrlFor } from "@/lib/vcard";
+import { cardUrlFor, profileUrlFor } from "@/lib/vcard";
 import { useI18n } from "@/i18n";
 
 export default function Dashboard() {
@@ -128,7 +128,7 @@ export default function Dashboard() {
       )}
 
       {customer && (
-        <QrDialog open={qrOpen} onOpenChange={setQrOpen} url={url} username={customer.username} />
+        <QrDialog open={qrOpen} onOpenChange={setQrOpen} url={url} qrUrl={cardUrlFor(customer.id)} username={customer.username} />
       )}
     </DashboardShell>
   );

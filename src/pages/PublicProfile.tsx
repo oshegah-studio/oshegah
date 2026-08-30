@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileView, type ProfileViewLink } from "@/components/ProfileView";
@@ -24,7 +24,13 @@ export default function PublicProfile() {
       });
       if (error) throw error;
       const customer = rows?.[0];
-      if (!customer) return null;
+      if (!customer) {
+        // Username may be an old alias — resolve it to the current one.
+        const { data: current } = await supabase.rpc("resolve_username", { _username: username });
+        return current && current.toLowerCase() !== username.toLowerCase()
+          ? { redirectTo: current as string }
+          : null;
+      }
       const { data: links } = await supabase
         .from("links")
         .select("*")
@@ -37,8 +43,10 @@ export default function PublicProfile() {
   });
 
   useEffect(() => {
-    if (data?.customer) void recordProfileView(data.customer.id);
-  }, [data?.customer?.id]);
+    if (data && "customer" in data && data.customer) void recordProfileView(data.customer.id);
+  }, [data && "customer" in data ? data.customer?.id : null]);
+
+  if (data && "redirectTo" in data) return <Navigate to={`/${data.redirectTo}`} replace />;
 
   if (isLoading) return <PageLoader label={t("publicProfile.loading")} />;
 
@@ -60,6 +68,7 @@ export default function PublicProfile() {
     );
   }
 
+  if (!("customer" in data)) return null;
   const { customer, links } = data;
 
   const onLinkClick = (link: ProfileViewLink) => {
