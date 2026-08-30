@@ -33,7 +33,14 @@ interface I18nValue {
   t: (key: string, vars?: Record<string, string | number>) => string;
 }
 
-const I18nContext = createContext<I18nValue | null>(null);
+// Kept on globalThis so hot-module reloads reuse the same context instance
+// instead of creating a second one that no provider is mounted against.
+const GLOBAL_KEY = "__oshegah_i18n_context__";
+const globalStore = globalThis as unknown as Record<string, unknown>;
+const I18nContext =
+  (globalStore[GLOBAL_KEY] as React.Context<I18nValue | null>) ??
+  ((globalStore[GLOBAL_KEY] = createContext<I18nValue | null>(null)) as React.Context<I18nValue | null>);
+
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(detectLang);
