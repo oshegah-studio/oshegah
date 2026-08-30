@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { THEME_LIST, BUTTON_STYLES, FONT_STYLES } from "@/lib/themes";
+import { THEME_LIST, BUTTON_STYLES, FONT_STYLES, getTheme } from "@/lib/themes";
 import { paletteFromImage } from "@/lib/palette";
 import { normalizeUsername, validateUsername, RESERVED_USERNAMES } from "@/lib/links";
 import type { CustomerRow } from "@/hooks/useOshegah";
@@ -92,33 +92,54 @@ export function ProfileEditor({
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
   const [autoBusy, setAutoBusy] = useState(false);
-  const [autoPrev, setAutoPrev] = useState<Pick<
+  type PaletteFields = Pick<
     FormState,
     "theme" | "background_color" | "primary_color" | "text_color" | "muted_text_color"
-  > | null>(null);
+  >;
+  const [autoPrev, setAutoPrev] = useState<PaletteFields | null>(null);
+  /** Last generated palette — kept so Auto Customize can be re-applied instantly. */
+  const [autoPalette, setAutoPalette] = useState<PaletteFields | null>(null);
   const qc = useQueryClient();
   const { t } = useI18n();
 
   useEffect(() => {
     setForm(toForm(customer));
     setAutoPrev(null);
+    setAutoPalette(null);
   }, [customer?.id]);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
+
+  const snapshot = (): PaletteFields => ({
+    theme: form.theme,
+    background_color: form.background_color,
+    primary_color: form.primary_color,
+    text_color: form.text_color,
+    muted_text_color: form.muted_text_color,
+  });
+
+  /** Selecting a preset theme always wins: custom color overrides are reset to
+   *  that theme's own tokens so the choice is never blocked by a generated palette. */
+  const selectTheme = (id: FormState["theme"]) => {
+    const tokens = getTheme(id);
+    setForm((f) => ({
+      ...f,
+      theme: id,
+      background_color: "",
+      muted_text_color: "",
+      primary_color: tokens.accent,
+      text_color: tokens.text,
+    }));
+  };
 
   const autoCustomize = async () => {
     if (!form.avatar_url) return;
     setAutoBusy(true);
     try {
       const palette = await paletteFromImage(form.avatar_url);
-      setAutoPrev({
-        theme: form.theme,
-        background_color: form.background_color,
-        primary_color: form.primary_color,
-        text_color: form.text_color,
-        muted_text_color: form.muted_text_color,
-      });
+      setAutoPrev(snapshot());
+      setAutoPalette(palette as PaletteFields);
       setForm((f) => ({ ...f, ...palette }));
       toast.success(t("profileEditor.autoCustomizeDone"));
     } catch {
@@ -272,7 +293,7 @@ export function ProfileEditor({
               <button
                 key={theme.id}
                 type="button"
-                onClick={() => set("theme", theme.id)}
+                onClick={() => selectTheme(theme.id)}
                 className={cn(
                   "card-interactive overflow-hidden rounded-xl border p-0 text-start",
                   selected ? "border-primary ring-2 ring-primary/30" : "border-border",
