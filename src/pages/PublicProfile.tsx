@@ -113,7 +113,13 @@ export default function PublicProfile() {
       <div className="absolute end-4 top-4 z-10">
         <LanguageSwitcher tone="invert" compact />
       </div>
-      <ProfileView customer={customer} links={links} onLinkClick={onLinkClick} onSaveContact={onSaveContact} />
+      <ProfileView
+        customer={customer}
+        links={links}
+        onLinkClick={onLinkClick}
+        onSaveContact={onSaveContact}
+        showBrandBadge
+      />
     </main>
   );
 }

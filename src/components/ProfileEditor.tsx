@@ -13,6 +13,7 @@ import { paletteFromImage } from "@/lib/palette";
 import { normalizeUsername, validateUsername, RESERVED_USERNAMES } from "@/lib/links";
 import type { CustomerRow } from "@/hooks/useOshegah";
 import { AvatarUploader } from "@/components/AvatarUploader";
+import { BackgroundUploader } from "@/components/BackgroundUploader";
 import { ProfileView } from "@/components/ProfileView";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n";
@@ -50,6 +51,7 @@ type FormState = {
   muted_text_color: string;
   button_shadow: boolean;
   font_style: string;
+  background_image_url: string;
 };
 
 const toForm = (c: CustomerRow | null): FormState => ({
@@ -74,6 +76,7 @@ const toForm = (c: CustomerRow | null): FormState => ({
   muted_text_color: c?.muted_text_color ?? "",
   button_shadow: c?.button_shadow ?? false,
   font_style: c?.font_style ?? "default",
+  background_image_url: c?.background_image_url ?? "",
 });
 
 const previewLinks = [
@@ -205,6 +208,7 @@ export function ProfileEditor({
       muted_text_color: form.muted_text_color || null,
       button_shadow: form.button_shadow,
       font_style: form.font_style,
+      background_image_url: form.background_image_url.trim() || null,
       ...(allowVerified ? { verified: form.verified } : {}),
       // Usernames are permanent: only sent when creating or when explicitly allowed (admin).
       ...(usernameLocked ? {} : { username }),
@@ -453,6 +457,11 @@ export function ProfileEditor({
         </div>
 
 
+        <BackgroundUploader
+          value={form.background_image_url}
+          onChange={(url) => set("background_image_url", url)}
+        />
+
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="primary_color">{t("profileEditor.accentColor")}</Label>
@@ -525,6 +534,7 @@ export function ProfileEditor({
                 font_style: form.font_style,
                 show_contact_button: form.show_contact_button,
                 show_save_contact: form.show_save_contact,
+                background_image_url: form.background_image_url || null,
               }}
               links={previewLinks}
             />
