@@ -1,7 +1,11 @@
-import { BadgeCheck, MapPin, ChevronRight, Download, Phone, Mail } from "lucide-react";
+import { BadgeCheck, MapPin, ChevronRight, Download, Phone, Mail, Share2 } from "lucide-react";
+import { toast } from "sonner";
 import { resolveProfileStyle } from "@/lib/themes";
 import { linkMeta, buildLinkHref } from "@/lib/links";
+import { OSHEGAH_LOGO_URL } from "@/components/OshegahLogo";
 import { useI18n } from "@/i18n";
+
+export const OSHEGAH_SITE_URL = "https://oshegah.com";
 
 export interface ProfileViewCustomer {
   id?: string;
@@ -25,6 +29,7 @@ export interface ProfileViewCustomer {
   muted_text_color?: string | null;
   button_shadow?: boolean | null;
   font_style?: string | null;
+  background_image_url?: string | null;
 }
 
 export interface ProfileViewLink {
@@ -41,12 +46,21 @@ interface Props {
   onLinkClick?: (link: ProfileViewLink) => void;
   onSaveContact?: () => void;
   compact?: boolean;
+  /** Floating OSHEGAH mark — public pages only (hidden in the editor preview). */
+  showBrandBadge?: boolean;
 }
 
 const initials = (name: string) =>
   name.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
 
-export function ProfileView({ customer, links, onLinkClick, onSaveContact, compact }: Props) {
+export function ProfileView({
+  customer,
+  links,
+  onLinkClick,
+  onSaveContact,
+  compact,
+  showBrandBadge,
+}: Props) {
   const { t } = useI18n();
   const s = resolveProfileStyle(customer);
   const { radius, accent, text } = s;
@@ -62,13 +76,50 @@ export function ProfileView({ customer, links, onLinkClick, onSaveContact, compa
   const saveEnabled =
     customer.show_save_contact !== false && Boolean(phone || email || customer.website);
 
+  /** Shares one single link — never the whole profile. */
+  const shareLink = async (link: ProfileViewLink) => {
+    const href = buildLinkHref(link.type, link.value);
+    const url = href.startsWith("http") ? href : `${OSHEGAH_SITE_URL}/${customer.username}`;
+    const title = link.title || linkMeta(link.type).label;
+    try {
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share({ title, text: title, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      toast.success(t("publicProfile.linkCopied"));
+    } catch (e) {
+      if ((e as DOMException)?.name === "AbortError") return;
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success(t("publicProfile.linkCopied"));
+      } catch {
+        toast.error(t("publicProfile.shareFailed"));
+      }
+    }
+  };
+
   return (
     <div
-      className="min-h-full w-full overflow-x-hidden"
+      className="relative min-h-full w-full overflow-x-hidden"
       style={{ background: s.background, color: text, fontFamily: s.fontFamily }}
     >
+      {/* Customer background photo + readability scrim */}
+      {s.backgroundImage && (
+        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+          <img
+            src={s.backgroundImage}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-cover"
+          />
+          <span className="absolute inset-0" style={{ background: s.backgroundOverlay }} />
+        </div>
+      )}
+
       <div
-        className={`mx-auto flex w-full max-w-md min-w-0 flex-col items-center ${compact ? "px-4 py-8" : "px-5 pb-14 pt-12 sm:pt-16"}`}
+        className={`relative mx-auto flex w-full max-w-md min-w-0 flex-col items-center ${compact ? "px-4 py-8" : "px-5 pb-14 pt-12 sm:pt-16"}`}
       >
         {/* Avatar */}
         <div className="relative animate-soft-in">
@@ -150,14 +201,11 @@ export function ProfileView({ customer, links, onLinkClick, onSaveContact, compa
             const Icon = meta.icon;
             const href = buildLinkHref(link.type, link.value);
             const external = href.startsWith("http");
+            const label = link.title || meta.label;
             return (
-              <a
+              <div
                 key={link.id}
-                href={href}
-                target={external ? "_blank" : undefined}
-                rel={external ? "noopener noreferrer" : undefined}
-                onClick={() => onLinkClick?.(link)}
-                className="group flex min-h-[56px] w-full min-w-0 animate-soft-in items-center gap-3 px-4 py-3.5 transition-transform duration-200 active:scale-[0.985] sm:hover:-translate-y-0.5"
+                className="group flex min-h-[56px] w-full min-w-0 animate-soft-in items-center gap-1 pe-1.5 ps-4 transition-transform duration-200 sm:hover:-translate-y-0.5"
                 style={{
                   borderRadius: radius,
                   background: s.surface,
@@ -168,18 +216,41 @@ export function ProfileView({ customer, links, onLinkClick, onSaveContact, compa
                   animationDelay: `${180 + Math.min(index, 10) * 45}ms`,
                 }}
               >
-                <span
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-                  style={{ background: `${meta.tint}22`, color: meta.tint === "#010101" || meta.tint === "#111111" ? text : meta.tint }}
+                <a
+                  href={href}
+                  target={external ? "_blank" : undefined}
+                  rel={external ? "noopener noreferrer" : undefined}
+                  onClick={() => onLinkClick?.(link)}
+                  className="flex min-w-0 flex-1 items-center gap-3 py-3.5 transition-transform duration-200 active:scale-[0.985]"
+                  style={{ color: text }}
                 >
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <span className="min-w-0 flex-1 truncate text-sm font-medium">{link.title || meta.label}</span>
-                <ChevronRight
-                  className="h-4 w-4 shrink-0 opacity-40 transition-transform duration-200 group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
-                  aria-hidden="true"
-                />
-              </a>
+                  <span
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+                    style={{ background: `${meta.tint}22`, color: meta.tint === "#010101" || meta.tint === "#111111" ? text : meta.tint }}
+                  >
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium">{label}</span>
+                  <ChevronRight
+                    className="h-4 w-4 shrink-0 opacity-40 transition-transform duration-200 group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
+                    aria-hidden="true"
+                  />
+                </a>
+                <button
+                  type="button"
+                  aria-label={t("publicProfile.shareLink", { title: label })}
+                  title={t("publicProfile.shareLink", { title: label })}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    void shareLink(link);
+                  }}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full opacity-55 transition-opacity duration-200 hover:opacity-100 focus-visible:opacity-100"
+                  style={{ color: text }}
+                >
+                  <Share2 className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </div>
             );
           })}
 
@@ -235,6 +306,21 @@ export function ProfileView({ customer, links, onLinkClick, onSaveContact, compa
           {t("brand.poweredBy")}
         </p>
       </div>
+
+      {/* Floating OSHEGAH mark — small, safe-area aware, never over the content column */}
+      {showBrandBadge && (
+        <a
+          href={OSHEGAH_SITE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t("publicProfile.visitOshegah")}
+          title={t("publicProfile.visitOshegah")}
+          className="fixed end-3 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/90 shadow-lg backdrop-blur transition-transform duration-200 hover:scale-105 active:scale-95"
+          style={{ bottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))" }}
+        >
+          <img src={OSHEGAH_LOGO_URL} alt="" aria-hidden="true" className="h-7 w-7 object-contain" />
+        </a>
+      )}
     </div>
   );
 }
