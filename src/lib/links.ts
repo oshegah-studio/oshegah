@@ -24,6 +24,33 @@ export interface LinkTypeMeta {
 
 const digits = (v: string) => v.replace(/[^\d+]/g, "");
 
+/**
+ * Egyptian mobile numbers are usually typed locally (01xxxxxxxxx).
+ * Normalise once, here, so WhatsApp links always use +20 and never double it.
+ */
+export const normalizeEgyptianPhone = (raw: string) => {
+  let v = (raw ?? "").replace(/[^\d+]/g, "");
+  if (!v) return "";
+  if (v.startsWith("00")) v = `+${v.slice(2)}`;
+  if (v.startsWith("+")) return v; // already international — leave alone
+  if (/^20(10|11|12|15)\d{8}$/.test(v)) return `+${v}`;
+  if (/^0(10|11|12|15)\d{8}$/.test(v)) return `+20${v.slice(1)}`;
+  if (/^(10|11|12|15)\d{8}$/.test(v)) return `+20${v}`;
+  return `+${v}`;
+};
+
+/** Local Egyptian form (01xxxxxxxxx) used by wallet USSD codes. */
+export const toEgyptianLocal = (raw: string) => {
+  const v = (raw ?? "").replace(/\D/g, "");
+  if (/^20\d{10}$/.test(v)) return `0${v.slice(2)}`;
+  if (/^(10|11|12|15)\d{8}$/.test(v)) return `0${v}`;
+  return v;
+};
+
+/** Vodafone Cash dialer code — visitors only ever see the “Vodafone Cash” button. */
+export const buildVodafoneCashHref = (v: string) => `tel://*9*7*${toEgyptianLocal(v)}23%`;
+
+
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 const isMobileUa = () =>
