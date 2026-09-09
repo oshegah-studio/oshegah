@@ -102,6 +102,7 @@ export type Database = {
           active: boolean
           avatar_url: string | null
           background_color: string | null
+          background_image_url: string | null
           bio: string | null
           business_id: string | null
           button_shadow: boolean
@@ -130,6 +131,7 @@ export type Database = {
           active?: boolean
           avatar_url?: string | null
           background_color?: string | null
+          background_image_url?: string | null
           bio?: string | null
           business_id?: string | null
           button_shadow?: boolean
@@ -158,6 +160,7 @@ export type Database = {
           active?: boolean
           avatar_url?: string | null
           background_color?: string | null
+          background_image_url?: string | null
           bio?: string | null
           business_id?: string | null
           button_shadow?: boolean
@@ -428,6 +431,7 @@ export type Database = {
           active: boolean
           avatar_url: string
           background_color: string
+          background_image_url: string
           bio: string
           button_shadow: boolean
           button_style: string
