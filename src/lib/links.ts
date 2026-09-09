@@ -47,9 +47,6 @@ export const toEgyptianLocal = (raw: string) => {
   return v;
 };
 
-/** Vodafone Cash now dials the stored phone number directly. */
-const buildVodafoneCashHref = (v: string) => `tel:${digits(v)}`;
-
 
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
