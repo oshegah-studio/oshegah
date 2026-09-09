@@ -1,4 +1,4 @@
-import { Navigate, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { PageLoader } from "@/components/states";
