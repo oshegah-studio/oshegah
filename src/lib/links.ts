@@ -95,10 +95,12 @@ const handleUrl = (base: string) => (value: string) => {
 export const LINK_TYPES: Record<LinkType, LinkTypeMeta> = {
   whatsapp: {
     type: "whatsapp", label: "WhatsApp", icon: MessageCircle, tint: "#25D366",
-    placeholder: "+20 100 000 0000", hint: "Phone number with country code",
-    buildHref: (v) => `https://wa.me/${digits(v).replace(/\+/g, "")}`,
-    validate: (v) => (digits(v).replace(/\+/g, "").length >= 8 ? null : "Enter a valid phone number with country code"),
+    placeholder: "010 0000 0000", hint: "Egyptian numbers automatically get +20",
+    buildHref: (v) => `https://wa.me/${normalizeEgyptianPhone(v).replace(/\D/g, "")}`,
+    validate: (v) => (digits(v).replace(/\+/g, "").length >= 8 ? null : "Enter a valid phone number"),
+    normalize: (v) => normalizeEgyptianPhone(v),
   },
+
   phone: {
     type: "phone", label: "Phone", icon: Phone, tint: "#4B7BEC",
     placeholder: "+20 100 000 0000", hint: "Opens the phone dialer",
@@ -184,10 +186,12 @@ export const LINK_TYPES: Record<LinkType, LinkTypeMeta> = {
   },
   vodafone_cash: {
     type: "vodafone_cash", label: "Vodafone Cash", icon: Smartphone, tint: "#E60000",
-    placeholder: "010 0000 0000", hint: "Wallet phone number",
-    buildHref: (v) => `tel:${digits(v)}`,
-    validate: (v) => (digits(v).length >= 8 ? null : "Enter a valid wallet number"),
+    placeholder: "010 0000 0000", hint: "Opens the dialer with the Vodafone Cash code",
+    buildHref: (v) => buildVodafoneCashHref(v),
+    validate: (v) => (toEgyptianLocal(v).length >= 8 ? null : "Enter a valid wallet number"),
+    normalize: (v) => toEgyptianLocal(v),
   },
+
   custom: {
     type: "custom", label: "Custom URL", icon: LinkIcon, tint: "#162446",
     placeholder: "https://…", hint: "Any link you want to share",
