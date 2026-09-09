@@ -101,7 +101,7 @@ export function ProfileView({
 
   return (
     <div
-      className="relative min-h-full w-full overflow-x-hidden"
+      className={`relative w-full ${compact ? "min-h-full" : "min-h-dvh"}`}
       style={{ background: s.background, color: text, fontFamily: s.fontFamily }}
     >
       {/* Customer background photo + readability scrim */}
