@@ -16,14 +16,9 @@ import { useAuth, type AccountType } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n";
 import { cn } from "@/lib/utils";
 
-const COOLDOWN_DAYS = 14;
-
-const nextChangeAt = (last: string | null) =>
-  last ? new Date(new Date(last).getTime() + COOLDOWN_DAYS * 86400000) : null;
-
 export function AccountSettings() {
   const { profile, refresh, signOut } = useAuth();
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const qc = useQueryClient();
   const navigate = useNavigate();
 
@@ -34,12 +29,6 @@ export function AccountSettings() {
   const [deleting, setDeleting] = useState(false);
 
   const current: AccountType = profile?.account_type ?? "personal";
-  const unlockAt = nextChangeAt(profile?.last_profile_type_change_at ?? null);
-  const locked = Boolean(unlockAt && unlockAt.getTime() > Date.now());
-  const daysLeft = unlockAt ? Math.ceil((unlockAt.getTime() - Date.now()) / 86400000) : 0;
-  const unlockLabel = unlockAt
-    ? new Intl.DateTimeFormat(lang === "ar" ? "ar-EG" : "en-GB", { dateStyle: "long" }).format(unlockAt)
-    : "";
 
   const confirmSwitch = async () => {
     if (!pendingType) return;
@@ -48,14 +37,7 @@ export function AccountSettings() {
     setSwitching(false);
     setPendingType(null);
     if (error) {
-      const match = /PROFILE_TYPE_LOCKED_UNTIL\s+(\S+)/.exec(error.message);
-      if (match) {
-        const date = new Intl.DateTimeFormat(lang === "ar" ? "ar-EG" : "en-GB", { dateStyle: "long" })
-          .format(new Date(match[1]));
-        toast.error(t("profileType.lockedToast", { date }));
-      } else {
-        toast.error(error.message);
-      }
+      toast.error(error.message);
       await refresh();
       return;
     }
@@ -96,7 +78,7 @@ export function AccountSettings() {
       <section className="animate-soft-in space-y-4 rounded-2xl border border-border bg-card p-5 shadow-soft">
         <div>
           <h2 className="font-display text-lg font-semibold">{t("profileType.title")}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{t("profileType.cooldownExplain")}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("profileType.switchExplain")}</p>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
@@ -106,12 +88,11 @@ export function AccountSettings() {
               <button
                 key={o.id}
                 type="button"
-                disabled={active || locked}
+                disabled={active || switching}
                 onClick={() => setPendingType(o.id)}
                 className={cn(
                   "card-interactive rounded-xl border p-4 text-start disabled:cursor-not-allowed",
                   active ? "border-primary ring-2 ring-primary/25" : "border-border",
-                  locked && !active && "opacity-60",
                 )}
               >
                 <span className="flex items-center gap-2 font-medium">
@@ -125,16 +106,6 @@ export function AccountSettings() {
           })}
         </div>
 
-        {locked ? (
-          <div className="rounded-xl border border-border bg-muted/50 p-3 text-sm">
-            <p className="font-medium">{t("profileType.locked")}</p>
-            <p className="text-muted-foreground">
-              {t("profileType.nextChange", { date: unlockLabel })} · {t("profileType.availableIn", { days: daysLeft })}
-            </p>
-          </div>
-        ) : (
-          <p className="text-xs text-muted-foreground">{t("profileType.available")}</p>
-        )}
       </section>
 
       {/* Danger zone */}

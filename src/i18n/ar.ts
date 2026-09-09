@@ -229,6 +229,10 @@ export const ar: DeepPartialSame<Dictionary> = {
     backHome: "العودة إلى OSHEGAH",
     verifiedProfile: "ملف موثّق",
     photoAlt: "صورة ملف {name}",
+    shareLink: "مشاركة {title}",
+    linkCopied: "تم نسخ الرابط.",
+    shareFailed: "تعذّرت مشاركة هذا الرابط.",
+    visitOshegah: "زيارة OSHEGAH",
   },
   avatar: {
     label: "الصورة الشخصية",
@@ -242,6 +246,15 @@ export const ar: DeepPartialSame<Dictionary> = {
     uploaded: "تم رفع الصورة.",
     failed: "فشل الرفع. حاول مرة أخرى.",
     signedOut: "سجّل الدخول مرة أخرى للرفع.",
+  },
+  background: {
+    label: "صورة الخلفية",
+    upload: "رفع خلفية",
+    replace: "تغيير الخلفية",
+    remove: "إزالة الخلفية",
+    preview: "معاينة صورة الخلفية",
+    hint: "JPG أو PNG أو WebP · حتى 5 ميجابايت · تظهر خلف ملفك العام",
+    uploaded: "تم رفع الخلفية.",
   },
   card: {
     tagline: "المس المستقبل",

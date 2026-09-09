@@ -225,6 +225,10 @@ export const en = {
     backHome: "Back to OSHEGAH",
     verifiedProfile: "Verified profile",
     photoAlt: "{name} profile photo",
+    shareLink: "Share {title}",
+    linkCopied: "Link copied to clipboard.",
+    shareFailed: "Couldn't share that link.",
+    visitOshegah: "Visit OSHEGAH",
   },
   avatar: {
     label: "Profile picture",
@@ -238,6 +242,15 @@ export const en = {
     uploaded: "Photo uploaded.",
     failed: "Upload failed. Please try again.",
     signedOut: "Please sign in again to upload.",
+  },
+  background: {
+    label: "Background image",
+    upload: "Upload background",
+    replace: "Replace background",
+    remove: "Remove background",
+    preview: "Background image preview",
+    hint: "JPG, PNG or WebP · up to 5MB · shown behind your public profile",
+    uploaded: "Background uploaded.",
   },
   card: {
     tagline: "TOUCH THE FUTURE",
