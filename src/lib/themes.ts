@@ -129,6 +129,7 @@ export interface ProfileStyleSource {
   muted_text_color?: string | null;
   button_shadow?: boolean | null;
   font_style?: string | null;
+  background_image_url?: string | null;
 }
 
 export interface ResolvedProfileStyle extends ProfileThemeTokens {
@@ -137,6 +138,10 @@ export interface ResolvedProfileStyle extends ProfileThemeTokens {
   fontFamily: string | undefined;
   /** readable foreground for filled accent buttons */
   onAccent: string;
+  /** optional customer-uploaded background photo */
+  backgroundImage: string | null;
+  /** readability overlay painted above the photo, under the content */
+  backgroundOverlay: string;
 }
 
 const isLight = (hex: string) => {
@@ -161,5 +166,11 @@ export function resolveProfileStyle(c: ProfileStyleSource): ResolvedProfileStyle
     shadow: c.button_shadow ? "0 12px 28px -14px rgba(0,0,0,0.55)" : undefined,
     fontFamily: fontStack(c.font_style),
     onAccent: isLight(accent) ? "#162446" : "#FFFFFF",
+    backgroundImage: c.background_image_url || null,
+    // Light type needs a dark scrim, dark type needs a light one — the uploaded
+    // image itself is never modified.
+    backgroundOverlay: isLight(c.text_color || base.text)
+      ? "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 100%)"
+      : "linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.75) 100%)",
   };
 }
