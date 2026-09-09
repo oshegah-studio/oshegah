@@ -47,8 +47,8 @@ export const toEgyptianLocal = (raw: string) => {
   return v;
 };
 
-/** Vodafone Cash dialer code — visitors only ever see the “Vodafone Cash” button. */
-export const buildVodafoneCashHref = (v: string) => `tel://*9*7*${toEgyptianLocal(v)}%23`;
+/** Vodafone Cash now dials the stored phone number directly. */
+const buildVodafoneCashHref = (v: string) => `tel:${digits(v)}`;
 
 
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
