@@ -1,4 +1,4 @@
-import { Navigate, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { PageLoader } from "@/components/states";
@@ -20,8 +20,19 @@ export function ProtectedRoute({
   if (!user) return <Navigate to="/login" state={{ from: location.pathname }} replace />;
 
   if (area === "admin" && !isAdmin) {
-    return <Navigate to={homeRouteFor(profile, isAdmin)} replace />;
+    // Server-side RLS already blocks admin operations; this is only the UI guard.
+    return (
+      <main className="flex min-h-dvh flex-col items-center justify-center gap-3 px-6 text-center">
+        <Seo title="Access denied — OSHEGAH" description="Restricted area." path="/admin" noindex />
+        <h1 className="font-display text-2xl font-semibold">{t("admin.accessDenied")}</h1>
+        <p className="max-w-sm text-sm text-muted-foreground">{t("admin.accessDeniedText")}</p>
+        <Link to={homeRouteFor(profile, isAdmin)} className="text-sm font-medium text-primary hover:underline">
+          {t("admin.backToDashboard")}
+        </Link>
+      </main>
+    );
   }
+
 
   if (area === "business" && !isAdmin && profile && profile.account_type !== "business") {
     return <Navigate to="/dashboard" replace />;

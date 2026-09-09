@@ -62,22 +62,32 @@ export default function Signup() {
         <p className="mt-1 text-sm text-muted-foreground">{t("auth.signupSubtitle")}</p>
         <form onSubmit={submit} className="mt-6 space-y-4">
           <div className="grid grid-cols-2 gap-2">
-            {(["personal", "business"] as const).map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => setAccountType(type)}
-                className={cn(
-                  "rounded-xl border px-3 py-2 text-sm font-medium transition-all duration-200",
-                  accountType === type
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border text-muted-foreground hover:border-primary/40",
-                )}
-              >
-                {t(`auth.${type}`)}
-              </button>
-            ))}
+            {(["personal", "business"] as const).map((type) => {
+              const soon = type === "business";
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  disabled={soon}
+                  aria-disabled={soon}
+                  onClick={() => !soon && setAccountType(type)}
+                  className={cn(
+                    "relative rounded-xl border px-3 py-2 text-sm font-medium transition-all duration-200",
+                    accountType === type && !soon
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:border-primary/40",
+                    soon && "cursor-not-allowed opacity-60 hover:border-border",
+                  )}
+                >
+                  {t(`auth.${type}`)}
+                  {soon && (
+                    <span className="mt-0.5 block text-[0.65rem] font-normal">{t("common.comingSoon")}</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
+
           <div className="space-y-1.5">
             <Label htmlFor="fullName">{t("auth.fullName")}</Label>
             <Input id="fullName" required value={fullName} onChange={(e) => setFullName(e.target.value)} />

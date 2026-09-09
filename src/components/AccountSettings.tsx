@@ -84,27 +84,36 @@ export function AccountSettings() {
         <div className="grid gap-3 sm:grid-cols-2">
           {options.map((o) => {
             const active = current === o.id;
+            const soon = o.id === "business";
             return (
               <button
                 key={o.id}
                 type="button"
-                disabled={active || switching}
-                onClick={() => setPendingType(o.id)}
+                disabled={active || switching || soon}
+                aria-disabled={active || soon}
+                onClick={() => !soon && setPendingType(o.id)}
                 className={cn(
                   "card-interactive rounded-xl border p-4 text-start disabled:cursor-not-allowed",
                   active ? "border-primary ring-2 ring-primary/25" : "border-border",
+                  soon && "opacity-60",
                 )}
               >
-                <span className="flex items-center gap-2 font-medium">
+                <span className="flex flex-wrap items-center gap-2 font-medium">
                   <o.icon className="h-4 w-4" aria-hidden="true" />
                   {o.label}
-                  {active && <span className="text-xs text-primary">· {t("profileType.current")}</span>}
+                  {active && !soon && <span className="text-xs text-primary">· {t("profileType.current")}</span>}
+                  {soon && (
+                    <span className="rounded-full border border-border px-2 py-0.5 text-[0.65rem] font-normal text-muted-foreground">
+                      {t("common.comingSoon")}
+                    </span>
+                  )}
                 </span>
                 <span className="mt-1 block text-xs text-muted-foreground">{o.text}</span>
               </button>
             );
           })}
         </div>
+
 
       </section>
 

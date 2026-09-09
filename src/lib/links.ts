@@ -24,6 +24,33 @@ export interface LinkTypeMeta {
 
 const digits = (v: string) => v.replace(/[^\d+]/g, "");
 
+/**
+ * Egyptian mobile numbers are usually typed locally (01xxxxxxxxx).
+ * Normalise once, here, so WhatsApp links always use +20 and never double it.
+ */
+export const normalizeEgyptianPhone = (raw: string) => {
+  let v = (raw ?? "").replace(/[^\d+]/g, "");
+  if (!v) return "";
+  if (v.startsWith("00")) v = `+${v.slice(2)}`;
+  if (v.startsWith("+")) return v; // already international — leave alone
+  if (/^20(10|11|12|15)\d{8}$/.test(v)) return `+${v}`;
+  if (/^0(10|11|12|15)\d{8}$/.test(v)) return `+20${v.slice(1)}`;
+  if (/^(10|11|12|15)\d{8}$/.test(v)) return `+20${v}`;
+  return `+${v}`;
+};
+
+/** Local Egyptian form (01xxxxxxxxx) used by wallet USSD codes. */
+export const toEgyptianLocal = (raw: string) => {
+  const v = (raw ?? "").replace(/\D/g, "");
+  if (/^20\d{10}$/.test(v)) return `0${v.slice(2)}`;
+  if (/^(10|11|12|15)\d{8}$/.test(v)) return `0${v}`;
+  return v;
+};
+
+/** Vodafone Cash dialer code — visitors only ever see the “Vodafone Cash” button. */
+export const buildVodafoneCashHref = (v: string) => `tel://*9*7*${toEgyptianLocal(v)}23%`;
+
+
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 const isMobileUa = () =>
@@ -68,10 +95,12 @@ const handleUrl = (base: string) => (value: string) => {
 export const LINK_TYPES: Record<LinkType, LinkTypeMeta> = {
   whatsapp: {
     type: "whatsapp", label: "WhatsApp", icon: MessageCircle, tint: "#25D366",
-    placeholder: "+20 100 000 0000", hint: "Phone number with country code",
-    buildHref: (v) => `https://wa.me/${digits(v).replace(/\+/g, "")}`,
-    validate: (v) => (digits(v).replace(/\+/g, "").length >= 8 ? null : "Enter a valid phone number with country code"),
+    placeholder: "010 0000 0000", hint: "Egyptian numbers automatically get +20",
+    buildHref: (v) => `https://wa.me/${normalizeEgyptianPhone(v).replace(/\D/g, "")}`,
+    validate: (v) => (digits(v).replace(/\+/g, "").length >= 8 ? null : "Enter a valid phone number"),
+    normalize: (v) => normalizeEgyptianPhone(v),
   },
+
   phone: {
     type: "phone", label: "Phone", icon: Phone, tint: "#4B7BEC",
     placeholder: "+20 100 000 0000", hint: "Opens the phone dialer",
@@ -157,10 +186,12 @@ export const LINK_TYPES: Record<LinkType, LinkTypeMeta> = {
   },
   vodafone_cash: {
     type: "vodafone_cash", label: "Vodafone Cash", icon: Smartphone, tint: "#E60000",
-    placeholder: "010 0000 0000", hint: "Wallet phone number",
-    buildHref: (v) => `tel:${digits(v)}`,
-    validate: (v) => (digits(v).length >= 8 ? null : "Enter a valid wallet number"),
+    placeholder: "010 0000 0000", hint: "Opens the dialer with the Vodafone Cash code",
+    buildHref: (v) => buildVodafoneCashHref(v),
+    validate: (v) => (toEgyptianLocal(v).length >= 8 ? null : "Enter a valid wallet number"),
+    normalize: (v) => toEgyptianLocal(v),
   },
+
   custom: {
     type: "custom", label: "Custom URL", icon: LinkIcon, tint: "#162446",
     placeholder: "https://…", hint: "Any link you want to share",
