@@ -47,9 +47,6 @@ export const toEgyptianLocal = (raw: string) => {
   return v;
 };
 
-/** Vodafone Cash dialer code — visitors only ever see the “Vodafone Cash” button. */
-export const buildVodafoneCashHref = (v: string) => `tel://*9*7*${toEgyptianLocal(v)}%23`;
-
 
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -187,7 +184,7 @@ export const LINK_TYPES: Record<LinkType, LinkTypeMeta> = {
   vodafone_cash: {
     type: "vodafone_cash", label: "Vodafone Cash", icon: Smartphone, tint: "#E60000",
     placeholder: "010 0000 0000", hint: "Opens the dialer with the Vodafone Cash code",
-    buildHref: (v) => buildVodafoneCashHref(v),
+    buildHref: (v) => `tel:${digits(v)}`,
     validate: (v) => (toEgyptianLocal(v).length >= 8 ? null : "Enter a valid wallet number"),
     normalize: (v) => toEgyptianLocal(v),
   },
