@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, BarChart3, Nfc, QrCode, Smartphone, Palette, ShieldCheck } from "lucide-react";
+import { ArrowRight, BarChart3, Nfc, QrCode, Smartphone, Palette, ShieldCheck, Trophy } from "lucide-react";
 import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
