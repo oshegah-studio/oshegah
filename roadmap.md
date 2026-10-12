@@ -1,4 +1,6 @@
 # OSHEGAH updates
+- [ ] Consolidate narrow-screen header controls into an accessible menu while preserving desktop and account navigation.
+- [ ] Verify all six requested mobile widths in English/Arabic, menu dismissal, settings, and navigation.
 - [x] Replace user-facing Tap wording and preserve slogan, including the social image.
 - [x] Separate customization from profile details with scoped persistence.
 - [x] Add persisted link icon selection and public rendering using the existing icon field.
