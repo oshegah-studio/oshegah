@@ -29,7 +29,7 @@ export function MobileHeaderMenu({ children, breakpoint = "sm", tone = "default"
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className={`h-11 w-11 shrink-0 ${breakpoint === "lg" ? "lg:hidden" : "sm:hidden"} ${tone === "invert" ? "text-sidebar-foreground hover:bg-sidebar-accent" : ""}`}
+        <Button variant="ghost" size="icon" className={`h-11 w-11 shrink-0 ${breakpoint === "lg" ? "lg:hidden" : "sm:hidden"} ${tone === "invert" ? "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground" : ""}`}
           aria-label={open ? t("common.close") : t("common.openMenu")}>
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>

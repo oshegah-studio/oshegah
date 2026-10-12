@@ -17,7 +17,7 @@ const initials = (name?: string | null, email?: string | null) => {
   return base.split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
 };
 
-export function AccountSwitcher({ className }: { className?: string }) {
+export function AccountSwitcher({ className, tone = "invert" }: { className?: string; tone?: "default" | "invert" }) {
   const { user, profile, isAdmin, accounts, refreshAccounts, signOut } = useAuth();
   const location = useLocation();
   const inAdmin = location.pathname.startsWith("/admin");
@@ -61,7 +61,8 @@ export function AccountSwitcher({ className }: { className?: string }) {
     <DropdownMenu>
       <DropdownMenuTrigger
         className={cn(
-          "flex w-full items-center gap-3 rounded-xl bg-sidebar-accent/50 p-3 text-start transition-colors hover:bg-sidebar-accent",
+          "flex w-full items-center gap-3 rounded-xl p-3 text-start transition-colors",
+          tone === "invert" ? "bg-sidebar-accent/50 hover:bg-sidebar-accent" : "bg-muted hover:bg-accent",
           className,
         )}
       >
@@ -73,14 +74,14 @@ export function AccountSwitcher({ className }: { className?: string }) {
           )}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-medium text-sidebar-foreground">{activeName}</span>
-          <span className="block truncate text-xs text-sidebar-foreground/60">
+          <span className={cn("block truncate text-sm font-medium", tone === "invert" ? "text-sidebar-foreground" : "text-foreground")}>{activeName}</span>
+          <span className={cn("block truncate text-xs", tone === "invert" ? "text-sidebar-foreground/60" : "text-muted-foreground")}>
             {isAdmin && inAdmin
               ? t("views.admin")
               : profile?.account_type === "business" ? t("auth.business") : t("auth.personal")}
           </span>
         </span>
-        <ChevronsUpDown className="h-4 w-4 shrink-0 text-sidebar-foreground/50" aria-hidden="true" />
+        <ChevronsUpDown className={cn("h-4 w-4 shrink-0", tone === "invert" ? "text-sidebar-foreground/50" : "text-muted-foreground")} aria-hidden="true" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="start" className="w-64">

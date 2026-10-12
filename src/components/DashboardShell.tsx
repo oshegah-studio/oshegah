@@ -98,7 +98,7 @@ export function DashboardShell({
           <MobileHeaderMenu breakpoint="lg" tone="invert">
             <div className="flex flex-col gap-1 pt-2">
               <div className="mb-2">
-                <AccountSwitcher />
+                <AccountSwitcher tone="default" />
               </div>
               {items.map((item) => (
                 <NavLink
