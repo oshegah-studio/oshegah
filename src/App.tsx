@@ -14,6 +14,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import BusinessDashboard from "./pages/BusinessDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import { AdminGate } from "@/components/AdminGate";
 import PublicProfile from "./pages/PublicProfile";
 import CardRedirect from "./pages/CardRedirect";
 import Leaderboard from "./pages/Leaderboard";
@@ -51,7 +52,7 @@ const App = () => (
             />
             <Route
               path="/admin"
-              element={<ProtectedRoute area="admin"><AdminDashboard /></ProtectedRoute>}
+              element={<ProtectedRoute area="admin"><AdminGate><AdminDashboard /></AdminGate></ProtectedRoute>}
             />
             <Route path="/c/:cardId" element={<CardRedirect />} />
             <Route path="/:username" element={<PublicProfile />} />
