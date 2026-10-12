@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { LogOut, Menu, Trophy, X, type LucideIcon } from "lucide-react";
+import { CustomerService } from "@/components/CustomerService";
 import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -153,6 +154,7 @@ export function DashboardShell({
             <div className="mt-7 animate-soft-in" style={{ animationDelay: "80ms" }}>
               {children}
             </div>
+            <div className="mt-8 border-t border-border pt-5"><CustomerService /></div>
           </div>
         </main>
 

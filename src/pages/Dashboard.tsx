@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BarChart3, Eye, LayoutDashboard, Link2, MousePointerClick, QrCode, Settings, User } from "lucide-react";
+import { BarChart3, Eye, LayoutDashboard, Link2, MousePointerClick, Palette, QrCode, Settings, User } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/DashboardShell";
 import { ProfileEditor } from "@/components/ProfileEditor";
 import { AccountSettings } from "@/components/AccountSettings";
@@ -52,9 +52,10 @@ export default function Dashboard() {
         <SkeletonCards />
       ) : (
         <Tabs defaultValue={customer ? "overview" : "profile"}>
-          <TabsList className="mb-6">
+          <TabsList className="mb-6 !h-auto !flex-wrap [&>button]:flex-none [&>button]:whitespace-normal [&>button]:break-words">
             <TabsTrigger value="overview"><BarChart3 className="me-2 h-4 w-4" />{t("dashboard.overview")}</TabsTrigger>
             <TabsTrigger value="profile"><User className="me-2 h-4 w-4" />{t("dashboard.profile")}</TabsTrigger>
+            <TabsTrigger value="customize" disabled={!customer}><Palette className="me-2 h-4 w-4" />{t("dashboard.customize")}</TabsTrigger>
             <TabsTrigger value="links" disabled={!customer}><Link2 className="me-2 h-4 w-4" />{t("dashboard.links")}</TabsTrigger>
             <TabsTrigger value="settings"><Settings className="me-2 h-4 w-4" />{t("dashboard.settings")}</TabsTrigger>
           </TabsList>
@@ -114,7 +115,11 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="profile" className="animate-soft-in">
-            <ProfileEditor customer={customer ?? null} ownerProfileId={profile?.id} />
+            <ProfileEditor mode="details" customer={customer ?? null} ownerProfileId={profile?.id} />
+          </TabsContent>
+
+          <TabsContent value="customize" className="animate-soft-in">
+            {customer && <ProfileEditor mode="appearance" customer={customer} />}
           </TabsContent>
 
           <TabsContent value="links" className="animate-soft-in">

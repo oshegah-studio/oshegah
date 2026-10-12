@@ -1,4 +1,6 @@
 import { BadgeCheck, MapPin, ChevronRight, Download, Phone, Mail, Share2 } from "lucide-react";
+import { CustomerService } from "@/components/CustomerService";
+import { resolveLinkIcon } from "@/lib/link-icons";
 import { toast } from "sonner";
 import { resolveProfileStyle } from "@/lib/themes";
 import { linkMeta, buildLinkHref } from "@/lib/links";
@@ -38,6 +40,7 @@ export interface ProfileViewCustomer {
 export interface ProfileViewLink {
   id: string;
   type: string;
+  icon?: string | null;
   title: string;
   value: string;
   enabled?: boolean | null;
@@ -201,7 +204,7 @@ export function ProfileView({
         <div className="mt-7 flex w-full min-w-0 flex-col gap-3">
           {enabled.map((link, index) => {
             const meta = linkMeta(link.type);
-            const Icon = meta.icon;
+            const Icon = resolveLinkIcon(link.type, link.value, link.icon);
             const href = buildLinkHref(link.type, link.value);
             const external = href.startsWith("http");
             const label = link.title || meta.label;
@@ -309,6 +312,7 @@ export function ProfileView({
           </div>
         )}
 
+        {showBrandBadge && <CustomerService className="mt-8" />}
         <p className="mt-10 text-center text-[0.68rem] uppercase tracking-[0.24em]" style={{ color: s.mutedText }}>
           {t("brand.poweredBy")}
         </p>
@@ -318,8 +322,6 @@ export function ProfileView({
       {showBrandBadge && (
         <a
           href={OSHEGAH_SITE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
           aria-label={t("publicProfile.visitOshegah")}
           title={t("publicProfile.visitOshegah")}
           className="fixed end-3 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/90 shadow-lg backdrop-blur transition-transform duration-200 hover:scale-105 active:scale-95"

@@ -20,6 +20,7 @@ import { useI18n } from "@/i18n";
 
 export interface ProfileEditorProps {
   customer: CustomerRow | null;
+  mode?: "all" | "details" | "appearance";
   /** profiles.id of the owner (personal cards) */
   ownerProfileId?: string | null;
   businessId?: string | null;
@@ -96,6 +97,7 @@ const previewLinks = [
 
 export function ProfileEditor({
   customer,
+  mode = "all",
   ownerProfileId,
   businessId,
   onSaved,
@@ -223,7 +225,7 @@ export function ProfileEditor({
     if (!form.full_name.trim()) return toast.error(t("profileEditor.nameRequired"));
 
     setSaving(true);
-    const payload = {
+    const allFields = {
       full_name: form.full_name.trim(),
       job_title: form.job_title.trim() || null,
       bio: form.bio.trim() || null,
@@ -253,12 +255,16 @@ export function ProfileEditor({
       ...(usernameLocked ? {} : { username }),
     };
 
+    const appearanceKeys = ["theme", "button_style", "primary_color", "text_color", "background_color", "muted_text_color", "button_shadow", "font_style", "background_image_url", "surface_color", "surface_border_color", "overlay_color"];
+    const payload = Object.fromEntries(Object.entries(allFields).filter(([key]) =>
+      !customer || mode === "all" || (mode === "appearance" ? appearanceKeys.includes(key) : !appearanceKeys.includes(key))
+    )) as Partial<typeof allFields>;
 
     const query = customer
       ? supabase.from("customers").update(payload).eq("id", customer.id).select("*").single()
       : supabase
           .from("customers")
-          .insert({ ...payload, username, user_id: ownerProfileId ?? null, business_id: businessId ?? null })
+          .insert({ ...allFields, username, user_id: ownerProfileId ?? null, business_id: businessId ?? null })
           .select("*")
           .single();
 
@@ -282,7 +288,7 @@ export function ProfileEditor({
 
   return (
     <div className="space-y-8">
-      <section className="animate-soft-in space-y-4 rounded-2xl border border-border bg-card p-5 shadow-soft">
+      {mode !== "appearance" && <section className="animate-soft-in space-y-4">
         <h2 className="font-display text-lg font-semibold">{t("profileEditor.details")}</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
@@ -369,20 +375,20 @@ export function ProfileEditor({
           <p className="text-xs text-muted-foreground">{t("profileEditor.contactOptionsHint")}</p>
         </div>
 
-      </section>
+      </section>}
 
-      <section className="animate-soft-in space-y-4 rounded-2xl border border-border bg-card p-5 shadow-soft" style={{ animationDelay: "60ms" }}>
+      {mode !== "details" && <section className="animate-soft-in space-y-4" style={{ animationDelay: "60ms" }}>
         <h2 className="font-display text-lg font-semibold">{t("profileEditor.appearance")}</h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {THEME_LIST.map((theme) => {
             const selected = form.theme === theme.id;
             return (
-              <button
+              <Button
                 key={theme.id}
                 type="button"
                 onClick={() => selectTheme(theme.id)}
                 className={cn(
-                  "card-interactive overflow-hidden rounded-xl border p-0 text-start",
+                  "card-interactive h-auto w-full whitespace-normal overflow-hidden rounded-xl border p-0 text-start bg-transparent hover:bg-transparent",
                   selected ? "border-primary ring-2 ring-primary/30" : "border-border",
                 )}
                 aria-pressed={selected}
@@ -395,7 +401,7 @@ export function ProfileEditor({
                 >
                   <span className="flex items-center justify-between gap-2">
                     <span className="truncate text-sm font-semibold" style={{ color: theme.text }}>
-                      {theme.name}
+                      {t(`profileEditor.themeNames.${theme.id}`)}
                     </span>
                     {selected && (
                       <span
@@ -407,7 +413,7 @@ export function ProfileEditor({
                     )}
                   </span>
                   <span className="mt-1 block text-[0.7rem] leading-snug" style={{ color: theme.mutedText }}>
-                    {theme.description}
+                    {t(`profileEditor.themeDescriptions.${theme.id}`)}
                   </span>
                   <span
                     className="mt-2.5 flex items-center gap-2 rounded-lg px-2.5 py-1.5"
@@ -430,7 +436,7 @@ export function ProfileEditor({
                     {t("publicProfile.contactMe")}
                   </span>
                 </span>
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -444,7 +450,7 @@ export function ProfileEditor({
               size="sm"
               onClick={() => set("button_style", style.id)}
             >
-              {style.name}
+              {t(`profileEditor.buttonStyles.${style.id}`)}
             </Button>
           ))}
         </div>
@@ -459,7 +465,7 @@ export function ProfileEditor({
               onClick={() => set("font_style", font.id)}
               style={{ fontFamily: font.stack || undefined }}
             >
-              {font.name}
+              {t(`profileEditor.fontStyles.${font.id}`)}
             </Button>
           ))}
         </div>
@@ -542,6 +548,13 @@ export function ProfileEditor({
           </div>
         </div>
 
+        <div className="grid gap-4 sm:grid-cols-2">
+          {(["surface_color", "surface_border_color", "overlay_color"] as const).map((key) => <div key={key} className="space-y-1.5">
+            <Label htmlFor={key}>{t(`profileEditor.${key}`)}</Label>
+            <Input id={key} value={form[key]} placeholder={t("profileEditor.useTheme")} onChange={(e) => set(key, e.target.value)} />
+          </div>)}
+        </div>
+
         <div className="flex items-center gap-3">
           <Switch id="button_shadow" checked={form.button_shadow} onCheckedChange={(v) => set("button_shadow", v)} />
           <Label htmlFor="button_shadow">{t("profileEditor.buttonShadow")}</Label>
@@ -582,11 +595,11 @@ export function ProfileEditor({
             />
           </div>
         </div>
-      </section>
+      </section>}
 
 
-      <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-soft">
-        <div className="w-full space-y-3" role="radiogroup" aria-labelledby="visibility-title">
+      <section className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-5">
+        {mode !== "appearance" && <div className="w-full space-y-3" role="radiogroup" aria-labelledby="visibility-title">
           <h3 id="visibility-title" className="font-display font-semibold">{t("profileEditor.visibilityTitle")}</h3>
           <div className="grid gap-3 sm:grid-cols-2">
             {(["public", "private"] as const).map((v) => {
@@ -617,7 +630,8 @@ export function ProfileEditor({
             })}
           </div>
         </div>
-        {allowVerified && (
+        }
+        {mode !== "appearance" && allowVerified && (
           <div className="flex items-center gap-3">
             <Switch id="verified" checked={form.verified} onCheckedChange={(v) => set("verified", v)} />
             <Label htmlFor="verified">{t("profileEditor.verifiedLabel")}</Label>

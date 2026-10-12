@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
-import { Instagram, Music2, Phone } from "lucide-react";
+import { Facebook, Instagram, Music2, Phone } from "lucide-react";
+import { CustomerService } from "@/components/CustomerService";
 import { OshegahLogo } from "@/components/OshegahLogo";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useI18n } from "@/i18n";
 
 export const OSHEGAH_CONTACT = {
+  facebook: "https://www.facebook.com/profile.php?id=61594147267721",
   instagram: "https://www.instagram.com/oshegahstudio/",
   tiktok: "https://www.tiktok.com/@oshegah.studio",
   phone: "+201070485277",
@@ -18,10 +20,10 @@ export function SiteFooter() {
     <footer className="border-t border-border bg-secondary/20">
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <div className="flex items-center gap-2.5">
+          <Link to="/" className="flex items-center gap-2.5">
             <OshegahLogo size={34} />
             <span className="font-display text-lg font-semibold tracking-[0.2em]">OSHEGAH</span>
-          </div>
+          </Link>
           <p className="mt-3 text-sm font-medium text-primary">{t("brand.slogan")}</p>
           <p className="mt-2 max-w-xs text-sm text-muted-foreground">{t("footer.about")}</p>
         </div>
@@ -49,6 +51,7 @@ export function SiteFooter() {
                 <Music2 className="h-4 w-4" aria-hidden="true" /> TikTok
               </a>
             </li>
+            <li><a href={OSHEGAH_CONTACT.facebook} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-primary"><Facebook className="h-4 w-4" aria-hidden="true" /> Facebook</a></li>
           </ul>
         </div>
 
@@ -70,6 +73,7 @@ export function SiteFooter() {
               </Link>
             </li>
           </ul>
+          <CustomerService className="mt-4" />
         </div>
 
         <div>

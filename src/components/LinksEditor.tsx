@@ -18,6 +18,7 @@ import { EmptyState, SkeletonRows } from "@/components/states";
 import { LINK_TYPE_LIST, linkMeta, type LinkType } from "@/lib/links";
 import { useLinks, type LinkRow } from "@/hooks/useOshegah";
 import { useI18n } from "@/i18n";
+import { LinkIconPicker } from "@/components/LinkIconPicker";
 import { MenuUploader, MENU_TYPES, removeMenuFile, uploadMenuFile } from "@/components/MenuUploader";
 
 const AUTOSAVE_MS = 700;
@@ -68,7 +69,7 @@ const LinkRowEditor = memo(function LinkRowEditor({
     pending.current = {};
     if (!Object.keys(patch).length) return;
     setState("saving");
-    await onPatch(link.id, patch);
+    try { await onPatch(link.id, patch); } catch { setState("idle"); return; }
     setState("saved");
     setTimeout(() => setState("idle"), 1200);
   }, [link.id, onPatch]);
@@ -79,19 +80,13 @@ const LinkRowEditor = memo(function LinkRowEditor({
     timer.current = setTimeout(() => void flush(), AUTOSAVE_MS);
   };
 
-  const lm = linkMeta(link.type);
 
   return (
     <div
       className="card-interactive flex animate-soft-in flex-wrap items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-soft"
       style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}
     >
-      <span
-        className="flex h-9 w-9 items-center justify-center rounded-full"
-        style={{ background: `${lm.tint}22`, color: lm.tint }}
-      >
-        <lm.icon className="h-4 w-4" aria-hidden="true" />
-      </span>
+      <LinkIconPicker type={link.type} value={value} icon={link.icon} onChange={(icon) => onPatch(link.id, { icon })} />
       <div className="min-w-[160px] flex-1">
         <Input
           value={title}
@@ -154,7 +149,7 @@ const LinkRowEditor = memo(function LinkRowEditor({
       </span>
       <Switch
         checked={link.enabled}
-        onCheckedChange={(v) => void onPatch(link.id, { enabled: v })}
+        onCheckedChange={(v) => void onPatch(link.id, { enabled: v }).catch(() => {})}
         aria-label={t("linksEditor.enableLink")}
       />
       <Button variant="ghost" size="icon" aria-label={t("linksEditor.moveUp")} disabled={isFirst} onClick={() => onMove(index, -1)}>
@@ -178,6 +173,7 @@ export function LinksEditor({ customerId }: { customerId: string }) {
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
   const [busy, setBusy] = useState(false);
+  const [icon, setIcon] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<LinkRow | null>(null);
 
   const meta = linkMeta(type);
@@ -200,6 +196,7 @@ export function LinksEditor({ customerId }: { customerId: string }) {
       .insert({
         customer_id: customerId,
         type,
+        icon,
         title: title.trim() || meta.label,
         value: meta.normalize ? meta.normalize(value) : value.trim(),
         sort_order: (links?.length ?? 0) + 1,
@@ -210,6 +207,7 @@ export function LinksEditor({ customerId }: { customerId: string }) {
     if (dbError) return toast.error(dbError.message);
     setTitle("");
     setValue("");
+    setIcon(null);
     setCache((rows) => [...rows, data as LinkRow]);
     toast.success(t("linksEditor.added"));
   };
@@ -223,6 +221,7 @@ export function LinksEditor({ customerId }: { customerId: string }) {
       if (error) {
         if (previous) qc.setQueryData(key, previous);
         toast.error(error.message);
+        throw error;
       }
     },
     [qc, setCache], // eslint-disable-line react-hooks/exhaustive-deps
@@ -260,7 +259,7 @@ export function LinksEditor({ customerId }: { customerId: string }) {
         ]);
         if (a.error || b.error) {
           qc.setQueryData(key, previous);
-          toast.error((a.error ?? b.error)!.message);
+          toast.error(a.error?.message ?? b.error?.message);
         }
       })();
     },
@@ -293,6 +292,7 @@ export function LinksEditor({ customerId }: { customerId: string }) {
             <p className="text-xs text-muted-foreground">{meta.hint}</p>
           </div>
         </div>
+        <div className="flex items-center gap-2"><LinkIconPicker type={type} value={value} icon={icon} onChange={setIcon} /><span className="text-sm text-muted-foreground">{t("linksEditor.chooseIcon")}</span></div>
         <Button onClick={add} disabled={busy}>
           <Plus className="me-2 h-4 w-4" /> {busy ? t("common.saving") : t("linksEditor.addLink")}
         </Button>
