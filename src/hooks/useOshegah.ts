@@ -164,3 +164,25 @@ export function useLeaderboard(period: LeaderboardPeriod = "all_time", limit = 2
     },
   });
 }
+
+export const LEADERBOARD_PAGE_SIZE = 20;
+
+/** Server-side paginated leaderboard; ranks are global (page 2 starts at 21). */
+export function useLeaderboardPage(period: LeaderboardPeriod, page: number) {
+  return useQuery({
+    queryKey: ["leaderboard", "page", period, page],
+    staleTime: 60_000,
+    placeholderData: (prev) => prev,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_leaderboard_page", {
+        _period: period,
+        _page: page,
+        _page_size: LEADERBOARD_PAGE_SIZE,
+      });
+      if (error) throw error;
+      const rows = (data ?? []) as (LeaderboardEntry & { total_count: number })[];
+      const total = rows[0]?.total_count ?? 0;
+      return { rows, total, totalPages: Math.max(1, Math.ceil(total / LEADERBOARD_PAGE_SIZE)) };
+    },
+  });
+}
