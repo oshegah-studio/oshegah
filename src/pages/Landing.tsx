@@ -54,6 +54,12 @@ export default function Landing() {
             <ThemeToggle className="hidden sm:inline-flex" />
             <LanguageSwitcher className="hidden sm:inline-flex" />
             <LanguageSwitcher className="sm:hidden" compact />
+            <Button asChild variant="outline" size="sm" className="sm:h-10 sm:px-4">
+              <Link to="/leaderboard" aria-label={t("leaderboard.button")}>
+                <Trophy className="h-4 w-4 sm:me-1.5" aria-hidden="true" />
+                <span className="hidden sm:inline">{t("leaderboard.button")}</span>
+              </Link>
+            </Button>
             {user ? (
               <Button asChild size="sm" className="hover-lift sm:h-10 sm:px-4"><Link to={home}>{t("common.dashboard")}</Link></Button>
             ) : (
