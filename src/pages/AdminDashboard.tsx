@@ -23,12 +23,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCustomerStats, type CustomerRow } from "@/hooks/useOshegah";
 import { profileUrlFor } from "@/lib/vcard";
 import { useI18n } from "@/i18n";
+import { useAdminGate } from "@/components/AdminGate";
+import { OwnerAdminManager } from "@/components/OwnerAdminManager";
+import { Lock } from "lucide-react";
 
-const ADMIN_EMAILS = [
-  "oshegahstudio@gmail.com",
-  "adhamabohamer132@gmail.com",
-  "yahiahani16@gmail.com",
-];
 
 export default function AdminDashboard() {
   const { t } = useI18n();
@@ -39,6 +37,7 @@ export default function AdminDashboard() {
   const [qrFor, setQrFor] = useState<CustomerRow | null>(null);
   const [deleteFor, setDeleteFor] = useState<CustomerRow | null>(null);
   const [tab, setTab] = useState("overview");
+  const { lock } = useAdminGate();
 
   const navItems: NavItem[] = [
     { to: "/admin", label: t("dashboard.areaAdmin"), icon: LayoutDashboard, end: true },
@@ -157,9 +156,14 @@ export default function AdminDashboard() {
       title={t("admin.title")}
       subtitle={t("admin.subtitle")}
       actions={
-        <Button className="hover-lift" onClick={() => openEditor(null)}>
-          <Plus className="me-2 h-4 w-4" /> {t("admin.newProfile")}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => void lock()}>
+            <Lock className="me-2 h-4 w-4" aria-hidden="true" /> {t("adminAuth.lock")}
+          </Button>
+          <Button className="hover-lift" onClick={() => openEditor(null)}>
+            <Plus className="me-2 h-4 w-4" /> {t("admin.newProfile")}
+          </Button>
+        </div>
       }
     >
       {isLoading ? (
@@ -237,15 +241,7 @@ export default function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="settings" className="animate-soft-in space-y-4">
-            <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-              <h2 className="font-display text-lg font-semibold">{t("admin.authorizedAdmins")}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{t("admin.settingsText")}</p>
-              <ul className="mt-3 space-y-1 text-sm" dir="ltr">
-                {ADMIN_EMAILS.map((email) => (
-                  <li key={email} className="font-mono text-muted-foreground">{email}</li>
-                ))}
-              </ul>
-            </section>
+            <OwnerAdminManager />
           </TabsContent>
 
           <TabsContent value="editor" className="animate-soft-in space-y-8">
