@@ -115,16 +115,20 @@ export type Database = {
           job_title: string | null
           location: string | null
           muted_text_color: string | null
+          overlay_color: string | null
           phone: string | null
           primary_color: string
           show_contact_button: boolean
           show_save_contact: boolean
+          surface_border_color: string | null
+          surface_color: string | null
           text_color: string
           theme: Database["public"]["Enums"]["profile_theme"]
           updated_at: string
           user_id: string | null
           username: string
           verified: boolean
+          visibility: string
           website: string | null
         }
         Insert: {
@@ -144,16 +148,20 @@ export type Database = {
           job_title?: string | null
           location?: string | null
           muted_text_color?: string | null
+          overlay_color?: string | null
           phone?: string | null
           primary_color?: string
           show_contact_button?: boolean
           show_save_contact?: boolean
+          surface_border_color?: string | null
+          surface_color?: string | null
           text_color?: string
           theme?: Database["public"]["Enums"]["profile_theme"]
           updated_at?: string
           user_id?: string | null
           username: string
           verified?: boolean
+          visibility?: string
           website?: string | null
         }
         Update: {
@@ -173,16 +181,20 @@ export type Database = {
           job_title?: string | null
           location?: string | null
           muted_text_color?: string | null
+          overlay_color?: string | null
           phone?: string | null
           primary_color?: string
           show_contact_button?: boolean
           show_save_contact?: boolean
+          surface_border_color?: string | null
+          surface_color?: string | null
           text_color?: string
           theme?: Database["public"]["Enums"]["profile_theme"]
           updated_at?: string
           user_id?: string | null
           username?: string
           verified?: boolean
+          visibility?: string
           website?: string | null
         }
         Relationships: [
@@ -243,6 +255,8 @@ export type Database = {
           created_at: string
           customer_id: string
           enabled: boolean
+          file_mime: string | null
+          file_path: string | null
           icon: string | null
           id: string
           sort_order: number
@@ -255,6 +269,8 @@ export type Database = {
           created_at?: string
           customer_id: string
           enabled?: boolean
+          file_mime?: string | null
+          file_path?: string | null
           icon?: string | null
           id?: string
           sort_order?: number
@@ -267,6 +283,8 @@ export type Database = {
           created_at?: string
           customer_id?: string
           enabled?: boolean
+          file_mime?: string | null
+          file_path?: string | null
           icon?: string | null
           id?: string
           sort_order?: number
@@ -442,10 +460,13 @@ export type Database = {
           job_title: string
           location: string
           muted_text_color: string
+          overlay_color: string
           phone: string
           primary_color: string
           show_contact_button: boolean
           show_save_contact: boolean
+          surface_border_color: string
+          surface_color: string
           text_color: string
           theme: Database["public"]["Enums"]["profile_theme"]
           username: string
@@ -503,6 +524,7 @@ export type Database = {
         | "instapay"
         | "vodafone_cash"
         | "custom"
+        | "menu"
       profile_theme:
         | "oshegah_dark"
         | "oshegah_light"
@@ -656,6 +678,7 @@ export const Constants = {
         "instapay",
         "vodafone_cash",
         "custom",
+        "menu",
       ],
       profile_theme: [
         "oshegah_dark",
