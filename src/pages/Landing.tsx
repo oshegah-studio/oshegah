@@ -35,7 +35,7 @@ export default function Landing() {
     <div className="min-h-dvh bg-background">
       <Seo
         title="OSHEGAH — smart NFC business cards & digital profiles"
-        description="Share your identity in one tap. OSHEGAH pairs premium NFC cards with a permanent digital profile, QR code and analytics."
+        description="Share your identity in one touch. OSHEGAH pairs premium NFC cards with a permanent digital profile, QR code and analytics."
         path="/"
         jsonLd={{
           "@context": "https://schema.org",
@@ -109,11 +109,7 @@ export default function Landing() {
             </div>
             <div className="animate-soft-in" style={{ animationDelay: "300ms" }}>
               <OshegahCard />
-              <div className="mt-6 flex justify-center">
-                <Button asChild variant="ghost" className="text-white/80 hover:bg-white/10 hover:text-white">
-                  <Link to="/leaderboard">{t("leaderboard.viewTop")}</Link>
-                </Button>
-              </div>
+
             </div>
           </div>
         </section>
