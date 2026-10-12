@@ -1,13 +1,13 @@
 import {
   MessageCircle, Phone, Mail, Instagram, Facebook, Youtube, Linkedin, Twitter,
-  Send, Globe, MapPin, Star, Wallet, Smartphone, Link as LinkIcon, Music2, Ghost,
+  Send, Globe, MapPin, Star, Wallet, Smartphone, Link as LinkIcon, Music2, Ghost, FileText,
   type LucideIcon,
 } from "lucide-react";
 
 export type LinkType =
   | "whatsapp" | "phone" | "email" | "instagram" | "facebook" | "tiktok" | "youtube"
   | "linkedin" | "twitter" | "snapchat" | "telegram" | "website" | "maps" | "reviews"
-  | "instapay" | "vodafone_cash" | "custom";
+  | "instapay" | "vodafone_cash" | "custom" | "menu";
 
 export interface LinkTypeMeta {
   type: LinkType;
@@ -194,9 +194,15 @@ export const LINK_TYPES: Record<LinkType, LinkTypeMeta> = {
     placeholder: "https://…", hint: "Any link you want to share",
     buildHref: asUrl, validate: urlValidator("URL"),
   },
+  menu: {
+    type: "menu", label: "Menu", icon: FileText, tint: "#162446",
+    placeholder: "", hint: "Uploaded PDF or image",
+    buildHref: (v) => v.trim(), validate: (v) => (v.trim() ? null : "Upload a file"),
+  },
 };
 
-export const LINK_TYPE_LIST = Object.values(LINK_TYPES);
+/** Types picked from the "Add link" dropdown — menus have their own upload flow. */
+export const LINK_TYPE_LIST = Object.values(LINK_TYPES).filter((l) => l.type !== "menu");
 
 export const linkMeta = (type: string): LinkTypeMeta =>
   LINK_TYPES[(type as LinkType)] ?? LINK_TYPES.custom;

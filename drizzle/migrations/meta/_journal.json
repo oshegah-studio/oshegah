@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791811702772,
+      "tag": "0000_visibility_menus_surfaces",
+      "breakpoints": true
+    }
+  ]
+}

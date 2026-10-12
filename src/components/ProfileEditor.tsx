@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, Loader2, Lock, Sparkles } from "lucide-react";
+import { Check, Globe2, Loader2, Lock, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { THEME_LIST, BUTTON_STYLES, FONT_STYLES, getTheme } from "@/lib/themes";
-import { paletteFromImage } from "@/lib/palette";
+import { paletteFromBackground, paletteFromImage } from "@/lib/palette";
 import { normalizeUsername, validateUsername, RESERVED_USERNAMES } from "@/lib/links";
 import type { CustomerRow } from "@/hooks/useOshegah";
 import { AvatarUploader } from "@/components/AvatarUploader";
@@ -52,6 +52,10 @@ type FormState = {
   button_shadow: boolean;
   font_style: string;
   background_image_url: string;
+  visibility: "public" | "private";
+  surface_color: string;
+  surface_border_color: string;
+  overlay_color: string;
 };
 
 const toForm = (c: CustomerRow | null): FormState => ({
@@ -77,6 +81,10 @@ const toForm = (c: CustomerRow | null): FormState => ({
   button_shadow: c?.button_shadow ?? false,
   font_style: c?.font_style ?? "default",
   background_image_url: c?.background_image_url ?? "",
+  visibility: c?.visibility === "private" ? "private" : "public",
+  surface_color: c?.surface_color ?? "",
+  surface_border_color: c?.surface_border_color ?? "",
+  overlay_color: c?.overlay_color ?? "",
 });
 
 const previewLinks = [
@@ -103,7 +111,8 @@ export function ProfileEditor({
   const [autoBusy, setAutoBusy] = useState(false);
   type PaletteFields = Pick<
     FormState,
-    "theme" | "background_color" | "primary_color" | "text_color" | "muted_text_color"
+    | "theme" | "background_color" | "primary_color" | "text_color" | "muted_text_color"
+    | "surface_color" | "surface_border_color" | "overlay_color"
   >;
   const [autoPrev, setAutoPrev] = useState<PaletteFields | null>(null);
   /** Last generated palette — kept so Auto Customize can be re-applied instantly. */
@@ -117,10 +126,10 @@ export function ProfileEditor({
     setAutoPalette(null);
   }, [customer?.id]);
 
-  // A new photo invalidates the stored generated palette.
+  // A new photo or background invalidates the stored generated palette.
   useEffect(() => {
     setAutoPalette(null);
-  }, [form.avatar_url]);
+  }, [form.avatar_url, form.background_image_url]);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -131,6 +140,9 @@ export function ProfileEditor({
     primary_color: form.primary_color,
     text_color: form.text_color,
     muted_text_color: form.muted_text_color,
+    surface_color: form.surface_color,
+    surface_border_color: form.surface_border_color,
+    overlay_color: form.overlay_color,
   });
 
   /** Selecting a preset theme always wins: custom color overrides are reset to
@@ -142,13 +154,17 @@ export function ProfileEditor({
       theme: id,
       background_color: "",
       muted_text_color: "",
+      surface_color: "",
+      surface_border_color: "",
+      overlay_color: "",
       primary_color: tokens.accent,
       text_color: tokens.text,
     }));
   };
 
   const autoCustomize = async () => {
-    if (!form.avatar_url) return;
+    const source = form.background_image_url || form.avatar_url;
+    if (!source) return;
     // Re-applying an already generated palette is instant (it stays saved in the
     // background even after the user picks another preset theme).
     if (autoPalette) {
@@ -159,7 +175,9 @@ export function ProfileEditor({
     }
     setAutoBusy(true);
     try {
-      const palette = await paletteFromImage(form.avatar_url);
+      const palette = form.background_image_url
+        ? await paletteFromBackground(form.background_image_url)
+        : { ...(await paletteFromImage(form.avatar_url)), surface_color: "", surface_border_color: "", overlay_color: "" };
       setAutoPrev(snapshot());
       setAutoPalette(palette as PaletteFields);
       setForm((f) => ({ ...f, ...palette }));
@@ -170,6 +188,23 @@ export function ProfileEditor({
     } finally {
       setAutoBusy(false);
     }
+  };
+
+  /** Visibility saves instantly for existing profiles (it is a standalone setting). */
+  const changeVisibility = async (v: FormState["visibility"]) => {
+    if (v === form.visibility) return;
+    const prev = form.visibility;
+    set("visibility", v);
+    if (!customer) return;
+    const { error } = await supabase.from("customers").update({ visibility: v }).eq("id", customer.id);
+    if (error) {
+      set("visibility", prev);
+      return toast.error(error.message);
+    }
+    toast.success(t("profileEditor.visibilitySaved"));
+    void qc.invalidateQueries({ queryKey: ["my-customer"] });
+    void qc.invalidateQueries({ queryKey: ["leaderboard"] });
+    void qc.invalidateQueries({ queryKey: ["admin-customers"] });
   };
 
   const revertAuto = () => {
@@ -209,6 +244,10 @@ export function ProfileEditor({
       button_shadow: form.button_shadow,
       font_style: form.font_style,
       background_image_url: form.background_image_url.trim() || null,
+      visibility: form.visibility,
+      surface_color: form.surface_color || null,
+      surface_border_color: form.surface_border_color || null,
+      overlay_color: form.overlay_color || null,
       ...(allowVerified ? { verified: form.verified } : {}),
       // Usernames are permanent: only sent when creating or when explicitly allowed (admin).
       ...(usernameLocked ? {} : { username }),
@@ -432,7 +471,7 @@ export function ProfileEditor({
               type="button"
               variant="outline"
               size="sm"
-              disabled={autoBusy || !form.avatar_url}
+              disabled={autoBusy || !(form.avatar_url || form.background_image_url)}
               onClick={() => void autoCustomize()}
             >
               {autoBusy ? (
@@ -449,7 +488,7 @@ export function ProfileEditor({
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            {form.avatar_url ? t("profileEditor.autoCustomizeHint") : t("profileEditor.autoCustomizeNeedsPhoto")}
+            {form.background_image_url ? t("profileEditor.autoCustomizeBgHint") : form.avatar_url ? t("profileEditor.autoCustomizeHint") : t("profileEditor.autoCustomizeNeedsPhoto")}
           </p>
           {autoPrev && (
             <p className="text-xs text-primary">{t("profileEditor.autoCustomizeApplied")}</p>
@@ -535,6 +574,9 @@ export function ProfileEditor({
                 show_contact_button: form.show_contact_button,
                 show_save_contact: form.show_save_contact,
                 background_image_url: form.background_image_url || null,
+                surface_color: form.surface_color || null,
+                surface_border_color: form.surface_border_color || null,
+                overlay_color: form.overlay_color || null,
               }}
               links={previewLinks}
             />
@@ -544,9 +586,36 @@ export function ProfileEditor({
 
 
       <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-soft">
-        <div className="flex items-center gap-3">
-          <Switch id="active" checked={form.active} onCheckedChange={(v) => set("active", v)} />
-          <Label htmlFor="active">{t("profileEditor.publishedLabel")}</Label>
+        <div className="w-full space-y-3" role="radiogroup" aria-labelledby="visibility-title">
+          <h3 id="visibility-title" className="font-display font-semibold">{t("profileEditor.visibilityTitle")}</h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {(["public", "private"] as const).map((v) => {
+              const selected = form.visibility === v;
+              const Icon = v === "public" ? Globe2 : Lock;
+              return (
+                <button
+                  key={v}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => void changeVisibility(v)}
+                  className={cn(
+                    "card-interactive rounded-xl border p-4 text-start",
+                    selected ? "border-primary ring-2 ring-primary/25" : "border-border",
+                  )}
+                >
+                  <span className="flex items-center gap-2 font-medium">
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                    {t(v === "public" ? "profileEditor.visibilityPublic" : "profileEditor.visibilityPrivate")}
+                    {selected && <Check className="ms-auto h-4 w-4 text-primary" aria-hidden="true" />}
+                  </span>
+                  <span className="mt-1 block text-xs text-muted-foreground">
+                    {t(v === "public" ? "profileEditor.visibilityPublicText" : "profileEditor.visibilityPrivateText")}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
         {allowVerified && (
           <div className="flex items-center gap-3">

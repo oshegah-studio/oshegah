@@ -18,6 +18,7 @@ import { EmptyState, SkeletonRows } from "@/components/states";
 import { LINK_TYPE_LIST, linkMeta, type LinkType } from "@/lib/links";
 import { useLinks, type LinkRow } from "@/hooks/useOshegah";
 import { useI18n } from "@/i18n";
+import { MenuUploader, MENU_TYPES, removeMenuFile, uploadMenuFile } from "@/components/MenuUploader";
 
 const AUTOSAVE_MS = 700;
 
@@ -46,6 +47,7 @@ const LinkRowEditor = memo(function LinkRowEditor({
   const [title, setTitle] = useState(link.title);
   const [value, setValue] = useState(link.value);
   const [state, setState] = useState<"idle" | "saving" | "saved">("idle");
+  const [replacing, setReplacing] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const pending = useRef<Partial<LinkRow>>({});
 
@@ -101,6 +103,39 @@ const LinkRowEditor = memo(function LinkRowEditor({
           onBlur={() => void flush()}
           className="h-8 border-0 px-0 font-medium shadow-none focus-visible:ring-0"
         />
+        {link.type === "menu" ? (
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <a href={link.value} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">
+              {link.file_mime === "application/pdf" ? "PDF" : "Image"} ↗
+            </a>
+            <label className="cursor-pointer text-xs text-muted-foreground underline-offset-2 hover:underline">
+              {replacing ? t("common.saving") : t("linksEditor.menuReplace")}
+              <input
+                type="file"
+                className="hidden"
+                accept={MENU_TYPES.join(",") + ",.pdf"}
+                disabled={replacing}
+                onChange={async (e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!f) return;
+                  setReplacing(true);
+                  try {
+                    const up = await uploadMenuFile(f, t);
+                    const old = link.file_path;
+                    await onPatch(link.id, { value: up.url, file_path: up.path, file_mime: up.mime });
+                    await removeMenuFile(old);
+                    toast.success(t("linksEditor.menuReplaced"));
+                  } catch (err) {
+                    toast.error(err instanceof Error ? err.message : t("avatar.failed"));
+                  } finally {
+                    setReplacing(false);
+                  }
+                }}
+              />
+            </label>
+          </div>
+        ) : (
         <Input
           value={value}
           aria-label={t("linksEditor.value")}
@@ -111,6 +146,7 @@ const LinkRowEditor = memo(function LinkRowEditor({
           onBlur={() => void flush()}
           className="h-7 border-0 px-0 text-xs text-muted-foreground shadow-none focus-visible:ring-0"
         />
+        )}
       </div>
       <span className="w-4 shrink-0 text-muted-foreground" aria-live="polite">
         {state === "saving" && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-label={t("common.saving")} />}
@@ -200,6 +236,7 @@ export function LinksEditor({ customerId }: { customerId: string }) {
       if (previous) qc.setQueryData(key, previous);
       return toast.error(error.message);
     }
+    if (link.type === "menu") await removeMenuFile(link.file_path);
     toast.success(t("linksEditor.removed"));
   };
 
@@ -260,6 +297,12 @@ export function LinksEditor({ customerId }: { customerId: string }) {
           <Plus className="me-2 h-4 w-4" /> {busy ? t("common.saving") : t("linksEditor.addLink")}
         </Button>
       </section>
+
+      <MenuUploader
+        customerId={customerId}
+        nextOrder={(links?.length ?? 0) + 1}
+        onAdded={(row) => setCache((rows) => [...rows, row])}
+      />
 
       <section className="space-y-3">
         {isLoading && <SkeletonRows count={3} />}
