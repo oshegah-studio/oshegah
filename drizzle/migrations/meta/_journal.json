@@ -15,6 +15,13 @@
       "when": 1791835313062,
       "tag": "0001_admin_owner_stepup_leaderboard_pages",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791835482385,
+      "tag": "0002_lock_admin_credential_tables",
+      "breakpoints": true
     }
   ]
 }
