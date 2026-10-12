@@ -14,6 +14,9 @@ export interface ProfileViewCustomer {
   job_title?: string | null;
   bio?: string | null;
   avatar_url?: string | null;
+  surface_color?: string | null;
+  surface_border_color?: string | null;
+  overlay_color?: string | null;
   phone?: string | null;
   email?: string | null;
   location?: string | null;
