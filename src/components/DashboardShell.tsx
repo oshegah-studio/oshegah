@@ -1,11 +1,12 @@
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { LogOut, Menu, Trophy, X, type LucideIcon } from "lucide-react";
+import { LogOut, Trophy, type LucideIcon } from "lucide-react";
 import { CustomerService } from "@/components/CustomerService";
 import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { AccountSwitcher } from "@/components/AccountSwitcher";
+import { MobileHeaderMenu } from "@/components/MobileHeaderMenu";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
@@ -36,7 +37,6 @@ export function DashboardShell({
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const { t } = useI18n();
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -92,30 +92,11 @@ export function DashboardShell({
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile top bar */}
         <header className="sticky top-0 z-40 flex w-full items-center justify-between gap-2 border-b border-sidebar-border bg-sidebar px-3 py-3 lg:hidden">
-          <div className="min-w-0 flex-1">
+          <div className="shrink-0">
             <Wordmark invert />
           </div>
-          <div className="flex shrink-0 items-center gap-1">
-            <LanguageSwitcher tone="invert" compact />
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={t("common.openMenu")}
-              className="text-sidebar-foreground hover:bg-sidebar-accent"
-              onClick={() => setMenuOpen((v) => !v)}
-            >
-              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
-          </div>
-        </header>
-
-
-        {menuOpen && (
-          <nav
-            className="animate-soft-in border-b border-sidebar-border bg-sidebar px-4 py-3 lg:hidden"
-            aria-label={t("nav.mobile")}
-          >
-            <div className="flex flex-col gap-1">
+          <MobileHeaderMenu breakpoint="lg" tone="invert">
+            <div className="flex flex-col gap-1 pt-2">
               <div className="mb-2">
                 <AccountSwitcher />
               </div>
@@ -124,22 +105,21 @@ export function DashboardShell({
                   key={item.to}
                   to={item.to}
                   end={item.end}
-                  className={navLinkClass}
-                  onClick={() => setMenuOpen(false)}
+                  className={({ isActive }) => cn("flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium", isActive ? "bg-accent text-accent-foreground" : "text-foreground hover:bg-muted")}
                 >
                   <item.icon className="h-4 w-4" aria-hidden="true" />
                   {item.label}
                 </NavLink>
               ))}
-              <button
+               <Button variant="ghost"
                 onClick={handleSignOut}
-                className="mt-1 flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-sidebar-foreground/70"
+                className="mt-1 justify-start gap-3"
               >
                 <LogOut className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" /> {t("common.signOut")}
-              </button>
+              </Button>
             </div>
-          </nav>
-        )}
+          </MobileHeaderMenu>
+        </header>
 
         <main className="flex-1 px-4 pb-24 pt-6 sm:px-8 sm:pb-12 lg:pt-10">
           <div className="mx-auto w-full min-w-0 max-w-5xl">
