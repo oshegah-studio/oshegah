@@ -52,7 +52,7 @@ export default function Dashboard() {
         <SkeletonCards />
       ) : (
         <Tabs defaultValue={customer ? "overview" : "profile"}>
-          <TabsList className="mb-6 !h-auto !flex-wrap">
+          <TabsList className="mb-6 !h-auto !flex-wrap [&>button]:flex-none [&>button]:whitespace-normal [&>button]:break-words">
             <TabsTrigger value="overview"><BarChart3 className="me-2 h-4 w-4" />{t("dashboard.overview")}</TabsTrigger>
             <TabsTrigger value="profile"><User className="me-2 h-4 w-4" />{t("dashboard.profile")}</TabsTrigger>
             <TabsTrigger value="customize" disabled={!customer}><Palette className="me-2 h-4 w-4" />{t("dashboard.customize")}</TabsTrigger>

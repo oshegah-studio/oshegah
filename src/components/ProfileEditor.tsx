@@ -383,12 +383,12 @@ export function ProfileEditor({
           {THEME_LIST.map((theme) => {
             const selected = form.theme === theme.id;
             return (
-              <button
+              <Button
                 key={theme.id}
                 type="button"
                 onClick={() => selectTheme(theme.id)}
                 className={cn(
-                  "card-interactive overflow-hidden rounded-xl border p-0 text-start",
+                  "card-interactive h-auto w-full whitespace-normal overflow-hidden rounded-xl border p-0 text-start bg-transparent hover:bg-transparent",
                   selected ? "border-primary ring-2 ring-primary/30" : "border-border",
                 )}
                 aria-pressed={selected}
@@ -401,7 +401,7 @@ export function ProfileEditor({
                 >
                   <span className="flex items-center justify-between gap-2">
                     <span className="truncate text-sm font-semibold" style={{ color: theme.text }}>
-                      {theme.name}
+                      {t(`profileEditor.themeNames.${theme.id}`)}
                     </span>
                     {selected && (
                       <span
@@ -413,7 +413,7 @@ export function ProfileEditor({
                     )}
                   </span>
                   <span className="mt-1 block text-[0.7rem] leading-snug" style={{ color: theme.mutedText }}>
-                    {theme.description}
+                    {t(`profileEditor.themeDescriptions.${theme.id}`)}
                   </span>
                   <span
                     className="mt-2.5 flex items-center gap-2 rounded-lg px-2.5 py-1.5"
@@ -436,7 +436,7 @@ export function ProfileEditor({
                     {t("publicProfile.contactMe")}
                   </span>
                 </span>
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -450,7 +450,7 @@ export function ProfileEditor({
               size="sm"
               onClick={() => set("button_style", style.id)}
             >
-              {style.name}
+              {t(`profileEditor.buttonStyles.${style.id}`)}
             </Button>
           ))}
         </div>
@@ -465,7 +465,7 @@ export function ProfileEditor({
               onClick={() => set("font_style", font.id)}
               style={{ fontFamily: font.stack || undefined }}
             >
-              {font.name}
+              {t(`profileEditor.fontStyles.${font.id}`)}
             </Button>
           ))}
         </div>
