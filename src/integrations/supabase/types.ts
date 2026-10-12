@@ -14,6 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_credentials: {
+        Row: {
+          created_at: string
+          failed_attempts: number
+          locked_until: string | null
+          password_hash: string
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          failed_attempts?: number
+          locked_until?: string | null
+          password_hash: string
+          updated_at?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          failed_attempts?: number
+          locked_until?: string | null
+          password_hash?: string
+          updated_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      admin_security_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          detail: Json
+          event: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json
+          event: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json
+          event?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      admin_sessions: {
+        Row: {
+          auth_session_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          auth_session_id: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          auth_session_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       business_members: {
         Row: {
           business_id: string
@@ -423,12 +504,64 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _admin_log: {
+        Args: { _detail?: Json; _event: string; _user: string }
+        Returns: undefined
+      }
+      _admin_open_session: { Args: never; Returns: string }
+      admin_auth_status: {
+        Args: never
+        Returns: {
+          configured: boolean
+          eligible: boolean
+          expires_at: string
+          locked_until: string
+          owner: boolean
+          username: string
+          verified: boolean
+        }[]
+      }
+      admin_login: {
+        Args: { _password: string; _username: string }
+        Returns: {
+          error: string
+          expires_at: string
+          ok: boolean
+        }[]
+      }
+      admin_logout: { Args: never; Returns: undefined }
+      admin_reset_own_credentials: {
+        Args: never
+        Returns: {
+          error: string
+          ok: boolean
+        }[]
+      }
+      admin_setup_credentials: {
+        Args: { _password: string; _username: string }
+        Returns: {
+          error: string
+          expires_at: string
+          ok: boolean
+        }[]
+      }
       get_leaderboard: {
         Args: { _limit?: number; _since?: string }
         Returns: {
           avatar_url: string
           full_name: string
           rank: number
+          username: string
+          views: number
+        }[]
+      }
+      get_leaderboard_page: {
+        Args: { _page?: number; _page_size?: number; _period?: string }
+        Returns: {
+          avatar_url: string
+          full_name: string
+          rank: number
+          total_count: number
           username: string
           views: number
         }[]
@@ -475,6 +608,7 @@ export type Database = {
         }[]
       }
       get_username_by_card: { Args: { _customer_id: string }; Returns: string }
+      has_admin_stepup: { Args: never; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -484,6 +618,39 @@ export type Database = {
       }
       is_active_customer: { Args: { _customer_id: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
+      is_owner: { Args: never; Returns: boolean }
+      owner_grant_admin: {
+        Args: { _email: string }
+        Returns: {
+          error: string
+          ok: boolean
+        }[]
+      }
+      owner_list_admins: {
+        Args: never
+        Returns: {
+          configured: boolean
+          email: string
+          full_name: string
+          granted_at: string
+          is_owner: boolean
+          user_id: string
+        }[]
+      }
+      owner_reset_admin_credentials: {
+        Args: { _user_id: string }
+        Returns: {
+          error: string
+          ok: boolean
+        }[]
+      }
+      owner_revoke_admin: {
+        Args: { _user_id: string }
+        Returns: {
+          error: string
+          ok: boolean
+        }[]
+      }
       owns_business: { Args: { _business_id: string }; Returns: boolean }
       owns_customer: { Args: { _customer_id: string }; Returns: boolean }
       owns_customer_row: {
