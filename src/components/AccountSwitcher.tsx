@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, ChevronsUpDown, LogOut, Plus, UserRoundX } from "lucide-react";
+import { Check, ChevronsUpDown, LayoutDashboard, LogOut, Plus, ShieldCheck, UserRoundX } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
   DropdownMenuSeparator, DropdownMenuTrigger,
@@ -18,7 +18,9 @@ const initials = (name?: string | null, email?: string | null) => {
 };
 
 export function AccountSwitcher({ className }: { className?: string }) {
-  const { user, profile, accounts, refreshAccounts, signOut } = useAuth();
+  const { user, profile, isAdmin, accounts, refreshAccounts, signOut } = useAuth();
+  const location = useLocation();
+  const inAdmin = location.pathname.startsWith("/admin");
   const { t } = useI18n();
   const qc = useQueryClient();
   const navigate = useNavigate();
@@ -73,13 +75,36 @@ export function AccountSwitcher({ className }: { className?: string }) {
         <span className="min-w-0 flex-1">
           <span className="block truncate text-sm font-medium text-sidebar-foreground">{activeName}</span>
           <span className="block truncate text-xs text-sidebar-foreground/60">
-            {profile?.account_type === "business" ? t("auth.business") : t("auth.personal")}
+            {isAdmin && inAdmin
+              ? t("views.admin")
+              : profile?.account_type === "business" ? t("auth.business") : t("auth.personal")}
           </span>
         </span>
         <ChevronsUpDown className="h-4 w-4 shrink-0 text-sidebar-foreground/50" aria-hidden="true" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="start" className="w-64">
+        {isAdmin && (
+          <>
+            <DropdownMenuLabel>{t("views.switch")}</DropdownMenuLabel>
+            {[
+              { to: "/dashboard", label: t("views.normal"), icon: LayoutDashboard, active: !inAdmin },
+              { to: "/admin", label: t("views.admin"), icon: ShieldCheck, active: inAdmin },
+            ].map((v) => (
+              <DropdownMenuItem
+                key={v.to}
+                aria-current={v.active ? "true" : undefined}
+                onSelect={() => navigate(v.to)}
+                className="flex items-center gap-2"
+              >
+                <v.icon className="h-4 w-4" aria-hidden="true" />
+                <span className="flex-1">{v.label}</span>
+                {v.active && <span className="text-xs text-primary">{t("views.current")}</span>}
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
+          </>
+        )}
         <DropdownMenuLabel>{t("accounts.switchAccount")}</DropdownMenuLabel>
         {accounts.map((a) => {
           const active = a.userId === user?.id;
