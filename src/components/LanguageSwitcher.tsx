@@ -1,6 +1,7 @@
 import { Globe } from "lucide-react";
 import { useI18n, type Lang } from "@/i18n";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const OPTIONS: { id: Lang; short: string; full: string }[] = [
   { id: "en", short: "EN", full: "English" },
@@ -14,10 +15,14 @@ export function LanguageSwitcher({
   className,
   tone = "default",
   compact = false,
+  fullLabels = false,
+  onSelect,
 }: {
   className?: string;
   tone?: "default" | "invert";
   compact?: boolean;
+  fullLabels?: boolean;
+  onSelect?: () => void;
 }) {
   const { lang, setLang, t } = useI18n();
   const invert = tone === "invert";
@@ -39,14 +44,15 @@ export function LanguageSwitcher({
       {OPTIONS.map((opt) => {
         const active = lang === opt.id;
         return (
-          <button
+          <Button
+            variant="ghost"
             key={opt.id}
             type="button"
-            onClick={() => setLang(opt.id)}
+            onClick={() => { setLang(opt.id); onSelect?.(); }}
             aria-pressed={active}
             aria-label={`${t("lang.switchTo")}: ${opt.full}`}
             className={cn(
-              "rounded-full px-2.5 py-1 text-xs font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "h-auto rounded-full px-2.5 py-1 text-xs font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               active
                 ? invert
                   ? "bg-sky text-navy"
@@ -56,8 +62,8 @@ export function LanguageSwitcher({
                   : "text-muted-foreground hover:text-foreground",
             )}
           >
-            {compact ? opt.short : opt.id === "en" ? "EN" : "العربية"}
-          </button>
+            {fullLabels ? opt.full : compact ? opt.short : opt.id === "en" ? "EN" : "العربية"}
+          </Button>
         );
       })}
     </div>

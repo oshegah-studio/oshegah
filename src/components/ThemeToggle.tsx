@@ -2,6 +2,7 @@ import { Monitor, Moon, Sun } from "lucide-react";
 import { useAppTheme, type AppTheme } from "@/hooks/useAppTheme";
 import { useI18n } from "@/i18n";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const OPTIONS: { id: AppTheme; icon: typeof Sun; key: string }[] = [
   { id: "light", icon: Sun, key: "appearance.light" },
@@ -13,10 +14,12 @@ export function ThemeToggle({
   className,
   tone = "default",
   labels = false,
+  onSelect,
 }: {
   className?: string;
   tone?: "default" | "invert";
   labels?: boolean;
+  onSelect?: () => void;
 }) {
   const { theme, setTheme } = useAppTheme();
   const { t } = useI18n();
@@ -34,15 +37,16 @@ export function ThemeToggle({
       {OPTIONS.map((o) => {
         const active = theme === o.id;
         return (
-          <button
+          <Button
+            variant="ghost"
             key={o.id}
             type="button"
             role="radio"
             aria-checked={active}
             title={t(o.key)}
-            onClick={() => setTheme(o.id)}
+            onClick={() => { setTheme(o.id); onSelect?.(); }}
             className={cn(
-              "flex min-h-8 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors duration-200",
+              "flex h-auto min-h-8 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors duration-200",
               active
                 ? tone === "invert"
                   ? "bg-sidebar-primary text-sidebar-primary-foreground"
@@ -55,7 +59,7 @@ export function ThemeToggle({
             <o.icon className="h-3.5 w-3.5" aria-hidden="true" />
             {labels && <span>{t(o.key)}</span>}
             {!labels && <span className="sr-only">{t(o.key)}</span>}
-          </button>
+          </Button>
         );
       })}
     </div>

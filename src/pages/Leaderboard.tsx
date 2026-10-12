@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Crown, Eye, Medal, Trophy } from "lucide-rea
 import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MobileHeaderMenu } from "@/components/MobileHeaderMenu";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/Reveal";
 import { PageLoader, ErrorState } from "@/components/states";
@@ -66,9 +67,12 @@ export default function Leaderboard() {
         path="/leaderboard"
       />
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-3 px-5 py-4">
-          <Wordmark />
-          <div className="flex items-center gap-2">
+        <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-3 px-4 py-2 sm:px-5 sm:py-4">
+          <Wordmark className="shrink-0" />
+          <MobileHeaderMenu>
+            <Button asChild variant="ghost" className="w-full justify-start"><Link to="/">{t("common.back")}</Link></Button>
+          </MobileHeaderMenu>
+          <div className="hidden items-center gap-2 sm:flex">
             <ThemeToggle className="hidden sm:inline-flex" />
             <LanguageSwitcher compact />
             <Button asChild variant="ghost" size="sm">
