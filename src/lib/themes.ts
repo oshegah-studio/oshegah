@@ -130,6 +130,9 @@ export interface ProfileStyleSource {
   button_shadow?: boolean | null;
   font_style?: string | null;
   background_image_url?: string | null;
+  surface_color?: string | null;
+  surface_border_color?: string | null;
+  overlay_color?: string | null;
 }
 
 export interface ResolvedProfileStyle extends ProfileThemeTokens {
@@ -142,6 +145,8 @@ export interface ResolvedProfileStyle extends ProfileThemeTokens {
   backgroundImage: string | null;
   /** readability overlay painted above the photo, under the content */
   backgroundOverlay: string;
+  /** true when Auto Customize supplied button surfaces (icons switch to accent chips) */
+  customSurface: boolean;
 }
 
 const isLight = (hex: string) => {
@@ -166,10 +171,14 @@ export function resolveProfileStyle(c: ProfileStyleSource): ResolvedProfileStyle
     shadow: c.button_shadow ? "0 12px 28px -14px rgba(0,0,0,0.55)" : undefined,
     fontFamily: fontStack(c.font_style),
     onAccent: isLight(accent) ? "#162446" : "#FFFFFF",
+    surface: c.surface_color || base.surface,
+    surfaceBorder: c.surface_border_color || base.surfaceBorder,
+    blur: c.surface_color ? true : base.blur,
+    customSurface: Boolean(c.surface_color),
     backgroundImage: c.background_image_url || null,
     // Light type needs a dark scrim, dark type needs a light one — the uploaded
     // image itself is never modified.
-    backgroundOverlay: isLight(c.text_color || base.text)
+    backgroundOverlay: c.overlay_color ? c.overlay_color : isLight(c.text_color || base.text)
       ? "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 100%)"
       : "linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.75) 100%)",
   };

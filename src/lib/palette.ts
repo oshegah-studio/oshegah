@@ -177,3 +177,93 @@ export async function paletteFromImage(src: string): Promise<GeneratedPalette> {
     theme: goLight ? "oshegah_light" : "oshegah_dark",
   };
 }
+
+/* ---------- background-photo aware palette ---------- */
+
+export interface BackgroundPalette extends GeneratedPalette {
+  surface_color: string;
+  surface_border_color: string;
+  overlay_color: string;
+}
+
+const rgba = (hex: string, a: number) => {
+  const { r, g, b } = rgbOf(hex);
+  return `rgba(${r},${g},${b},${a})`;
+};
+/** Solid colour seen when `top` at `alpha` is painted over `under`. */
+const mix = (top: string, under: string, alpha: number) => {
+  const a = rgbOf(top), b = rgbOf(under);
+  return hexOf({ r: a.r * alpha + b.r * (1 - alpha), g: a.g * alpha + b.g * (1 - alpha), b: a.b * alpha + b.b * (1 - alpha) });
+};
+
+/**
+ * Analyses the whole photo (light AND dark regions, not just the dominant
+ * colour) and returns overlay + translucent button surfaces whose text is
+ * contrast-checked against the worst-case spot of the image. The photo itself
+ * is never modified.
+ */
+export async function paletteFromBackground(src: string): Promise<BackgroundPalette> {
+  const img = await loadImage(src);
+  const size = 48;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) throw new Error("canvas-unavailable");
+  ctx.drawImage(img, 0, 0, size, size);
+  const { data } = ctx.getImageData(0, 0, size, size);
+
+  const lums: number[] = [];
+  let brightest = { l: -1, hex: "#FFFFFF" };
+  let darkest = { l: 2, hex: "#000000" };
+  for (let i = 0; i < data.length; i += 4) {
+    const rgb = { r: data[i], g: data[i + 1], b: data[i + 2] };
+    const l = luminance(rgb);
+    lums.push(l);
+    if (l > brightest.l) brightest = { l, hex: hexOf(rgb) };
+    if (l < darkest.l) darkest = { l, hex: hexOf(rgb) };
+  }
+  lums.sort((a, b) => a - b);
+  const median = lums[Math.floor(lums.length / 2)] ?? 0.2;
+
+  const colors = await extractColors(src, 8);
+  const scored = colors.map((hex) => ({ hex, ...rgbToHsl(rgbOf(hex)) }));
+  const seed =
+    [...scored].sort((a, b) => b.s * (1 - Math.abs(b.l - 0.5)) - a.s * (1 - Math.abs(a.l - 0.5)))[0] ??
+    { h: 215, s: 0.5, l: 0.3 };
+
+  // Mostly-light photos get dark type on frosted white; everything else (dark or mixed) light type on navy-tinted glass.
+  const lightMode = median > 0.45;
+  const scrim = lightMode ? "#FFFFFF" : hslToHex(seed.h, Math.min(seed.s, 0.45), 0.08);
+  const text = lightMode ? "#101828" : "#FFFFFF";
+
+  // Smallest overlay that keeps text readable even over the worst spot.
+  const worst = lightMode ? darkest.hex : brightest.hex;
+  let overlayA = 0.2;
+  while (overlayA < 0.85 && contrast(text, mix(scrim, worst, overlayA)) < 4.5) overlayA += 0.05;
+
+  // Button surface: tinted, translucent; text must clear AA on top of it at the worst spot.
+  const surfaceBase = lightMode ? "#FFFFFF" : hslToHex(seed.h, Math.min(seed.s, 0.4), 0.14);
+  let surfaceA = 0.55;
+  const behind = mix(scrim, worst, overlayA);
+  while (surfaceA < 0.95 && contrast(text, mix(surfaceBase, behind, surfaceA)) < 4.5) surfaceA += 0.05;
+  const surfaceSolid = mix(surfaceBase, behind, surfaceA);
+
+  const accent = ensureContrast(
+    hslToHex(seed.h, Math.max(seed.s, 0.5), lightMode ? 0.38 : 0.72),
+    surfaceSolid,
+    3.2,
+  );
+  const muted = ensureContrast(lightMode ? "#3A4256" : "#D6DEEA", mix(scrim, worst, overlayA), 4.5);
+
+  return {
+    background_color: lightMode ? "#F4F6FA" : hslToHex(seed.h, Math.min(seed.s, 0.45), 0.1),
+    primary_color: accent,
+    text_color: text,
+    muted_text_color: muted,
+    theme: lightMode ? "oshegah_light" : "oshegah_dark",
+    surface_color: rgba(surfaceBase, Math.round(surfaceA * 100) / 100),
+    surface_border_color: lightMode ? "rgba(16,24,40,0.14)" : "rgba(255,255,255,0.22)",
+    overlay_color: `linear-gradient(180deg, ${rgba(scrim, Math.max(0.15, overlayA - 0.1))} 0%, ${rgba(scrim, Math.min(0.9, overlayA + 0.05))} 100%)`,
+  };
+}

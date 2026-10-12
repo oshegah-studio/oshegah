@@ -226,7 +226,11 @@ export function ProfileView({
                 >
                   <span
                     className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-                    style={{ background: `${meta.tint}22`, color: meta.tint === "#010101" || meta.tint === "#111111" ? text : meta.tint }}
+                    style={
+                      s.customSurface
+                        ? { background: accent, color: s.onAccent }
+                        : { background: `${meta.tint}22`, color: meta.tint === "#010101" || meta.tint === "#111111" ? text : meta.tint }
+                    }
                   >
                     <Icon className="h-4 w-4" aria-hidden="true" />
                   </span>
