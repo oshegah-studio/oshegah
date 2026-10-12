@@ -3,6 +3,7 @@ import { ArrowRight, BarChart3, Nfc, QrCode, Smartphone, Palette, ShieldCheck, T
 import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MobileHeaderMenu } from "@/components/MobileHeaderMenu";
 import { Button } from "@/components/ui/button";
 import { OshegahCard } from "@/components/OshegahCard";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -48,12 +49,21 @@ export default function Landing() {
         }}
       />
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:gap-3 sm:px-5">
-          <Wordmark className="min-w-0 flex-1" />
-          <nav className="flex shrink-0 items-center gap-1.5 sm:gap-2" aria-label={t("nav.main")}>
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-2 sm:gap-3 sm:px-5 sm:py-4">
+          <Wordmark className="shrink-0 sm:flex-1" />
+          <MobileHeaderMenu>
+            {user ? (
+              <Button asChild variant="ghost" className="w-full justify-start"><Link to={home}>{t("common.dashboard")}</Link></Button>
+            ) : (
+              <>
+                <Button asChild variant="ghost" className="w-full justify-start"><Link to="/login">{t("nav.login")}</Link></Button>
+                <Button asChild className="mt-2 w-full"><Link to="/signup">{t("nav.signup")}</Link></Button>
+              </>
+            )}
+          </MobileHeaderMenu>
+          <nav className="hidden shrink-0 items-center gap-2 sm:flex" aria-label={t("nav.main")}>
             <ThemeToggle className="hidden sm:inline-flex" />
             <LanguageSwitcher className="hidden sm:inline-flex" />
-            <LanguageSwitcher className="sm:hidden" compact />
             <Button asChild variant="outline" size="sm" className="sm:h-10 sm:px-4">
               <Link to="/leaderboard" aria-label={t("leaderboard.button")}>
                 <Trophy className="h-4 w-4 sm:me-1.5" aria-hidden="true" />

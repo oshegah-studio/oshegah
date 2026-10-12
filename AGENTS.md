@@ -1,4 +1,5 @@
 # Architecture rules
+- Public and authentication headers reuse MobileHeaderMenu below the existing sm breakpoint and existing appearance/language hooks; Radix Popover owns dismissal and focus rather than a parallel navigation state system.
 - ProfileEditor owns the existing profile form in details or appearance mode; updates persist only that mode's fields so separate editors cannot overwrite unrelated settings.
 - Link icon overrides use the existing links.icon column and a shared allowlisted resolver; invalid or absent values fall back to the link type icon.
 - Company support uses a single reusable CustomerService link per page, in normal document flow to avoid covering navigation or profile links.- Privileged access = admin role in user_roles AND a live admin step-up session bound to the current sign-in session (is_admin()); admin roles change only through owner-only database functions, never direct table writes — so hidden UI never grants access.

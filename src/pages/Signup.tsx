@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MobileHeaderMenu } from "@/components/MobileHeaderMenu";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n";
@@ -52,11 +53,12 @@ export default function Signup() {
         description="Create a free OSHEGAH account and share your contact details instantly with a smart NFC or QR profile."
         path="/signup"
       />
-      <div className="w-full max-w-sm animate-soft-in rounded-2xl border border-border bg-card p-7 shadow-soft">
+      <div className="w-full max-w-sm animate-soft-in rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-7">
         <div className="flex items-center justify-between gap-2">
-          <Wordmark />
+          <Wordmark className="shrink-0" />
+          <MobileHeaderMenu />
           <ThemeToggle className="hidden sm:inline-flex" />
-          <LanguageSwitcher compact />
+          <LanguageSwitcher className="hidden sm:inline-flex" compact />
         </div>
         <h1 className="mt-6 font-display text-2xl font-semibold">{t("auth.signupTitle")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("auth.signupSubtitle")}</p>
