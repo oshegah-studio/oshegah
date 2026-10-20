@@ -7,6 +7,7 @@ import { useI18n } from "@/i18n";
 import {
   TUTORIAL_VIDEO_URL,
   TUTORIAL_VIDEO_POSTER,
+  TUTORIAL_VIDEO_ASPECT,
   resolveTutorialSource,
 } from "@/lib/tutorial-video";
 
