@@ -6,3 +6,4 @@
 - [x] Add persisted link icon selection and public rendering using the existing icon field.
 - [x] Update Facebook, support, logo behavior and redundant leaderboard entry; retain the sole footer link under Contact.
 - [x] Verify real profile creation, appearance save/reload, Auto Customize then manual theme selection, icon save/reload/public display, and EN/AR layouts at 320, 390, 768 and 1280px. Remove temporary test data and uploads.
+- [x] Replace the homepage hero card with the guide film: CDN-hosted MP4/WebM player at the film's own ratio with a branded poster; verified playing in English and Arabic at 320, 390 and 430px.

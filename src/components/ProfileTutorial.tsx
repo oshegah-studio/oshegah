@@ -6,7 +6,9 @@ import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n";
 import {
   TUTORIAL_VIDEO_URL,
+  TUTORIAL_VIDEO_WEBM_URL,
   TUTORIAL_VIDEO_POSTER,
+  TUTORIAL_VIDEO_ASPECT,
   resolveTutorialSource,
 } from "@/lib/tutorial-video";
 
@@ -19,7 +21,7 @@ export function ProfileTutorial() {
   const { user, profile, isAdmin } = useAuth();
   const { t } = useI18n();
   const home = homeRouteFor(profile, isAdmin);
-  const source = resolveTutorialSource(TUTORIAL_VIDEO_URL);
+  const source = resolveTutorialSource(TUTORIAL_VIDEO_URL, TUTORIAL_VIDEO_WEBM_URL);
 
   return (
     <div className="w-full">
@@ -29,7 +31,10 @@ export function ProfileTutorial() {
       <p className="mt-2 max-w-md text-sm text-white/70">{t("landing.tutorial.text")}</p>
 
       <div className="mt-5 overflow-hidden rounded-2xl border border-white/15 bg-navy shadow-lift">
-        <div className="relative aspect-video w-full">
+        <div
+          className={`relative w-full ${source?.kind === "file" ? "" : "aspect-video"}`}
+          style={source?.kind === "file" ? { aspectRatio: TUTORIAL_VIDEO_ASPECT } : undefined}
+        >
           {source?.kind === "file" && (
             <video
               className="h-full w-full object-cover"
@@ -37,8 +42,11 @@ export function ProfileTutorial() {
               preload="metadata"
               playsInline
               poster={TUTORIAL_VIDEO_POSTER}
-              src={source.url}
-            />
+            >
+              {source.sources.map((s) => (
+                <source key={s.src} src={s.src} type={s.type} />
+              ))}
+            </video>
           )}
           {source?.kind === "youtube" && (
             <iframe
