@@ -20,7 +20,7 @@ export function ProfileTutorial() {
   const { user, profile, isAdmin } = useAuth();
   const { t } = useI18n();
   const home = homeRouteFor(profile, isAdmin);
-  const source = resolveTutorialSource(TUTORIAL_VIDEO_URL);
+  const source = resolveTutorialSource(TUTORIAL_VIDEO_URL, TUTORIAL_VIDEO_WEBM_URL);
 
   return (
     <div className="w-full">
@@ -41,8 +41,11 @@ export function ProfileTutorial() {
               preload="metadata"
               playsInline
               poster={TUTORIAL_VIDEO_POSTER}
-              src={source.url}
-            />
+            >
+              {source.sources.map((s) => (
+                <source key={s.src} src={s.src} type={s.type} />
+              ))}
+            </video>
           )}
           {source?.kind === "youtube" && (
             <iframe
