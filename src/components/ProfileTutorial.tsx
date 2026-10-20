@@ -6,6 +6,7 @@ import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n";
 import {
   TUTORIAL_VIDEO_URL,
+  TUTORIAL_VIDEO_WEBM_URL,
   TUTORIAL_VIDEO_POSTER,
   TUTORIAL_VIDEO_ASPECT,
   resolveTutorialSource,
