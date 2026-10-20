@@ -5,7 +5,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MobileHeaderMenu } from "@/components/MobileHeaderMenu";
 import { Button } from "@/components/ui/button";
-import { OshegahCard } from "@/components/OshegahCard";
+import { ProfileTutorial } from "@/components/ProfileTutorial";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Reveal } from "@/components/Reveal";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
@@ -124,8 +124,7 @@ export default function Landing() {
               </div>
             </div>
             <div className="animate-soft-in" style={{ animationDelay: "300ms" }}>
-              <OshegahCard />
-
+              <ProfileTutorial />
             </div>
           </div>
         </section>
