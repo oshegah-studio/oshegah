@@ -63,6 +63,12 @@ export const ar: DeepPartialSame<Dictionary> = {
     ctaText: "أنشئ ملف OSHEGAH خلال دقائق وابدأ بتتبع كل اتصال.",
     getStarted: "ابدأ الآن",
     rights: "© {year} OSHEGAH. جميع الحقوق محفوظة.",
+    tutorial: {
+      title: "أنشئ ملفك على OSHEGAH",
+      text: "جهّز ملفك الرقمي، وخصّص معلوماتك، وشارك كل روابطك المهمة بلمسة واحدة.",
+      comingSoon: "فيديو الشرح قريبًا",
+      cta: "أنشئ ملفك الشخصي",
+    },
     features: {
       nfc: { title: "جاهزة لـ NFC و QR", text: "المس بطاقتك أو امسحها ليُفتح ملفك فورًا — بدون أي تطبيق." },
       themes: { title: "ثيمات فاخرة", text: "خمسة ثيمات مختارة، ألوان تمييز مخصصة، وثلاثة أنماط أزرار." },

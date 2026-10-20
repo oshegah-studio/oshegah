@@ -59,6 +59,12 @@ export const en = {
     ctaText: "Set up your OSHEGAH profile in minutes and start tracking every connection.",
     getStarted: "Get started",
     rights: "© {year} OSHEGAH. All rights reserved.",
+    tutorial: {
+      title: "Create Your OSHEGAH Profile",
+      text: "Set up your digital profile, customize your information, and share all your important links with a single touch.",
+      comingSoon: "Tutorial video coming soon",
+      cta: "Create Your Profile",
+    },
     features: {
       nfc: { title: "NFC + QR ready", text: "Touch or scan your card and your profile opens instantly — no app needed." },
       themes: { title: "Premium themes", text: "Five curated themes, custom accent colors, and three button styles." },
