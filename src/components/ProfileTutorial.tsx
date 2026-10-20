@@ -29,7 +29,10 @@ export function ProfileTutorial() {
       <p className="mt-2 max-w-md text-sm text-white/70">{t("landing.tutorial.text")}</p>
 
       <div className="mt-5 overflow-hidden rounded-2xl border border-white/15 bg-navy shadow-lift">
-        <div className="relative aspect-video w-full">
+        <div
+          className={`relative w-full ${source?.kind === "file" ? "" : "aspect-video"}`}
+          style={source?.kind === "file" ? { aspectRatio: TUTORIAL_VIDEO_ASPECT } : undefined}
+        >
           {source?.kind === "file" && (
             <video
               className="h-full w-full object-cover"
