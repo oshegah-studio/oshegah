@@ -702,6 +702,21 @@ export type Database = {
         }[]
       }
       card_request_config: { Args: never; Returns: Json }
+      get_card_request: {
+        Args: { _admin?: boolean; _id: string }
+        Returns: Json
+      }
+      get_card_requests: {
+        Args: {
+          _admin?: boolean
+          _from?: string
+          _page?: number
+          _search?: string
+          _status?: string
+          _to?: string
+        }
+        Returns: Json
+      }
       get_circle_entries: {
         Args: never
         Returns: {

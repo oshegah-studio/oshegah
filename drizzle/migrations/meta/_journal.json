@@ -43,6 +43,13 @@
       "when": 1792715383564,
       "tag": "0005_card_request_submit",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792715399843,
+      "tag": "0006_card_request_retrieval",
+      "breakpoints": true
     }
   ]
 }
