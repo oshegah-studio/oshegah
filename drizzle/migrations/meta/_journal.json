@@ -99,6 +99,13 @@
       "when": 1792773392853,
       "tag": "0013_serial_numbers",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792781847800,
+      "tag": "0014_serial_public_claim",
+      "breakpoints": true
     }
   ]
 }

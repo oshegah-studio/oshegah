@@ -1029,6 +1029,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      claim_serial: {
+        Args: { _customer: string; _serial: string }
+        Returns: Json
+      }
       get_card_delivery_settings: { Args: { _page?: number }; Returns: Json }
       get_card_request: {
         Args: { _admin?: boolean; _id: string }
