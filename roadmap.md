@@ -1,8 +1,8 @@
 # OSHEGAH updates
-- [ ] Fix the shared authentication header at narrow and desktop widths.
-- [ ] Add persistent, owner-only saved profiles and deduplicated recent history with backend validation.
-- [ ] Add My Circle tabs, save controls, and integrated Home/My Circle/Profile navigation in English and Arabic.
-- [ ] Verify real authenticated flows, privacy isolation, persistence, responsive layouts, and existing navigation.
+- [x] Fix the shared authentication header at narrow and desktop widths.
+- [x] Add persistent, owner-only saved profiles and deduplicated recent history with backend validation.
+- [x] Add My Circle tabs, save controls, and integrated Home/My Circle/Profile navigation in English and Arabic.
+- [x] Verify real authenticated flows, privacy isolation, persistence, responsive layouts, and existing navigation; seven retained live privacy/regression tests passed and temporary entries removed.
 - [x] Consolidate narrow-screen header controls into an accessible menu while preserving desktop and account navigation.
 - [x] Verify all six requested mobile widths in English/Arabic, menu dismissal, settings, and navigation.
 - [x] Replace user-facing Tap wording and preserve slogan, including the social image.
