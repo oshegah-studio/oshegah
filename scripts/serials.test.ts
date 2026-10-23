@@ -20,6 +20,7 @@ await db.exec(`CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_
  INSERT INTO public.admin_credentials VALUES('${A}','testadmin');`);
 const file=readdirSync('drizzle/migrations').find(f=>f.endsWith('serial_numbers.sql'))!;
 await db.exec(readFileSync(`drizzle/migrations/${file}`,'utf8'));
+await db.exec(readFileSync(`drizzle/migrations/${readdirSync('drizzle/migrations').find(f=>f.endsWith('serial_public_claim.sql'))!}`,'utf8'));
 let passed=0;
 async function test(name:string,fn:()=>Promise<void>|void){await fn();console.log(`PASS ${++passed}: ${name}`);}
 async function as(uid:string,admin:boolean){await db.exec(`SET test.uid='${uid}'; SET test.admin='${admin}'`);}
@@ -65,4 +66,21 @@ await test('history records every event in order with owners and reasons',async(
 await test('list: counts, search by email/username/serial, filters, pagination',async()=>{const l=(await q("SELECT public.admin_list_serials(1,'',''::text,'','created') r"))[0].r;assert.equal(l.counts.total,8);assert.equal(l.counts.assigned,3);assert.equal(l.counts.revoked,1);assert.equal((await q("SELECT public.admin_list_serials(1,'two@test') r"))[0].r.total,1);assert.equal((await q("SELECT public.admin_list_serials(1,'user_one') r"))[0].r.total,2);assert.equal((await q("SELECT public.admin_list_serials(1,'C64R') r"))[0].r.total,1);assert.equal((await q("SELECT public.admin_list_serials(1,'','unassigned','inactive') r"))[0].r.total,5);});
 await test('direct table writes are refused for app users',async()=>{await db.exec('SET ROLE authenticated');try{await rejects("UPDATE public.serial_cards SET owner_user_id=$1",[U1],/permission denied/);await rejects("INSERT INTO public.serial_card_events(serial_id,event_type,actor_label) VALUES($1,'activated','x')",[a],/permission denied/);await rejects('DELETE FROM public.serial_card_events',[],/permission denied/);}finally{await db.exec('RESET ROLE');}});
 await test('frontend list parser splits lines, commas and CSV cells',()=>{assert.deepEqual(parseSerialList('serial\nOSH-AAAA1111, osh-bbbb2222\n"OSH-CCCC3333";x\n\n'),['serial','OSH-AAAA1111','osh-bbbb2222','OSH-CCCC3333','x']);});
+// Public card-link flow (/OSH-XXXXXXXX)
+await as(A,true);
+const fresh=(await q('SELECT public.admin_register_serials($1,true) r',[['OSH-Z1111111','OSH-Z2222222','OSH-Z3333333']]))[0].r.created;
+await test('unknown serial is reported, never auto-registered',async()=>{assert.equal((await q("SELECT public.resolve_serial('OSH-NOPE0000') r"))[0].r.state,'unknown');assert.equal((await q("SELECT count(*)::int n FROM serial_cards WHERE serial='OSH-NOPE0000'"))[0].n,0);});
+await test('registered unassigned serial resolves to activation state',async()=>{assert.equal(fresh.length,3);assert.equal((await q("SELECT public.resolve_serial('osh-z1111111') r"))[0].r.state,'unassigned');});
+await test('revoked serial resolves revoked and cannot be claimed',async()=>{assert.equal((await q("SELECT public.resolve_serial('OSH-A82K9M4P') r"))[0].r.state,'revoked');await as(U1,false);await rejects("SELECT public.claim_serial('OSH-A82K9M4P',$1)",[P1],/SERIAL_REVOKED/);});
+await as(U1,false);
+await test("user cannot claim with another user's profile",async()=>{await rejects("SELECT public.claim_serial('OSH-Z1111111',$1)",[P2],/PROFILE_NOT_OWNED/);});
+await test('anonymous visitor cannot claim',async()=>{await db.exec("SET test.uid=''");await rejects("SELECT public.claim_serial('OSH-Z1111111',$1)",[P1],/AUTH_REQUIRED/);await as(U1,false);});
+await test('claim with self activation on: assigned, active, resolves to profile, events logged',async()=>{const r=(await q("SELECT public.claim_serial('OSH-Z1111111',$1) r",[P1]))[0].r;assert.deepEqual(r,{state:'active',username:'user_one'});assert.deepEqual((await q("SELECT public.resolve_serial('OSH-Z1111111') r"))[0].r.username,'user_one');const ev=await q("SELECT e.event_type FROM serial_card_events e JOIN serial_cards s ON s.id=e.serial_id WHERE s.serial='OSH-Z1111111' ORDER BY e.created_at,e.event_type");assert.deepEqual(ev.map(e=>e.event_type).sort(),['activated','assigned','registered']);});
+await as(U2,false);
+await test('second user cannot claim an already claimed card',async()=>{await rejects("SELECT public.claim_serial('OSH-Z1111111',$1)",[P2],/SERIAL_ALREADY_ASSIGNED/);});
+await as(A,true);
+await test('admin list shows customer claim immediately',async()=>{const l=(await q("SELECT public.admin_list_serials(1,'Z1111111') r"))[0].r.rows[0];assert.equal(l.owner_email,'one@test.dev');assert.equal(l.activation_status,'active');});
+await test('admin reassignment changes destination of same serial',async()=>{const zid=await id('OSH-Z1111111');await q('SELECT public.admin_reassign_serial($1,$2,$3,$4)',[zid,U2,P2,'Transfer']);assert.equal((await q("SELECT public.resolve_serial('OSH-Z1111111') r"))[0].r.username,'user_two');});
+await test('with self activation off, claim is pending approval and does not open profile',async()=>{await q('SELECT public.save_serial_settings(false)');await as(U2,false);const r=(await q("SELECT public.claim_serial('OSH-Z2222222',$1) r",[P2]))[0].r;assert.equal(r.state,'pending');assert.equal((await q("SELECT public.resolve_serial('OSH-Z2222222') r"))[0].r.state,'pending');await as(U1,false);assert.equal((await q("SELECT public.resolve_serial('OSH-Z2222222') r"))[0].r.state,'inactive');});
+await test('concurrent claims: only the first succeeds',async()=>{await as(U1,false);await q("SELECT public.claim_serial('OSH-Z3333333',$1)",[P1]);await as(U2,false);await rejects("SELECT public.claim_serial('OSH-Z3333333',$1)",[P2],/SERIAL_ALREADY_ASSIGNED/);assert.equal((await q("SELECT owner_user_id o FROM serial_cards WHERE serial='OSH-Z3333333'"))[0].o,U1);});
 console.log(`${passed} serial tests passed`);
