@@ -702,6 +702,18 @@ export type Database = {
         }[]
       }
       card_request_config: { Args: never; Returns: Json }
+      change_card_request: {
+        Args: {
+          _action: string
+          _delivery?: number
+          _id: string
+          _note?: string
+          _reason?: string
+          _status?: string
+          _tracking?: string
+        }
+        Returns: undefined
+      }
       get_card_request: {
         Args: { _admin?: boolean; _id: string }
         Returns: Json
