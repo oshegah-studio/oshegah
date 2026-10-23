@@ -178,12 +178,55 @@ export type Database = {
           },
         ]
       }
+      card_delivery_settings: {
+        Row: {
+          delivery_mode: string
+          flat_fee: number | null
+          governorate_fees: Json
+          id: boolean
+          max_quantity: number
+          price_updated_at: string
+          price_updated_by: string | null
+          unit_price: number
+          updated_at: string
+          updated_by: string | null
+          version: number
+        }
+        Insert: {
+          delivery_mode?: string
+          flat_fee?: number | null
+          governorate_fees?: Json
+          id?: boolean
+          max_quantity?: number
+          price_updated_at?: string
+          price_updated_by?: string | null
+          unit_price?: number
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Update: {
+          delivery_mode?: string
+          flat_fee?: number | null
+          governorate_fees?: Json
+          id?: boolean
+          max_quantity?: number
+          price_updated_at?: string
+          price_updated_by?: string | null
+          unit_price?: number
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Relationships: []
+      }
       card_request_history: {
         Row: {
           actor_label: string
           changed_by: string
           created_at: string
           event_type: string
+          financial_change: Json | null
           id: string
           internal_note: string
           new_status: string
@@ -196,6 +239,7 @@ export type Database = {
           changed_by: string
           created_at?: string
           event_type?: string
+          financial_change?: Json | null
           id?: string
           internal_note?: string
           new_status: string
@@ -208,6 +252,7 @@ export type Database = {
           changed_by?: string
           created_at?: string
           event_type?: string
+          financial_change?: Json | null
           id?: string
           internal_note?: string
           new_status?: string
@@ -235,7 +280,9 @@ export type Database = {
           customer_notes: string
           delivery: Json
           delivery_charge: number | null
+          delivery_pricing_mode: string
           discount: number
+          financial_snapshot: Json | null
           id: string
           idempotency_key: string
           product_name: string
@@ -260,7 +307,9 @@ export type Database = {
           customer_notes?: string
           delivery: Json
           delivery_charge?: number | null
+          delivery_pricing_mode?: string
           discount?: number
+          financial_snapshot?: Json | null
           id?: string
           idempotency_key: string
           product_name?: string
@@ -285,7 +334,9 @@ export type Database = {
           customer_notes?: string
           delivery?: Json
           delivery_charge?: number | null
+          delivery_pricing_mode?: string
           discount?: number
+          financial_snapshot?: Json | null
           id?: string
           idempotency_key?: string
           product_name?: string
@@ -310,6 +361,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      card_settings_history: {
+        Row: {
+          actor_label: string
+          administrator: string
+          created_at: string
+          id: string
+          new_value: Json | null
+          previous_value: Json | null
+          setting: string
+        }
+        Insert: {
+          actor_label: string
+          administrator: string
+          created_at?: string
+          id?: string
+          new_value?: Json | null
+          previous_value?: Json | null
+          setting: string
+        }
+        Update: {
+          actor_label?: string
+          administrator?: string
+          created_at?: string
+          id?: string
+          new_value?: Json | null
+          previous_value?: Json | null
+          setting?: string
+        }
+        Relationships: []
       }
       circle_entries: {
         Row: {
@@ -720,6 +801,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      get_card_delivery_settings: { Args: { _page?: number }; Returns: Json }
       get_card_request: {
         Args: { _admin?: boolean; _id: string }
         Returns: Json
@@ -863,6 +945,10 @@ export type Database = {
         Returns: undefined
       }
       resolve_username: { Args: { _username: string }; Returns: string }
+      save_card_delivery_settings: {
+        Args: { _settings: Json; _version: number }
+        Returns: undefined
+      }
       submit_card_request: {
         Args: { _customer_id: string; _key: string; _payload: Json }
         Returns: string

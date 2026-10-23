@@ -71,6 +71,13 @@
       "when": 1792715928162,
       "tag": "0009_card_request_rpc_only_writes",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792717821293,
+      "tag": "0010_card_delivery_settings",
+      "breakpoints": true
     }
   ]
 }
