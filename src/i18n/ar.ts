@@ -70,9 +70,9 @@ export const ar: DeepPartialSame<Dictionary> = {
     removePerson: "إزالة {name}",
   },
   landing: {
-    heroTitle: "كل حضورك الرقمي في بطاقة NFC واحدة فاخرة.",
+    heroTitle: "حضورك كله، بلمسة واحدة.",
     heroText:
-      "تجمع OSHEGAH بين بطاقة NFC وQR فعلية وملف رقمي أنيق — الروابط والمدفوعات وبيانات التواصل والتحليلات، كل ذلك بلمسة واحدة.",
+      "اجمع ملفك الرقمي وبيانات تواصلك وروابطك المهمة في بطاقة NFC واحدة فاخرة.",
     createProfile: "أنشئ ملفك الشخصي",
     goDashboard: "الذهاب إلى لوحة التحكم",
     seeLive: "شاهد ملفًا مباشرًا",
@@ -82,6 +82,7 @@ export const ar: DeepPartialSame<Dictionary> = {
     getStarted: "ابدأ الآن",
     rights: "© {year} OSHEGAH. جميع الحقوق محفوظة.",
     tutorial: {
+      label: "جديد على OSHEGAH؟ ابدأ هنا",
       title: "أنشئ ملفك على OSHEGAH",
       text: "جهّز ملفك الرقمي، وخصّص معلوماتك، وشارك كل روابطك المهمة بلمسة واحدة.",
       comingSoon: "فيديو الشرح قريبًا",

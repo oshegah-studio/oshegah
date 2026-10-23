@@ -1,4 +1,6 @@
 # OSHEGAH updates
+- [x] Simplify the homepage into one compact header and a balanced marketing/video hero, preserving existing actions.
+- [x] Verify homepage at 320–1440px in English/Arabic, all appearance controls, hosted video playback and navigation; no overflow or browser errors.
 - [x] Fix the shared authentication header at narrow and desktop widths.
 - [x] Add persistent, owner-only saved profiles and deduplicated recent history with backend validation.
 - [x] Add My Circle tabs, save controls, and integrated Home/My Circle/Profile navigation in English and Arabic.
