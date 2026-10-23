@@ -78,6 +78,13 @@
       "when": 1792717821293,
       "tag": "0010_card_delivery_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792717968996,
+      "tag": "0011_lock_card_submission_configuration",
+      "breakpoints": true
     }
   ]
 }
