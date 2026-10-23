@@ -57,6 +57,13 @@
       "when": 1792715415531,
       "tag": "0007_card_request_actions",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792715796341,
+      "tag": "0008_card_request_validation_audit",
+      "breakpoints": true
     }
   ]
 }

@@ -183,6 +183,7 @@ export type Database = {
           actor_label: string
           changed_by: string
           created_at: string
+          event_type: string
           id: string
           internal_note: string
           new_status: string
@@ -194,6 +195,7 @@ export type Database = {
           actor_label: string
           changed_by: string
           created_at?: string
+          event_type?: string
           id?: string
           internal_note?: string
           new_status: string
@@ -205,6 +207,7 @@ export type Database = {
           actor_label?: string
           changed_by?: string
           created_at?: string
+          event_type?: string
           id?: string
           internal_note?: string
           new_status?: string
@@ -224,6 +227,7 @@ export type Database = {
       }
       card_requests: {
         Row: {
+          consent_at: string
           contact: Json
           created_at: string
           currency: string
@@ -248,6 +252,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          consent_at?: string
           contact: Json
           created_at?: string
           currency?: string
@@ -272,6 +277,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          consent_at?: string
           contact?: Json
           created_at?: string
           currency?: string
