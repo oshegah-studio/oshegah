@@ -25,7 +25,8 @@ import { profileUrlFor } from "@/lib/vcard";
 import { useI18n } from "@/i18n";
 import { useAdminGate } from "@/components/AdminGate";
 import { OwnerAdminManager } from "@/components/OwnerAdminManager";
-import { Lock } from "lucide-react";
+import { Lock, KeyRound } from "lucide-react";
+import { useSerialText } from "@/features/serials/model";
 import { Link } from "react-router-dom";
 import { useCardText } from "@/features/cards/model";
 import { useCardRequests } from "@/features/cards/api";
@@ -44,11 +45,13 @@ export default function AdminDashboard() {
   const [deleteFor, setDeleteFor] = useState<CustomerRow | null>(null);
   const [tab, setTab] = useState("overview");
   const { lock } = useAdminGate();
+  const { text: serialText } = useSerialText();
 
   const navItems: NavItem[] = [
     { to: "/admin", label: t("dashboard.areaAdmin"), icon: LayoutDashboard, end: true },
     { to: "/admin/card-requests", label: `${cardText.admin}${cardRequests.data?.counts?.submitted ? ` (${cardRequests.data.counts.submitted})` : ""}`, icon: CreditCard },
     { to: "/admin/card-delivery-settings", label: settingsText[lang==='ar'?'ar':'en'].title, icon: Settings },
+    { to: "/admin/serials", label: serialText.title, icon: KeyRound },
   ];
 
   const { data: customers, isLoading } = useQuery({
