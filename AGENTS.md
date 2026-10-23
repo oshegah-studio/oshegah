@@ -1,5 +1,5 @@
 # Architecture rules
-- Card requests use authenticated RPCs for submission and audited actions; private immutable snapshots and server-configured product prices prevent customer tampering, while admin operations require the existing live step-up gate.
+- Card requests use authenticated RPCs and a singleton versioned Card & Delivery Settings record; the insert trigger derives immutable financial snapshots under a shared configuration lock, while step-up-only saves lock the record and audit each changed setting to prevent tampering and conflicting updates.
 - Card request translations and validation live in the cards feature module; existing DashboardShell navigation carries customer request destinations without adding another primary bar.
 - My Circle uses one unique user/customer row with separate saved/viewed timestamps; auth-scoped RPCs validate active targets and reject ownership, while RLS keeps lists private and returns only direct-profile display fields.
 - Shared AuthHeader uses a dedicated desktop settings row because authentication panels stay narrow even on wide screens; mobile reuses MobileHeaderMenu.
