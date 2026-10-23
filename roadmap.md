@@ -1,9 +1,10 @@
 # OSHEGAH updates
-- [ ] Inspect card products, profile prerequisites, authentication, and existing admin authorization.
-- [ ] Implement secure card requests, price snapshots, status transitions and private audit history.
-- [ ] Build customer request/review/confirmation/tracking and integrate existing navigation.
-- [ ] Build admin request search, pagination, details, workflow and production summaries.
-- [ ] Test authenticated end-to-end workflow, privacy, validation and responsive translations.
+- [x] Inspect card products, profile prerequisites, authentication, and existing admin authorization.
+- [x] Implement secure card requests, price snapshots, status transitions and private audit history.
+- [x] Build customer request/review/confirmation/tracking and integrate existing navigation.
+- [x] Build admin request search, pagination, details, workflow and production summaries.
+- [x] Verify live customer submission/readback/reload/cancellation, 13 card-rule tests and 7 My Circle regression tests, English/Arabic layouts at 320/390/768/1280px, no overflow/runtime errors; remove temporary requests.
+- [ ] Verify authorized admin fulfillment, internal-note readback, search/pagination and print QR end-to-end, plus customer cancellation after Under Review/Approved — blocked by additional admin verification; existing gate requires the owner's admin credentials, which are not available to testing. Signup confirmation and external OAuth return remain untested with real new accounts.
 - [x] Simplify the homepage into one compact header and a balanced marketing/video hero, preserving existing actions.
 - [x] Verify homepage at 320–1440px in English/Arabic, all appearance controls, hosted video playback and navigation; no overflow or browser errors.
 - [x] Fix the shared authentication header at narrow and desktop widths.
