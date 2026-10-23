@@ -49,10 +49,12 @@ export default function Landing() {
           brand: { "@type": "Brand", name: "OSHEGAH" },
         }}
       />
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-2 sm:gap-3 sm:px-5 sm:py-4">
-          <Wordmark className="shrink-0 sm:flex-1" />
-          <MobileHeaderMenu>
+      <header className="sticky top-0 z-40 border-b border-sidebar-border bg-sidebar text-sidebar-foreground">
+        <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between gap-3 px-5 lg:h-20 lg:gap-4">
+          <Wordmark invert className="shrink-0 [&>span]:tracking-normal [&>span]:text-sidebar-foreground" />
+          <PrimaryNavigation restrained className="hidden shrink-0 gap-0.5 lg:flex" />
+          <MobileHeaderMenu breakpoint="lg" tone="invert">
+            <div className="hidden sm:block"><PrimaryNavigation className="flex flex-col items-stretch" /></div>
             {user ? (
               <Button asChild variant="ghost" className="w-full justify-start"><Link to={home}>{t("common.dashboard")}</Link></Button>
             ) : (
@@ -62,55 +64,48 @@ export default function Landing() {
               </>
             )}
           </MobileHeaderMenu>
-          <nav className="hidden min-w-0 flex-1 flex-wrap items-center justify-end gap-2 sm:flex" aria-label={t("nav.main")}>
-            <ThemeToggle className="hidden sm:inline-flex" />
-            <LanguageSwitcher className="hidden sm:inline-flex" />
-            <Button asChild variant="outline" size="sm" className="sm:h-10 sm:px-4">
+          <nav className="hidden shrink-0 items-center justify-end gap-1.5 lg:flex xl:gap-2" aria-label={t("nav.main")}>
+            <ThemeToggle tone="invert" className="shrink-0 [&_button]:px-2" />
+            <LanguageSwitcher tone="invert" compact className="shrink-0 [&_button]:px-2" />
+            <Button asChild variant="ghost" size="sm" className="h-9 gap-1.5 px-2 text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground">
               <Link to="/leaderboard" aria-label={t("leaderboard.button")}>
-                <Trophy className="h-4 w-4 sm:me-1.5" aria-hidden="true" />
-                <span className="hidden sm:inline">{t("leaderboard.button")}</span>
+                <Trophy className="h-4 w-4" aria-hidden="true" />
+                <span>{t("leaderboard.button")}</span>
               </Link>
             </Button>
             {user ? (
-              <Button asChild size="sm" className="hover-lift sm:h-10 sm:px-4"><Link to={home}>{t("common.dashboard")}</Link></Button>
+              <Button asChild size="sm" className="h-9 rounded-md bg-sidebar-primary px-3 text-xs text-sidebar-primary-foreground hover:bg-sidebar-primary/90"><Link to={home}>{t("common.dashboard")}</Link></Button>
             ) : (
               <>
-                <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex sm:h-10 sm:px-4"><Link to="/login">{t("nav.login")}</Link></Button>
-                <Button asChild size="sm" className="hover-lift sm:h-10 sm:px-4"><Link to="/signup">{t("nav.signup")}</Link></Button>
+                <Button variant="ghost" size="sm" asChild className="h-9 px-2 text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"><Link to="/login">{t("nav.login")}</Link></Button>
+                <Button asChild size="sm" className="h-9 rounded-md bg-sidebar-primary px-3 text-xs text-sidebar-primary-foreground hover:bg-sidebar-primary/90"><Link to="/signup">{t("nav.signup")}</Link></Button>
               </>
             )}
           </nav>
         </div>
-        <PrimaryNavigation />
       </header>
 
       <main>
-        {/* Hero — navy atmosphere with soft-blue lighting */}
-        <section className="relative overflow-hidden bg-navy text-white">
-          <div
-            className="pointer-events-none absolute -top-32 end-[-10%] h-[420px] w-[420px] rounded-full opacity-30 blur-3xl"
-            style={{ background: "radial-gradient(circle, hsl(var(--sky)) 0%, transparent 70%)" }}
-            aria-hidden="true"
-          />
-          <div className="relative mx-auto grid w-full max-w-6xl items-center gap-12 px-5 py-16 lg:grid-cols-2 lg:py-24">
-            <div>
-              <p className="eyebrow animate-soft-in text-sky/80">{t("brand.slogan")}</p>
+        <section className="bg-sidebar-accent/100 text-sidebar-foreground">
+          <div className="mx-auto grid w-full max-w-[1200px] items-center gap-10 px-5 py-10 sm:gap-12 sm:py-14 md:grid-cols-2 md:gap-8 lg:gap-14 lg:py-20">
+            <div className="min-w-0">
+              <p className="animate-soft-in text-xs font-semibold uppercase text-sidebar-primary/80">{t("brand.slogan")}</p>
               <h1
-                className="mt-4 animate-soft-in font-display text-4xl font-semibold leading-tight sm:text-5xl"
+                className="mt-4 max-w-[480px] animate-soft-in font-display text-4xl font-semibold leading-[1.15] tracking-normal lg:text-5xl"
                 style={{ animationDelay: "80ms" }}
               >
                 {t("landing.heroTitle")}
               </h1>
               <p
-                className="mt-5 max-w-lg animate-soft-in text-base text-white/70"
+                className="mt-5 max-w-md animate-soft-in text-base leading-relaxed text-sidebar-foreground/70"
                 style={{ animationDelay: "160ms" }}
               >
                 {t("landing.heroText")}
               </p>
-              <div className="mt-8 flex animate-soft-in flex-wrap gap-3" style={{ animationDelay: "240ms" }}>
-                <Button size="lg" asChild className="hover-lift bg-sky text-navy hover:bg-sky/90">
+              <div className="mt-7 flex animate-soft-in flex-wrap gap-3" style={{ animationDelay: "240ms" }}>
+                <Button size="lg" asChild className="h-11 rounded-md bg-sidebar-primary px-5 text-sm text-sidebar-primary-foreground hover:bg-sidebar-primary/90">
                   <Link to={user ? home : "/signup"}>
-                    {user ? t("landing.goDashboard") : t("landing.createProfile")}
+                    {t("landing.createProfile")}
                     <ArrowRight className="ms-2 h-4 w-4 rtl:-scale-x-100" />
                   </Link>
                 </Button>
@@ -118,13 +113,13 @@ export default function Landing() {
                   size="lg"
                   variant="outline"
                   asChild
-                  className="border-white/25 bg-transparent text-white hover:bg-white/10 hover:text-white"
+                  className="h-11 rounded-md border-sidebar-foreground/25 bg-transparent px-5 text-sm text-sidebar-foreground hover:bg-sidebar-foreground/5 hover:text-sidebar-foreground"
                 >
                   <Link to={`/${topUsername}`}>{t("landing.seeLive")}</Link>
                 </Button>
               </div>
             </div>
-            <div className="animate-soft-in" style={{ animationDelay: "300ms" }}>
+            <div className="min-w-0 animate-soft-in" style={{ animationDelay: "300ms" }}>
               <ProfileTutorial />
             </div>
           </div>
