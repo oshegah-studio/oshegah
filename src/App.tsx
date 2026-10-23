@@ -26,6 +26,9 @@ import GetYourCard from "./pages/GetYourCard";
 import CardRequests from "./pages/CardRequests";
 import CardRequestDetail from "./pages/CardRequestDetail";
 import CardDeliverySettings from "./pages/CardDeliverySettings";
+import SerialManagement from "./pages/SerialManagement";
+import MyOshegahCards from "./pages/MyOshegahCards";
+import SerialRedirect from "./pages/SerialRedirect";
 import { PublicMobileNavigation } from "@/components/PrimaryNavigation";
 
 const queryClient = new QueryClient();
@@ -53,6 +56,8 @@ const App = () => (
             <Route path="/my-cards/:id" element={<ProtectedRoute area="account"><CardRequestDetail /></ProtectedRoute>} />
             <Route path="/admin/card-requests" element={<ProtectedRoute area="admin"><AdminGate><CardRequests admin /></AdminGate></ProtectedRoute>} />
             <Route path="/admin/card-delivery-settings" element={<ProtectedRoute area="admin"><AdminGate><CardDeliverySettings /></AdminGate></ProtectedRoute>} />
+            <Route path="/admin/serials" element={<ProtectedRoute area="admin"><AdminGate><SerialManagement /></AdminGate></ProtectedRoute>} />
+            <Route path="/my-oshegah-cards" element={<ProtectedRoute area="account"><MyOshegahCards /></ProtectedRoute>} />
             <Route path="/admin/card-requests/:id" element={<ProtectedRoute area="admin"><AdminGate><CardRequestDetail admin /></AdminGate></ProtectedRoute>} />
             <Route
 
@@ -68,6 +73,7 @@ const App = () => (
               element={<ProtectedRoute area="admin"><AdminGate><AdminDashboard /></AdminGate></ProtectedRoute>}
             />
             <Route path="/c/:cardId" element={<CardRedirect />} />
+            <Route path="/s/:serial" element={<SerialRedirect />} />
             <Route path="/:username" element={<PublicProfile />} />
             <Route path="*" element={<NotFound />} />
             </Routes>

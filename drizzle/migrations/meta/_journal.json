@@ -92,6 +92,13 @@
       "when": 1792718186757,
       "tag": "0012_card_settings_rpc_only_writes",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792773392853,
+      "tag": "0013_serial_numbers",
+      "breakpoints": true
     }
   ]
 }
