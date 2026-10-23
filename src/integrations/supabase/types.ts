@@ -692,6 +692,140 @@ export type Database = {
         }
         Relationships: []
       }
+      serial_card_events: {
+        Row: {
+          actor: string | null
+          actor_label: string
+          created_at: string
+          event_type: string
+          id: string
+          new_owner: string | null
+          new_state: Json | null
+          previous_owner: string | null
+          previous_state: Json | null
+          reason: string
+          serial_id: string
+        }
+        Insert: {
+          actor?: string | null
+          actor_label: string
+          created_at?: string
+          event_type: string
+          id?: string
+          new_owner?: string | null
+          new_state?: Json | null
+          previous_owner?: string | null
+          previous_state?: Json | null
+          reason?: string
+          serial_id: string
+        }
+        Update: {
+          actor?: string | null
+          actor_label?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          new_owner?: string | null
+          new_state?: Json | null
+          previous_owner?: string | null
+          previous_state?: Json | null
+          reason?: string
+          serial_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "serial_card_events_serial_id_fkey"
+            columns: ["serial_id"]
+            isOneToOne: false
+            referencedRelation: "serial_cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      serial_cards: {
+        Row: {
+          activated_at: string | null
+          activation_status: string
+          admin_notes: string
+          assigned_at: string | null
+          assignment_status: string
+          card_request_id: string | null
+          created_at: string
+          customer_id: string | null
+          id: string
+          last_actor: string | null
+          owner_user_id: string | null
+          serial: string
+          updated_at: string
+        }
+        Insert: {
+          activated_at?: string | null
+          activation_status?: string
+          admin_notes?: string
+          assigned_at?: string | null
+          assignment_status?: string
+          card_request_id?: string | null
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          last_actor?: string | null
+          owner_user_id?: string | null
+          serial: string
+          updated_at?: string
+        }
+        Update: {
+          activated_at?: string | null
+          activation_status?: string
+          admin_notes?: string
+          assigned_at?: string | null
+          assignment_status?: string
+          card_request_id?: string | null
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          last_actor?: string | null
+          owner_user_id?: string | null
+          serial?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "serial_cards_card_request_id_fkey"
+            columns: ["card_request_id"]
+            isOneToOne: false
+            referencedRelation: "card_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "serial_cards_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      serial_settings: {
+        Row: {
+          id: boolean
+          self_activation: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          id?: boolean
+          self_activation?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          id?: boolean
+          self_activation?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -752,6 +886,62 @@ export type Database = {
         Returns: undefined
       }
       _admin_open_session: { Args: never; Returns: string }
+      _serial_actor: { Args: never; Returns: string }
+      _serial_log: {
+        Args: {
+          _new_owner: string
+          _next: Json
+          _prev: Json
+          _prev_owner: string
+          _reason: string
+          _serial: string
+          _type: string
+        }
+        Returns: undefined
+      }
+      _serial_profile_ok: {
+        Args: { _customer: string; _user: string }
+        Returns: boolean
+      }
+      _serial_rows: {
+        Args: {
+          _activation: string
+          _assignment: string
+          _request: string
+          _search: string
+        }
+        Returns: {
+          activated_at: string
+          activation_status: string
+          assigned_at: string
+          assignment_status: string
+          card_request_id: string
+          created_at: string
+          customer_id: string
+          id: string
+          owner_email: string
+          owner_name: string
+          owner_user_id: string
+          serial: string
+          updated_at: string
+          username: string
+        }[]
+      }
+      _serial_state: {
+        Args: { r: Database["public"]["Tables"]["serial_cards"]["Row"] }
+        Returns: Json
+      }
+      activate_my_serial: { Args: { _id: string }; Returns: undefined }
+      admin_assign_serials: {
+        Args: {
+          _customer?: string
+          _ids: string[]
+          _note?: string
+          _request?: string
+          _user: string
+        }
+        Returns: number
+      }
       admin_auth_status: {
         Args: never
         Returns: {
@@ -764,6 +954,22 @@ export type Database = {
           verified: boolean
         }[]
       }
+      admin_generate_serials: {
+        Args: { _count: number; _note?: string }
+        Returns: Json
+      }
+      admin_get_serial: { Args: { _id: string }; Returns: Json }
+      admin_list_serials: {
+        Args: {
+          _activation?: string
+          _assignment?: string
+          _page?: number
+          _request?: string
+          _search?: string
+          _sort?: string
+        }
+        Returns: Json
+      }
       admin_login: {
         Args: { _password: string; _username: string }
         Returns: {
@@ -773,12 +979,30 @@ export type Database = {
         }[]
       }
       admin_logout: { Args: never; Returns: undefined }
+      admin_reassign_serial: {
+        Args: {
+          _customer?: string
+          _id: string
+          _reason?: string
+          _user: string
+        }
+        Returns: undefined
+      }
+      admin_register_serials: {
+        Args: { _commit?: boolean; _note?: string; _serials: string[] }
+        Returns: Json
+      }
       admin_reset_own_credentials: {
         Args: never
         Returns: {
           error: string
           ok: boolean
         }[]
+      }
+      admin_search_serial_users: { Args: { _q: string }; Returns: Json }
+      admin_set_serial_activation: {
+        Args: { _action: string; _id: string; _reason?: string }
+        Returns: undefined
       }
       admin_setup_credentials: {
         Args: { _password: string; _username: string }
@@ -787,6 +1011,10 @@ export type Database = {
           expires_at: string
           ok: boolean
         }[]
+      }
+      admin_update_serial_notes: {
+        Args: { _id: string; _notes: string }
+        Returns: undefined
       }
       card_request_config: { Args: never; Returns: Json }
       change_card_request: {
@@ -902,6 +1130,7 @@ export type Database = {
       is_active_customer: { Args: { _customer_id: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
+      my_serial_cards: { Args: never; Returns: Json }
       owner_grant_admin: {
         Args: { _email: string }
         Returns: {
@@ -944,9 +1173,18 @@ export type Database = {
         Args: { _customer_id: string; _visitor_id: string }
         Returns: undefined
       }
+      resolve_serial: { Args: { _serial: string }; Returns: Json }
       resolve_username: { Args: { _username: string }; Returns: string }
       save_card_delivery_settings: {
         Args: { _settings: Json; _version: number }
+        Returns: undefined
+      }
+      save_serial_settings: {
+        Args: { _self_activation: boolean }
+        Returns: undefined
+      }
+      set_serial_profile: {
+        Args: { _customer: string; _id: string }
         Returns: undefined
       }
       submit_card_request: {
