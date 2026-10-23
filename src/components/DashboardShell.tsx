@@ -1,6 +1,7 @@
 import { type ReactNode } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { LogOut, Trophy, type LucideIcon } from "lucide-react";
+import { CreditCard, LogOut, Trophy, type LucideIcon } from "lucide-react";
+import { useCardText } from "@/features/cards/model";
 import { CustomerService } from "@/components/CustomerService";
 import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -39,7 +40,9 @@ export function DashboardShell({
   const navigate = useNavigate();
   const { t } = useI18n();
   const primary = usePrimaryDestinations();
-  const allItems = [...primary, ...items.filter(item => !primary.some(main => main.to === item.to))];
+  const { text } = useCardText();
+  const cardItems: NavItem[] = [{ to: "/get-your-card", label: text.request, icon: CreditCard, end: true }, { to: "/my-cards", label: text.mine, icon: CreditCard }];
+  const allItems = [...primary, ...items.filter(item => !primary.some(main => main.to === item.to)), ...cardItems.filter(item => !items.some(existing => existing.to === item.to))];
 
   const handleSignOut = async () => {
     await signOut();

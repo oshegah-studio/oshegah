@@ -60,7 +60,7 @@ export default function Landing() {
             ) : (
               <>
                 <Button asChild variant="ghost" className="w-full justify-start"><Link to="/login">{t("nav.login")}</Link></Button>
-                <Button asChild className="mt-2 w-full"><Link to="/signup">{t("nav.signup")}</Link></Button>
+                <Button asChild className="mt-2 w-full"><Link to="/get-your-card">{t("nav.signup")}</Link></Button>
               </>
             )}
           </MobileHeaderMenu>
@@ -78,7 +78,7 @@ export default function Landing() {
             ) : (
               <>
                 <Button variant="ghost" size="sm" asChild className="h-9 px-2 text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"><Link to="/login">{t("nav.login")}</Link></Button>
-                <Button asChild size="sm" className="h-9 rounded-md bg-sidebar-primary px-3 text-xs text-sidebar-primary-foreground hover:bg-sidebar-primary/90"><Link to="/signup">{t("nav.signup")}</Link></Button>
+                <Button asChild size="sm" className="h-9 rounded-md bg-sidebar-primary px-3 text-xs text-sidebar-primary-foreground hover:bg-sidebar-primary/90"><Link to="/get-your-card">{t("nav.signup")}</Link></Button>
               </>
             )}
           </nav>

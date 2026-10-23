@@ -22,6 +22,9 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 import MyCircle from "./pages/MyCircle";
+import GetYourCard from "./pages/GetYourCard";
+import CardRequests from "./pages/CardRequests";
+import CardRequestDetail from "./pages/CardRequestDetail";
 import { PublicMobileNavigation } from "@/components/PrimaryNavigation";
 
 const queryClient = new QueryClient();
@@ -44,6 +47,11 @@ const App = () => (
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/my-circle" element={<ProtectedRoute area="account"><MyCircle /></ProtectedRoute>} />
+            <Route path="/get-your-card" element={<ProtectedRoute area="account"><GetYourCard /></ProtectedRoute>} />
+            <Route path="/my-cards" element={<ProtectedRoute area="account"><CardRequests /></ProtectedRoute>} />
+            <Route path="/my-cards/:id" element={<ProtectedRoute area="account"><CardRequestDetail /></ProtectedRoute>} />
+            <Route path="/admin/card-requests" element={<ProtectedRoute area="admin"><AdminGate><CardRequests admin /></AdminGate></ProtectedRoute>} />
+            <Route path="/admin/card-requests/:id" element={<ProtectedRoute area="admin"><AdminGate><CardRequestDetail admin /></AdminGate></ProtectedRoute>} />
             <Route
 
               path="/dashboard"

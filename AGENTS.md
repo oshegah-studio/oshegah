@@ -1,4 +1,6 @@
 # Architecture rules
+- Card requests use authenticated RPCs for submission and audited actions; private immutable snapshots and server-configured product prices prevent customer tampering, while admin operations require the existing live step-up gate.
+- Card request translations and validation live in the cards feature module; existing DashboardShell navigation carries customer request destinations without adding another primary bar.
 - My Circle uses one unique user/customer row with separate saved/viewed timestamps; auth-scoped RPCs validate active targets and reject ownership, while RLS keeps lists private and returns only direct-profile display fields.
 - Shared AuthHeader uses a dedicated desktop settings row because authentication panels stay narrow even on wide screens; mobile reuses MobileHeaderMenu.
 - Home/My Circle/Profile destinations share PrimaryNavigation; DashboardShell replaces its existing mobile bar rather than stacking a second bar.
