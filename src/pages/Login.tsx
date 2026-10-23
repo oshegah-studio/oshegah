@@ -6,10 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Wordmark } from "@/components/Brand";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { MobileHeaderMenu } from "@/components/MobileHeaderMenu";
+import { AuthHeader } from "@/components/AuthHeader";
 import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n";
 import { Seo } from "@/components/Seo";
@@ -48,12 +45,7 @@ export default function Login() {
         path="/login"
       />
       <div className="w-full max-w-sm animate-soft-in rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-7">
-        <div className="flex items-center justify-between gap-2">
-          <Wordmark className="shrink-0" />
-          <MobileHeaderMenu />
-          <ThemeToggle className="hidden sm:inline-flex" />
-          <LanguageSwitcher className="hidden sm:inline-flex" compact />
-        </div>
+        <AuthHeader />
         <h1 className="mt-6 font-display text-2xl font-semibold">
           {addingAccount ? t("accounts.addTitle") : t("auth.loginTitle")}
         </h1>

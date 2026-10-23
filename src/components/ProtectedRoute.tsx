@@ -10,7 +10,7 @@ export function ProtectedRoute({
   area,
 }: {
   children: ReactNode;
-  area: "personal" | "business" | "admin";
+  area: "personal" | "business" | "admin" | "account";
 }) {
   const { user, profile, isAdmin, loading } = useAuth();
   const location = useLocation();
@@ -43,6 +43,7 @@ export function ProtectedRoute({
   }
 
   const seo = {
+    account: { path: "/my-circle", title: "My Circle — OSHEGAH", description: "Your recent and saved profiles." },
     personal: {
       path: "/dashboard",
       title: "My dashboard — OSHEGAH",
