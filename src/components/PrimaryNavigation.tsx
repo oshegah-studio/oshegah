@@ -3,7 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 export function usePrimaryDestinations() {
   const { user, profile } = useAuth();
@@ -24,13 +24,11 @@ export function PrimaryNavigation({ mobile = false }: { mobile?: boolean }) {
         : "hidden items-center justify-center gap-2 sm:flex",
     )}>
       {items.map(item => (
-        <Button key={item.to} variant="ghost" asChild className={mobile ? "h-auto min-h-14 rounded-md px-1 py-2" : "gap-2"}>
-          <NavLink to={item.to} end={item.end} state={item.to === "/login" ? { from: "/dashboard" } : undefined}
-            className={({ isActive }) => cn(mobile ? "flex flex-col gap-1 text-xs" : "flex items-center", isActive ? "bg-accent text-primary" : "text-muted-foreground")}>
+          <NavLink key={item.to} to={item.to} end={item.end} state={item.to === "/login" ? { from: "/dashboard" } : undefined}
+            className={({ isActive }) => cn(buttonVariants({ variant: "ghost" }), mobile ? "h-auto min-h-14 flex-col gap-1 rounded-md px-1 py-2 text-xs" : "gap-2", isActive ? "bg-accent text-primary" : "text-muted-foreground")}>
             <item.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
             <span>{item.label}</span>
           </NavLink>
-        </Button>
       ))}
     </nav>
   );

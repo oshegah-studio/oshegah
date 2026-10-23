@@ -135,7 +135,7 @@ export default function PublicProfile() {
       <PrimaryNavigation />
       <div className="relative z-10 flex flex-wrap items-center justify-end gap-2 bg-background px-4 py-3">
         {!authLoading && (!user || ownership.data === false) && <SaveProfileButton customerId={customer.id} isOwn={false} />}
-        <LanguageSwitcher tone="invert" compact />
+        <LanguageSwitcher compact />
       </div>
       <ProfileView
         customer={customer}

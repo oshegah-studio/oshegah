@@ -62,7 +62,7 @@ export default function Landing() {
               </>
             )}
           </MobileHeaderMenu>
-          <nav className="hidden shrink-0 flex-wrap items-center justify-end gap-2 sm:flex" aria-label={t("nav.main")}>
+          <nav className="hidden min-w-0 flex-1 flex-wrap items-center justify-end gap-2 sm:flex" aria-label={t("nav.main")}>
             <ThemeToggle className="hidden sm:inline-flex" />
             <LanguageSwitcher className="hidden sm:inline-flex" />
             <Button asChild variant="outline" size="sm" className="sm:h-10 sm:px-4">
