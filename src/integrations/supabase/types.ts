@@ -178,6 +178,35 @@ export type Database = {
           },
         ]
       }
+      circle_entries: {
+        Row: {
+          customer_id: string
+          saved_at: string | null
+          user_id: string
+          viewed_at: string | null
+        }
+        Insert: {
+          customer_id: string
+          saved_at?: string | null
+          user_id: string
+          viewed_at?: string | null
+        }
+        Update: {
+          customer_id?: string
+          saved_at?: string | null
+          user_id?: string
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_entries_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           active: boolean
@@ -545,6 +574,17 @@ export type Database = {
           ok: boolean
         }[]
       }
+      get_circle_entries: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          customer_id: string
+          full_name: string
+          saved_at: string
+          username: string
+          viewed_at: string
+        }[]
+      }
       get_leaderboard: {
         Args: { _limit?: number; _since?: string }
         Returns: {
@@ -668,6 +708,10 @@ export type Database = {
           account_type: Database["public"]["Enums"]["account_type"]
           last_profile_type_change_at: string
         }[]
+      }
+      update_circle: {
+        Args: { _action: string; _customer_id: string }
+        Returns: undefined
       }
     }
     Enums: {

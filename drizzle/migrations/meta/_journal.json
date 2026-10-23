@@ -22,6 +22,13 @@
       "when": 1791835482385,
       "tag": "0002_lock_admin_credential_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792713705447,
+      "tag": "0003_my_circle_private_lists",
+      "breakpoints": true
     }
   ]
 }
