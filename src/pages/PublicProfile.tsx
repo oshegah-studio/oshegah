@@ -15,8 +15,9 @@ import { useCircle } from "@/hooks/useCircle";
 import { SaveProfileButton } from "@/components/SaveProfileButton";
 import { PrimaryNavigation } from "@/components/PrimaryNavigation";
 
-export default function PublicProfile() {
-  const { username = "" } = useParams();
+export default function PublicProfile({ username: fixedUsername }: { username?: string } = {}) {
+  const params = useParams();
+  const username = fixedUsername ?? params.username ?? "";
   const { t } = useI18n();
   const { user, loading: authLoading } = useAuth();
   const { mutation } = useCircle();

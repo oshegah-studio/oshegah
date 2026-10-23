@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { cardReturnPath, rememberReturn } from "@/features/cards/intent";
 import { toast } from "sonner";
