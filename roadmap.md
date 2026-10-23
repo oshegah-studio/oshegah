@@ -1,4 +1,7 @@
 # OSHEGAH updates
+- [ ] Add database-backed admin Card & Delivery Settings, protected audited saves and trusted submission snapshots.
+- [ ] Update customer quantities, governorate selection, delivery availability and transparent totals from active settings.
+- [ ] Verify settings, calculations, snapshot immutability, privacy and mobile/desktop regressions; report unavailable admin checks.
 - [x] Inspect card products, profile prerequisites, authentication, and existing admin authorization.
 - [x] Implement secure card requests, price snapshots, status transitions and private audit history.
 - [x] Build customer request/review/confirmation/tracking and integrate existing navigation.
