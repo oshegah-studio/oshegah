@@ -29,10 +29,11 @@ import { Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCardText } from "@/features/cards/model";
 import { useCardRequests } from "@/features/cards/api";
+import { settingsText } from "@/features/cards/settings";
 
 
 export default function AdminDashboard() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { text: cardText } = useCardText();
   const cardRequests = useCardRequests(true, 1);
   const qc = useQueryClient();
@@ -47,6 +48,7 @@ export default function AdminDashboard() {
   const navItems: NavItem[] = [
     { to: "/admin", label: t("dashboard.areaAdmin"), icon: LayoutDashboard, end: true },
     { to: "/admin/card-requests", label: `${cardText.admin}${cardRequests.data?.counts?.submitted ? ` (${cardRequests.data.counts.submitted})` : ""}`, icon: CreditCard },
+    { to: "/admin/card-delivery-settings", label: settingsText[lang==='ar'?'ar':'en'].title, icon: Settings },
   ];
 
   const { data: customers, isLoading } = useQuery({

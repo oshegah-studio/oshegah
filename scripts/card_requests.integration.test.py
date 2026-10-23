@@ -17,7 +17,9 @@ class CardRules(unittest.TestCase):
   p=requests.get(cls.base+'profiles',headers=cls.headers,params={'auth_user_id':'eq.'+cls.uid}).json()[0]
   c=requests.get(cls.base+'customers',headers=cls.headers,params={'user_id':'eq.'+p['id']}).json()[0]
   cls.customer=c['id'];cls.created=[]
-  cls.payload={'full_name':'Workflow validation','phone':'01012345678','email':'','contact_method':'whatsapp','country':'EG','governorate':'Cairo','city':'Test validation','address':'Validation only; not a fulfillment request','instructions':'','notes':'OSHEGAH_CARD_WORKFLOW_TEST','quantity':1,'consent':True}
+  cls.config=cls.rpc('card_request_config',{}).json()
+  region=next((k for k,v in cls.config['governorate_fees'].items() if v['enabled']),'Cairo')
+  cls.payload={'full_name':'Workflow validation','phone':'01012345678','email':'','contact_method':'whatsapp','country':'EG','governorate':region,'city':'Test validation','address':'Validation only; not a fulfillment request','instructions':'','notes':'OSHEGAH_CARD_WORKFLOW_TEST','quantity':1,'consent':True}
  @classmethod
  def rpc(cls,name,data):return requests.post(cls.base+'rpc/'+name,headers=cls.headers,json=data)
  def submit(self,changes=None,key=None,customer=None):
@@ -27,11 +29,13 @@ class CardRules(unittest.TestCase):
  def tearDown(self):
   for i in set(self.created):self.rpc('change_card_request',{'_id':i,'_action':'customer_cancel'})
   self.created=[]
- def test_server_price_is_300_egp_and_ignores_client_price(self):
-  r=self.submit({'unit_price':1,'subtotal':1,'total':1,'quantity':2});self.assertEqual(r.status_code,200)
-  d=self.rpc('get_card_request',{'_id':r.json()}).json()['request'];self.assertEqual(d['unit_price'],300);self.assertEqual(d['subtotal'],600);self.assertEqual(d['currency'],'EGP');self.assertIsNone(d['delivery_charge']);self.assertIsNone(d['total'])
- def test_maximum_quantity_is_five(self):
-  self.assertEqual(self.submit({'quantity':5}).status_code,200);self.assertEqual(self.submit({'quantity':6}).status_code,400)
+ def test_server_uses_active_price_and_ignores_client_price(self):
+  r=self.submit({'unit_price':1,'subtotal':1,'total':1});self.assertEqual(r.status_code,200)
+  d=self.rpc('get_card_request',{'_id':r.json()}).json()['request'];self.assertEqual(d['unit_price'],self.config['unit_price']);self.assertEqual(d['subtotal'],self.config['unit_price']);self.assertEqual(d['currency'],'EGP')
+  fee=self.config['delivery_charge'] if self.config['delivery_mode']=='flat' else self.config['governorate_fees'][self.payload['governorate']]['fee']
+  self.assertEqual(d['delivery_charge'],fee);self.assertEqual(d['total'],None if fee is None else self.config['unit_price']+fee)
+ def test_maximum_quantity_uses_active_limit(self):
+  limit=self.config['max_quantity'];self.assertEqual(self.submit({'quantity':limit}).status_code,200);self.assertEqual(self.submit({'quantity':limit+1}).status_code,400)
  def test_quantity_must_be_positive_integer(self):
   for n in [0,-1,1.5]:self.assertEqual(self.submit({'quantity':n}).status_code,400)
  def test_delivery_is_egypt_only(self):self.assertEqual(self.submit({'country':'US'}).status_code,400)
@@ -54,4 +58,17 @@ class CardRules(unittest.TestCase):
   h={'apikey':self.headers['apikey']};self.assertEqual(requests.post(self.base+'rpc/get_card_requests',headers=h,json={}).status_code,401)
  def test_paginated_at_most_twenty(self):
   d=self.rpc('get_card_requests',{'_page':1}).json();self.assertEqual(d['page_size'],20);self.assertLessEqual(len(d['rows']),20)
+ def test_settings_and_audit_require_live_admin_verification(self):
+  self.assertEqual(self.rpc('get_card_delivery_settings',{}).status_code,403)
+  self.assertEqual(self.rpc('save_card_delivery_settings',{'_version':self.config['version'],'_settings':{'unit_price':0}}).status_code,403)
+  for table in ['card_delivery_settings','card_settings_history']:
+   self.assertEqual(requests.get(self.base+table,headers=self.headers).json(),[])
+  self.assertEqual(requests.patch(self.base+'card_delivery_settings?id=eq.true',headers=self.headers,json={'unit_price':0}).status_code,403)
+ def test_submission_stores_financial_snapshot(self):
+  r=self.submit();self.assertEqual(r.status_code,200)
+  d=self.rpc('get_card_request',{'_id':r.json()}).json()['request'];s=d['financial_snapshot']
+  for key in ['unit_price','quantity','subtotal','total','currency']:self.assertEqual(s[key],d[key])
+  self.assertEqual(s['governorate'],self.payload['governorate']);self.assertEqual(s['settings_version'],self.config['version']);self.assertTrue(s['submitted_at'])
+ def test_stale_review_version_rejected(self):
+  self.assertEqual(self.submit({'settings_version':self.config['version']-1}).status_code,400)
 if __name__=='__main__':unittest.main()

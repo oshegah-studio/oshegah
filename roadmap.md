@@ -1,4 +1,8 @@
 # OSHEGAH updates
+- [x] Add database-backed admin Card & Delivery Settings, protected audited saves and trusted submission snapshots.
+- [x] Update customer quantities, governorate selection, delivery availability and transparent totals from active settings.
+- [x] Verify 20 isolated database acceptance tests, 16 live card regressions, 7 My Circle regressions, real customer submission/readback/reload/cancellation, real admin denial, and EN/AR 320/390/768/1280 layouts; admin layout checks used simulated responses only, production settings remain unchanged and temporary orders removed.
+- [ ] Verify authorized settings Save Changes, customer price propagation and audit readback end-to-end against live configuration — blocked by the existing additional admin verification; no credentials available and no security bypass performed. Authorized pricing/mode changes and financial audits passed against the real migrations in isolated Postgres instead.
 - [x] Inspect card products, profile prerequisites, authentication, and existing admin authorization.
 - [x] Implement secure card requests, price snapshots, status transitions and private audit history.
 - [x] Build customer request/review/confirmation/tracking and integrate existing navigation.

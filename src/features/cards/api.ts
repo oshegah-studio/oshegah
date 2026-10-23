@@ -2,7 +2,7 @@ import {useQuery} from '@tanstack/react-query';
 import {supabase} from '@/integrations/supabase/client';
 import {useAuth} from '@/hooks/useAuth';
 import type {CardConfig,CardRequest,CardHistory} from './model';
-export function useCardConfig(){return useQuery({queryKey:['card-config'],queryFn:async()=>{const {data,error}=await supabase.rpc('card_request_config');if(error)throw error;return data as unknown as CardConfig;}});}
+export function useCardConfig(){return useQuery({queryKey:['card-config'],refetchOnMount:'always',refetchInterval:30000,queryFn:async()=>{const {data,error}=await supabase.rpc('card_request_config');if(error)throw error;if(!data)throw Error('SETTINGS_UNAVAILABLE');return data as unknown as CardConfig;}});}
 export function useCardRequests(admin:boolean,page:number,search='',status='',from='',to=''){
  const {user}=useAuth();
  return useQuery({queryKey:['card-requests',user?.id,admin,page,search,status,from,to],enabled:Boolean(user),refetchOnMount:'always',queryFn:async()=>{

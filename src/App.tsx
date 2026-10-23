@@ -25,6 +25,7 @@ import MyCircle from "./pages/MyCircle";
 import GetYourCard from "./pages/GetYourCard";
 import CardRequests from "./pages/CardRequests";
 import CardRequestDetail from "./pages/CardRequestDetail";
+import CardDeliverySettings from "./pages/CardDeliverySettings";
 import { PublicMobileNavigation } from "@/components/PrimaryNavigation";
 
 const queryClient = new QueryClient();
@@ -51,6 +52,7 @@ const App = () => (
             <Route path="/my-cards" element={<ProtectedRoute area="account"><CardRequests /></ProtectedRoute>} />
             <Route path="/my-cards/:id" element={<ProtectedRoute area="account"><CardRequestDetail /></ProtectedRoute>} />
             <Route path="/admin/card-requests" element={<ProtectedRoute area="admin"><AdminGate><CardRequests admin /></AdminGate></ProtectedRoute>} />
+            <Route path="/admin/card-delivery-settings" element={<ProtectedRoute area="admin"><AdminGate><CardDeliverySettings /></AdminGate></ProtectedRoute>} />
             <Route path="/admin/card-requests/:id" element={<ProtectedRoute area="admin"><AdminGate><CardRequestDetail admin /></AdminGate></ProtectedRoute>} />
             <Route
 
