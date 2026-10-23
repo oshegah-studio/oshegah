@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useCardText } from "@/features/cards/model";
 import { BarChart3, Eye, LayoutDashboard, Link2, MousePointerClick, Palette, QrCode, Settings, User } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/DashboardShell";
 import { ProfileEditor } from "@/components/ProfileEditor";
@@ -19,6 +21,8 @@ import { useI18n } from "@/i18n";
 export default function Dashboard() {
   const { profile } = useAuth();
   const { t } = useI18n();
+  const location = useLocation();
+  const { text: cardText } = useCardText();
   const { data: customer, isLoading } = useMyCustomer();
   const { data: links } = useLinks(customer?.id);
   const { data: stats } = useCustomerStats(customer ? [customer.id] : []);
@@ -48,6 +52,9 @@ export default function Dashboard() {
         )
       }
     >
+      {location.state?.cardReturn && customer && (
+        <div className="mb-6"><Button asChild><Link to="/get-your-card">{cardText.request}</Link></Button></div>
+      )}
       {isLoading ? (
         <SkeletonCards />
       ) : (

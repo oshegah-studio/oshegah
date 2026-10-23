@@ -19,6 +19,7 @@ export default function GetYourCard(){
  const [step,setStep]=useState<'form'|'review'|'success'>('form');const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [invalid,setInvalid]=useState<string[]>([]);const [key]=useState(()=>crypto.randomUUID());const [result,setResult]=useState<{id:string;number:number;date:string}|null>(null);
  const [form,setForm]=useState<RequestForm>({full_name:'',phone:'',email:'',contact_method:'whatsapp',country:'EG',governorate:'',city:'',address:'',instructions:'',notes:'',quantity:1,consent:false});
  useEffect(()=>{setForm(f=>({...f,full_name:f.full_name||customer?.full_name||profile?.full_name||'',phone:f.phone||customer?.phone||'',email:f.email||user?.email||''}));},[customer?.id,profile?.id,user?.id]);
+ useEffect(()=>{sessionStorage.removeItem('oshegah-card-return');},[]);
  const profileValid=customer&&customer.active&&customer.full_name.trim()&&/^[a-z0-9][a-z0-9._-]{1,28}[a-z0-9]$/.test(customer.username);
  const update=(name:keyof RequestForm,value:string|number|boolean)=>setForm(f=>({...f,[name]:value}));
  const validate=(consent:boolean)=>{const p=requestSchema.safeParse({...form,consent});if(!p.success){setInvalid(p.error.issues.map(i=>String(i.path[0])));setError(text.invalid);return null;}setInvalid([]);setError('');return p.data;};

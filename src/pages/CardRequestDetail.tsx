@@ -1,7 +1,7 @@
 import {useEffect,useState} from 'react';
 import {Link,useParams} from 'react-router-dom';
 import {useQueryClient} from '@tanstack/react-query';
-import {Download,Lock,Printer} from 'lucide-react';
+import {Download,Printer} from 'lucide-react';
 import {toast} from 'sonner';
 import {supabase} from '@/integrations/supabase/client';
 import {Button} from '@/components/ui/button';
@@ -10,8 +10,6 @@ import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {Dialog,DialogContent,DialogDescription,DialogHeader,DialogTitle} from '@/components/ui/dialog';
 import {AlertDialog,AlertDialogContent,AlertDialogHeader,AlertDialogTitle,AlertDialogDescription,AlertDialogFooter,AlertDialogCancel} from '@/components/ui/alert-dialog';
-import {CustomerService} from '@/components/CustomerService';
-import {useAdminGate} from '@/components/AdminGate';
 import {downloadDataUrl} from '@/components/QrDialog';
 import {renderBrandedQr} from '@/lib/qr';
 import {cardUrlFor,profileUrlFor} from '@/lib/vcard';

@@ -106,7 +106,7 @@ export function DashboardShell({
               <div className="mb-2">
                 <AccountSwitcher tone="default" />
               </div>
-              {items.map((item) => (
+              {allItems.filter(item => !primary.some(main => main.to === item.to)).map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
