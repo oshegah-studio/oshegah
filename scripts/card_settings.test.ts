@@ -16,7 +16,7 @@ await db.exec(`CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_
  INSERT INTO public.customers VALUES('11111111-1111-4111-8111-111111111111',true,'Test profile','settings_test',null);
  INSERT INTO public.admin_credentials VALUES('22222222-2222-4222-8222-222222222222','Isolated test admin');
  SET test.uid='22222222-2222-4222-8222-222222222222'; SET test.admin='true';`);
-for(const file of ['0004_card_request_storage.sql','0005_card_request_submit.sql','0006_card_request_retrieval.sql','0007_card_request_actions.sql','0008_card_request_validation_audit.sql','0009_card_request_rpc_only_writes.sql','0010_card_delivery_settings.sql','0011_lock_card_submission_configuration.sql'])await db.exec(readFileSync(`drizzle/migrations/${file}`,'utf8'));
+for(const file of ['0004_card_request_storage.sql','0005_card_request_submit.sql','0006_card_request_retrieval.sql','0007_card_request_actions.sql','0008_card_request_validation_audit.sql','0009_card_request_rpc_only_writes.sql','0010_card_delivery_settings.sql','0011_lock_card_submission_configuration.sql','0012_card_settings_rpc_only_writes.sql'])await db.exec(readFileSync(`drizzle/migrations/${file}`,'utf8'));
 await db.exec('INSERT INTO public.card_delivery_settings(id) VALUES(true)');
 let passed=0;
 async function test(name:string,fn:()=>Promise<void>|void){await fn();console.log(`PASS ${++passed}: ${name}`);}
