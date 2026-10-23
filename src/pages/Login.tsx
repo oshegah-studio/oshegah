@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { cardReturnPath } from "@/features/cards/intent";
+import { cardReturnPath, rememberReturn } from "@/features/cards/intent";
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -25,7 +25,7 @@ export default function Login() {
   const addingAccount = Boolean(location.state?.addAccount);
   const returnPath = cardReturnPath(location.state?.from);
   useEffect(() => {
-    if (location.state?.from === "/get-your-card") sessionStorage.setItem("oshegah-card-return", "/get-your-card");
+    if (location.state?.from) rememberReturn(location.state.from);
   }, [location.state?.from]);
 
   if (user && !addingAccount) {
@@ -39,7 +39,7 @@ export default function Login() {
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success(t("auth.welcomeBack"));
-    navigate(location.state?.from || "/dashboard", { replace: true });
+    navigate(cardReturnPath(location.state?.from) || location.state?.from || "/dashboard", { replace: true });
   };
 
   return (

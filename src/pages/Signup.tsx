@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
-import { cardReturnPath } from "@/features/cards/intent";
+import { cardReturnPath, rememberReturn } from "@/features/cards/intent";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +20,7 @@ export default function Signup() {
   const location = useLocation();
   const returnPath = cardReturnPath(location.state?.from);
   const { t } = useI18n();
+  useEffect(() => { if (location.state?.from) rememberReturn(location.state.from); }, [location.state?.from]);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,7 +44,7 @@ export default function Signup() {
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success(t("auth.accountCreated"));
-    navigate(accountType === "business" ? "/business" : "/dashboard", { replace: true });
+    navigate(cardReturnPath() || (accountType === "business" ? "/business" : "/dashboard"), { replace: true });
   };
 
   return (

@@ -28,6 +28,7 @@ import CardRequestDetail from "./pages/CardRequestDetail";
 import CardDeliverySettings from "./pages/CardDeliverySettings";
 import SerialManagement from "./pages/SerialManagement";
 import MyOshegahCards from "./pages/MyOshegahCards";
+import ProfileOrSerial from "./pages/ProfileOrSerial";
 import SerialRedirect from "./pages/SerialRedirect";
 import { PublicMobileNavigation } from "@/components/PrimaryNavigation";
 
@@ -74,7 +75,7 @@ const App = () => (
             />
             <Route path="/c/:cardId" element={<CardRedirect />} />
             <Route path="/s/:serial" element={<SerialRedirect />} />
-            <Route path="/:username" element={<PublicProfile />} />
+            <Route path="/:username" element={<ProfileOrSerial />} />
             <Route path="*" element={<NotFound />} />
             </Routes>
             <PublicMobileNavigation />
