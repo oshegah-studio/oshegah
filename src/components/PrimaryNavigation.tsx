@@ -15,18 +15,19 @@ export function usePrimaryDestinations() {
   ];
 }
 
-export function PrimaryNavigation({ mobile = false }: { mobile?: boolean }) {
+export function PrimaryNavigation({ mobile = false, className, restrained = false }: { mobile?: boolean; className?: string; restrained?: boolean }) {
   const items = usePrimaryDestinations();
   return (
     <nav aria-label={useI18n().t("nav.main")} className={cn(
       mobile
         ? "fixed inset-x-0 bottom-0 z-40 grid grid-cols-3 border-t border-border bg-background/95 px-2 pt-1 backdrop-blur pb-[max(0.375rem,env(safe-area-inset-bottom))] sm:hidden"
         : "hidden items-center justify-center gap-2 sm:flex",
+      className,
     )}>
       {items.map(item => (
           <NavLink key={item.to} to={item.to} end={item.end} state={item.to === "/login" ? { from: "/dashboard" } : undefined}
-            className={({ isActive }) => cn(buttonVariants({ variant: "ghost" }), mobile ? "h-auto min-h-14 flex-col gap-1 rounded-md px-1 py-2 text-xs" : "gap-2", isActive ? "bg-accent text-primary" : "text-muted-foreground")}>
-            <item.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+            className={({ isActive }) => cn(buttonVariants({ variant: "ghost" }), mobile ? "h-auto min-h-14 flex-col gap-1 rounded-md px-1 py-2 text-xs" : "gap-2", restrained ? "h-9 rounded-md px-2 text-xs hover:bg-sidebar-accent hover:text-sidebar-foreground" : "", restrained ? (isActive ? "bg-sidebar-accent/50 text-sidebar-primary" : "text-sidebar-foreground/70") : (isActive ? "bg-accent text-primary" : "text-muted-foreground"))}>
+            <item.icon className={cn("shrink-0", restrained ? "h-4 w-4" : "h-5 w-5")} aria-hidden="true" />
             <span>{item.label}</span>
           </NavLink>
       ))}

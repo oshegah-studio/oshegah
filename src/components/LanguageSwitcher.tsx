@@ -33,12 +33,12 @@ export function LanguageSwitcher({
       aria-label={t("lang.label")}
       className={cn(
         "inline-flex items-center gap-0.5 rounded-full border p-0.5 transition-colors",
-        invert ? "border-white/15 bg-white/5" : "border-border bg-muted/50",
+        invert ? "border-sidebar-border bg-sidebar-accent/40" : "border-border bg-muted/50",
         className,
       )}
     >
       <Globe
-        className={cn("ms-1.5 h-3.5 w-3.5 shrink-0", invert ? "text-white/50" : "text-muted-foreground")}
+        className={cn("ms-1.5 h-3.5 w-3.5 shrink-0", invert ? "text-sidebar-foreground/60" : "text-muted-foreground")}
         aria-hidden="true"
       />
       {OPTIONS.map((opt) => {
@@ -55,10 +55,10 @@ export function LanguageSwitcher({
               "h-auto rounded-full px-2.5 py-1 text-xs font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               active
                 ? invert
-                  ? "bg-sky text-navy"
+                  ? "bg-sidebar-primary text-sidebar-primary-foreground"
                   : "bg-primary text-primary-foreground shadow-soft"
                 : invert
-                  ? "text-white/60 hover:text-white"
+                  ? "text-sidebar-foreground/70 hover:text-sidebar-foreground"
                   : "text-muted-foreground hover:text-foreground",
             )}
           >
