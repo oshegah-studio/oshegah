@@ -830,6 +830,10 @@ export type Database = {
         Returns: undefined
       }
       resolve_username: { Args: { _username: string }; Returns: string }
+      submit_card_request: {
+        Args: { _customer_id: string; _key: string; _payload: Json }
+        Returns: string
+      }
       switch_profile_type: {
         Args: { _next: Database["public"]["Enums"]["account_type"] }
         Returns: {
