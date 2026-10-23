@@ -33,9 +33,10 @@ export default function Landing() {
   const { user, profile, isAdmin } = useAuth();
   const navigate = useNavigate();
   useEffect(() => {
-    if (user && cardReturnPath()) {
-      sessionStorage.removeItem("oshegah-card-return");
-      navigate("/get-your-card", { replace: true });
+    const back = user ? cardReturnPath() : null;
+    if (back) {
+      if (back === "/get-your-card") sessionStorage.removeItem("oshegah-card-return");
+      navigate(back, { replace: true });
     }
   }, [user?.id, navigate]);
   const { t } = useI18n();

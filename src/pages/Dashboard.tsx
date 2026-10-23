@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { serialReturnPath } from "@/features/cards/intent";
 import { useCardText } from "@/features/cards/model";
 import { BarChart3, Eye, LayoutDashboard, Link2, MousePointerClick, Palette, QrCode, Settings, User } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/DashboardShell";
@@ -27,6 +28,12 @@ export default function Dashboard() {
   const { data: links } = useLinks(customer?.id);
   const { data: stats } = useCustomerStats(customer ? [customer.id] : []);
   const [qrOpen, setQrOpen] = useState(false);
+  const navigate = useNavigate();
+  // Return to a pending card activation once the profile is saved.
+  useEffect(() => {
+    const back = serialReturnPath();
+    if (customer?.id && back) navigate(back, { replace: true });
+  }, [customer?.id, navigate]);
 
   const navItems: NavItem[] = [
     { to: "/dashboard", label: t("common.dashboard"), icon: LayoutDashboard, end: true },
