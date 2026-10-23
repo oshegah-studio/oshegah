@@ -64,6 +64,13 @@
       "when": 1792715796341,
       "tag": "0008_card_request_validation_audit",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792715928162,
+      "tag": "0009_card_request_rpc_only_writes",
+      "breakpoints": true
     }
   ]
 }
