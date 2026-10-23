@@ -1,4 +1,9 @@
 # OSHEGAH updates
+- [ ] Inspect card products, profile prerequisites, authentication, and existing admin authorization.
+- [ ] Implement secure card requests, price snapshots, status transitions and private audit history.
+- [ ] Build customer request/review/confirmation/tracking and integrate existing navigation.
+- [ ] Build admin request search, pagination, details, workflow and production summaries.
+- [ ] Test authenticated end-to-end workflow, privacy, validation and responsive translations.
 - [x] Simplify the homepage into one compact header and a balanced marketing/video hero, preserving existing actions.
 - [x] Verify homepage at 320–1440px in English/Arabic, all appearance controls, hosted video playback and navigation; no overflow or browser errors.
 - [x] Fix the shared authentication header at narrow and desktop widths.
