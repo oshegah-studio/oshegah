@@ -1,0 +1,17 @@
+CREATE TABLE public.card_requests (id uuid PRIMARY KEY DEFAULT gen_random_uuid(),request_number bigint GENERATED ALWAYS AS IDENTITY UNIQUE,user_id uuid NOT NULL,customer_id uuid REFERENCES public.customers(id) ON DELETE SET NULL,idempotency_key uuid NOT NULL,profile_snapshot jsonb NOT NULL,contact jsonb NOT NULL,delivery jsonb NOT NULL,product_name text NOT NULL DEFAULT 'OSHEGAH NFC Card',quantity integer NOT NULL,currency text NOT NULL DEFAULT 'EGP',unit_price numeric(12,2) NOT NULL,subtotal numeric(12,2) NOT NULL,delivery_charge numeric(12,2),discount numeric(12,2) NOT NULL DEFAULT 0,total numeric(12,2),status text NOT NULL DEFAULT 'submitted',customer_notes text NOT NULL DEFAULT '',tracking_reference text,reviewed_at timestamptz,created_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now(),UNIQUE(user_id,idempotency_key));
+GRANT SELECT ON public.card_requests TO authenticated;
+GRANT ALL ON public.card_requests TO service_role;
+GRANT USAGE,SELECT ON SEQUENCE public.card_requests_request_number_seq TO service_role;
+ALTER TABLE public.card_requests ENABLE ROW LEVEL SECURITY;
+CREATE POLICY card_requests_private_read ON public.card_requests FOR SELECT TO authenticated USING(user_id=auth.uid() OR public.is_admin());
+CREATE INDEX card_requests_user_date ON public.card_requests(user_id,created_at DESC);
+CREATE INDEX card_requests_status_date ON public.card_requests(status,created_at DESC);
+CREATE TABLE public.card_request_history(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),request_id uuid NOT NULL REFERENCES public.card_requests(id) ON DELETE CASCADE,previous_status text,new_status text NOT NULL,changed_by uuid NOT NULL,actor_label text NOT NULL,reason text NOT NULL DEFAULT '',internal_note text NOT NULL DEFAULT '',created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT ON public.card_request_history TO authenticated;
+GRANT ALL ON public.card_request_history TO service_role;
+ALTER TABLE public.card_request_history ENABLE ROW LEVEL SECURITY;
+CREATE POLICY card_history_admin_read ON public.card_request_history FOR SELECT TO authenticated USING(public.is_admin());
+CREATE INDEX card_request_history_date ON public.card_request_history(request_id,created_at);
+CREATE OR REPLACE FUNCTION public.card_request_config() RETURNS jsonb LANGUAGE sql STABLE SET search_path=public AS $$ SELECT jsonb_build_object('product_name','OSHEGAH NFC Card','unit_price',300,'currency','EGP','max_quantity',5,'country','EG','delivery_charge',NULL); $$;
+REVOKE ALL ON FUNCTION public.card_request_config() FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.card_request_config() TO authenticated,service_role;

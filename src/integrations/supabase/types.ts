@@ -178,6 +178,133 @@ export type Database = {
           },
         ]
       }
+      card_request_history: {
+        Row: {
+          actor_label: string
+          changed_by: string
+          created_at: string
+          id: string
+          internal_note: string
+          new_status: string
+          previous_status: string | null
+          reason: string
+          request_id: string
+        }
+        Insert: {
+          actor_label: string
+          changed_by: string
+          created_at?: string
+          id?: string
+          internal_note?: string
+          new_status: string
+          previous_status?: string | null
+          reason?: string
+          request_id: string
+        }
+        Update: {
+          actor_label?: string
+          changed_by?: string
+          created_at?: string
+          id?: string
+          internal_note?: string
+          new_status?: string
+          previous_status?: string | null
+          reason?: string
+          request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "card_request_history_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "card_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      card_requests: {
+        Row: {
+          contact: Json
+          created_at: string
+          currency: string
+          customer_id: string | null
+          customer_notes: string
+          delivery: Json
+          delivery_charge: number | null
+          discount: number
+          id: string
+          idempotency_key: string
+          product_name: string
+          profile_snapshot: Json
+          quantity: number
+          request_number: number
+          reviewed_at: string | null
+          status: string
+          subtotal: number
+          total: number | null
+          tracking_reference: string | null
+          unit_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contact: Json
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          customer_notes?: string
+          delivery: Json
+          delivery_charge?: number | null
+          discount?: number
+          id?: string
+          idempotency_key: string
+          product_name?: string
+          profile_snapshot: Json
+          quantity: number
+          request_number?: never
+          reviewed_at?: string | null
+          status?: string
+          subtotal: number
+          total?: number | null
+          tracking_reference?: string | null
+          unit_price: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contact?: Json
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          customer_notes?: string
+          delivery?: Json
+          delivery_charge?: number | null
+          discount?: number
+          id?: string
+          idempotency_key?: string
+          product_name?: string
+          profile_snapshot?: Json
+          quantity?: number
+          request_number?: never
+          reviewed_at?: string | null
+          status?: string
+          subtotal?: number
+          total?: number | null
+          tracking_reference?: string | null
+          unit_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "card_requests_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       circle_entries: {
         Row: {
           customer_id: string
@@ -574,6 +701,7 @@ export type Database = {
           ok: boolean
         }[]
       }
+      card_request_config: { Args: never; Returns: Json }
       get_circle_entries: {
         Args: never
         Returns: {
