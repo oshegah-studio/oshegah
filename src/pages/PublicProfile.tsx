@@ -10,10 +10,16 @@ import { downloadVCard, profileUrlFor } from "@/lib/vcard";
 import type { CustomerRow, LinkRow } from "@/hooks/useOshegah";
 import { useI18n } from "@/i18n";
 import { Seo } from "@/components/Seo";
+import { useAuth } from "@/hooks/useAuth";
+import { useCircle } from "@/hooks/useCircle";
+import { SaveProfileButton } from "@/components/SaveProfileButton";
+import { PrimaryNavigation } from "@/components/PrimaryNavigation";
 
 export default function PublicProfile() {
   const { username = "" } = useParams();
   const { t } = useI18n();
+  const { user, loading: authLoading } = useAuth();
+  const { mutation } = useCircle();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["public-profile", username],
@@ -41,6 +47,22 @@ export default function PublicProfile() {
     },
 
   });
+
+  const customerId = data && "customer" in data ? data.customer?.id : undefined;
+  const ownership = useQuery({
+    queryKey: ["profile-ownership", user?.id, customerId],
+    enabled: Boolean(user && customerId),
+    queryFn: async () => {
+      if (!user || !customerId) return false;
+      const { data: owned, error } = await supabase.rpc("owns_customer", { _customer_id: customerId });
+      if (error) throw error;
+      return owned;
+    },
+  });
+  const record = mutation.mutate;
+  useEffect(() => {
+    if (user && customerId && ownership.data === false) record({ customerId, action: "view" });
+  }, [user?.id, customerId, ownership.data, record]);
 
   useEffect(() => {
     if (data && "customer" in data && data.customer) void recordProfileView(data.customer.id);
@@ -110,7 +132,9 @@ export default function PublicProfile() {
           },
         }}
       />
-      <div className="absolute end-4 top-4 z-10">
+      <PrimaryNavigation />
+      <div className="relative z-10 flex flex-wrap items-center justify-end gap-2 bg-background px-4 py-3">
+        {!authLoading && (!user || ownership.data === false) && <SaveProfileButton customerId={customer.id} isOwn={false} />}
         <LanguageSwitcher tone="invert" compact />
       </div>
       <ProfileView

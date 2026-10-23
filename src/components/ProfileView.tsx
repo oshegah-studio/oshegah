@@ -324,8 +324,7 @@ export function ProfileView({
           href={OSHEGAH_SITE_URL}
           aria-label={t("publicProfile.visitOshegah")}
           title={t("publicProfile.visitOshegah")}
-          className="fixed end-3 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/90 shadow-lg backdrop-blur transition-transform duration-200 hover:scale-105 active:scale-95"
-          style={{ bottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))" }}
+          className="fixed end-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] sm:bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] z-30 flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/90 shadow-lg backdrop-blur transition-transform duration-200 hover:scale-105 active:scale-95"
         >
           <img src={OSHEGAH_LOGO_URL} alt="" aria-hidden="true" className="h-7 w-7 object-contain" />
         </a>

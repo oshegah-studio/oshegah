@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n";
+import { PrimaryNavigation, usePrimaryDestinations } from "@/components/PrimaryNavigation";
 
 export interface NavItem {
   to: string;
@@ -37,6 +38,8 @@ export function DashboardShell({
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const { t } = useI18n();
+  const primary = usePrimaryDestinations();
+  const allItems = [...primary, ...items.filter(item => !primary.some(main => main.to === item.to))];
 
   const handleSignOut = async () => {
     await signOut();
@@ -63,7 +66,7 @@ export function DashboardShell({
             </p>
           </div>
           <nav className="mt-8 flex flex-col gap-1" aria-label={t("nav.dashboard")}>
-            {items.map((item) => (
+            {allItems.map((item) => (
               <NavLink key={item.to} to={item.to} end={item.end} className={navLinkClass}>
                 <item.icon className="h-4 w-4" aria-hidden="true" />
                 {item.label}
@@ -139,29 +142,8 @@ export function DashboardShell({
         </main>
 
         {/* Mobile bottom nav */}
-        <nav
-          className="fixed bottom-0 start-0 end-0 z-40 flex w-full items-stretch gap-1 border-t border-sidebar-border bg-sidebar px-2 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] sm:hidden"
-          aria-label={t("nav.quick")}
-        >
-          {items.slice(0, 5).map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) =>
-                cn(
-                  "flex min-h-11 min-w-0 flex-1 flex-col items-center gap-1 rounded-lg px-1 py-2 text-[0.65rem] font-medium transition-colors",
-                  isActive ? "text-sidebar-primary" : "text-sidebar-foreground/60",
-                )
-              }
-            >
-
-              <item.icon className="h-5 w-5" aria-hidden="true" />
-              <span className="w-full truncate text-center">{item.label}</span>
-            </NavLink>
-
-          ))}
-        </nav>
+        <div className="hidden sm:block lg:hidden"><PrimaryNavigation /></div>
+        <PrimaryNavigation mobile />
       </div>
     </div>
   );

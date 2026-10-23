@@ -21,6 +21,8 @@ import Leaderboard from "./pages/Leaderboard";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
+import MyCircle from "./pages/MyCircle";
+import { PublicMobileNavigation } from "@/components/PrimaryNavigation";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,7 @@ const App = () => (
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/my-circle" element={<ProtectedRoute area="account"><MyCircle /></ProtectedRoute>} />
             <Route
 
               path="/dashboard"
@@ -58,6 +61,7 @@ const App = () => (
             <Route path="/:username" element={<PublicProfile />} />
             <Route path="*" element={<NotFound />} />
             </Routes>
+            <PublicMobileNavigation />
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

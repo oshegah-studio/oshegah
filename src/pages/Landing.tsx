@@ -12,6 +12,7 @@ import { useAuth, homeRouteFor } from "@/hooks/useAuth";
 import { useLeaderboard } from "@/hooks/useOshegah";
 import { useI18n } from "@/i18n";
 import { Seo } from "@/components/Seo";
+import { PrimaryNavigation } from "@/components/PrimaryNavigation";
 
 /** Fallback demo profile used only when the leaderboard is still empty. */
 const DEMO_USERNAME = "yahiahani";
@@ -61,7 +62,7 @@ export default function Landing() {
               </>
             )}
           </MobileHeaderMenu>
-          <nav className="hidden shrink-0 items-center gap-2 sm:flex" aria-label={t("nav.main")}>
+          <nav className="hidden shrink-0 flex-wrap items-center justify-end gap-2 sm:flex" aria-label={t("nav.main")}>
             <ThemeToggle className="hidden sm:inline-flex" />
             <LanguageSwitcher className="hidden sm:inline-flex" />
             <Button asChild variant="outline" size="sm" className="sm:h-10 sm:px-4">
@@ -80,7 +81,7 @@ export default function Landing() {
             )}
           </nav>
         </div>
-
+        <PrimaryNavigation />
       </header>
 
       <main>

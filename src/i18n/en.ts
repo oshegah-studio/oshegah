@@ -40,6 +40,8 @@ export const en = {
     confirm: "Confirm",
   },
   nav: {
+    home: "Home",
+    profile: "Profile",
     login: "Log in",
     signup: "Get your card",
     main: "Main navigation",
