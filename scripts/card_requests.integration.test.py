@@ -58,4 +58,17 @@ class CardRules(unittest.TestCase):
   h={'apikey':self.headers['apikey']};self.assertEqual(requests.post(self.base+'rpc/get_card_requests',headers=h,json={}).status_code,401)
  def test_paginated_at_most_twenty(self):
   d=self.rpc('get_card_requests',{'_page':1}).json();self.assertEqual(d['page_size'],20);self.assertLessEqual(len(d['rows']),20)
+ def test_settings_and_audit_require_live_admin_verification(self):
+  self.assertEqual(self.rpc('get_card_delivery_settings',{}).status_code,403)
+  self.assertEqual(self.rpc('save_card_delivery_settings',{'_version':self.config['version'],'_settings':{'unit_price':0}}).status_code,403)
+  for table in ['card_delivery_settings','card_settings_history']:
+   self.assertEqual(requests.get(self.base+table,headers=self.headers).json(),[])
+  self.assertEqual(requests.patch(self.base+'card_delivery_settings?id=eq.true',headers=self.headers,json={'unit_price':0}).status_code,403)
+ def test_submission_stores_financial_snapshot(self):
+  r=self.submit();self.assertEqual(r.status_code,200)
+  d=self.rpc('get_card_request',{'_id':r.json()}).json()['request'];s=d['financial_snapshot']
+  for key in ['unit_price','quantity','subtotal','total','currency']:self.assertEqual(s[key],d[key])
+  self.assertEqual(s['governorate'],self.payload['governorate']);self.assertEqual(s['settings_version'],self.config['version']);self.assertTrue(s['submitted_at'])
+ def test_stale_review_version_rejected(self):
+  self.assertEqual(self.submit({'settings_version':self.config['version']-1}).status_code,400)
 if __name__=='__main__':unittest.main()
