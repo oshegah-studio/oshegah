@@ -1,4 +1,7 @@
 # Architecture rules
+- My Circle uses one unique user/customer row with separate saved/viewed timestamps; auth-scoped RPCs validate active targets and reject ownership, while RLS keeps lists private and returns only direct-profile display fields.
+- Shared AuthHeader uses a dedicated desktop settings row because authentication panels stay narrow even on wide screens; mobile reuses MobileHeaderMenu.
+- Home/My Circle/Profile destinations share PrimaryNavigation; DashboardShell replaces its existing mobile bar rather than stacking a second bar.
 - Headers reuse MobileHeaderMenu and existing appearance/language hooks below their existing breakpoint (sm for public/auth, lg for DashboardShell); Radix Popover owns dismissal and focus rather than a parallel navigation state system.
 - ProfileEditor owns the existing profile form in details or appearance mode; updates persist only that mode's fields so separate editors cannot overwrite unrelated settings.
 - Link icon overrides use the existing links.icon column and a shared allowlisted resolver; invalid or absent values fall back to the link type icon.
