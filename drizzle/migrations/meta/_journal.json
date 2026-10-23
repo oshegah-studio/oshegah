@@ -29,6 +29,41 @@
       "when": 1792713705447,
       "tag": "0003_my_circle_private_lists",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792715364826,
+      "tag": "0004_card_request_storage",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792715383564,
+      "tag": "0005_card_request_submit",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792715399843,
+      "tag": "0006_card_request_retrieval",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792715415531,
+      "tag": "0007_card_request_actions",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792715796341,
+      "tag": "0008_card_request_validation_audit",
+      "breakpoints": true
     }
   ]
 }

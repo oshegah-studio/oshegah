@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   BarChart3, Eye, ExternalLink, LayoutDashboard, MousePointerClick, Plus,
-  QrCode, Settings, ShieldCheck, Trash2, Users,
+  CreditCard, QrCode, Settings, ShieldCheck, Trash2, Users,
 } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/DashboardShell";
 import { ProfileEditor } from "@/components/ProfileEditor";
@@ -26,10 +26,15 @@ import { useI18n } from "@/i18n";
 import { useAdminGate } from "@/components/AdminGate";
 import { OwnerAdminManager } from "@/components/OwnerAdminManager";
 import { Lock } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useCardText } from "@/features/cards/model";
+import { useCardRequests } from "@/features/cards/api";
 
 
 export default function AdminDashboard() {
   const { t } = useI18n();
+  const { text: cardText } = useCardText();
+  const cardRequests = useCardRequests(true, 1);
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<CustomerRow | null>(null);
@@ -41,6 +46,7 @@ export default function AdminDashboard() {
 
   const navItems: NavItem[] = [
     { to: "/admin", label: t("dashboard.areaAdmin"), icon: LayoutDashboard, end: true },
+    { to: "/admin/card-requests", label: `${cardText.admin}${cardRequests.data?.counts?.submitted ? ` (${cardRequests.data.counts.submitted})` : ""}`, icon: CreditCard },
   ];
 
   const { data: customers, isLoading } = useQuery({

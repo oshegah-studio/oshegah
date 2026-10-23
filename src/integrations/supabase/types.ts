@@ -178,6 +178,139 @@ export type Database = {
           },
         ]
       }
+      card_request_history: {
+        Row: {
+          actor_label: string
+          changed_by: string
+          created_at: string
+          event_type: string
+          id: string
+          internal_note: string
+          new_status: string
+          previous_status: string | null
+          reason: string
+          request_id: string
+        }
+        Insert: {
+          actor_label: string
+          changed_by: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          internal_note?: string
+          new_status: string
+          previous_status?: string | null
+          reason?: string
+          request_id: string
+        }
+        Update: {
+          actor_label?: string
+          changed_by?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          internal_note?: string
+          new_status?: string
+          previous_status?: string | null
+          reason?: string
+          request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "card_request_history_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "card_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      card_requests: {
+        Row: {
+          consent_at: string
+          contact: Json
+          created_at: string
+          currency: string
+          customer_id: string | null
+          customer_notes: string
+          delivery: Json
+          delivery_charge: number | null
+          discount: number
+          id: string
+          idempotency_key: string
+          product_name: string
+          profile_snapshot: Json
+          quantity: number
+          request_number: number
+          reviewed_at: string | null
+          status: string
+          subtotal: number
+          total: number | null
+          tracking_reference: string | null
+          unit_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          consent_at?: string
+          contact: Json
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          customer_notes?: string
+          delivery: Json
+          delivery_charge?: number | null
+          discount?: number
+          id?: string
+          idempotency_key: string
+          product_name?: string
+          profile_snapshot: Json
+          quantity: number
+          request_number?: never
+          reviewed_at?: string | null
+          status?: string
+          subtotal: number
+          total?: number | null
+          tracking_reference?: string | null
+          unit_price: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          consent_at?: string
+          contact?: Json
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          customer_notes?: string
+          delivery?: Json
+          delivery_charge?: number | null
+          discount?: number
+          id?: string
+          idempotency_key?: string
+          product_name?: string
+          profile_snapshot?: Json
+          quantity?: number
+          request_number?: never
+          reviewed_at?: string | null
+          status?: string
+          subtotal?: number
+          total?: number | null
+          tracking_reference?: string | null
+          unit_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "card_requests_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       circle_entries: {
         Row: {
           customer_id: string
@@ -574,6 +707,34 @@ export type Database = {
           ok: boolean
         }[]
       }
+      card_request_config: { Args: never; Returns: Json }
+      change_card_request: {
+        Args: {
+          _action: string
+          _delivery?: number
+          _id: string
+          _note?: string
+          _reason?: string
+          _status?: string
+          _tracking?: string
+        }
+        Returns: undefined
+      }
+      get_card_request: {
+        Args: { _admin?: boolean; _id: string }
+        Returns: Json
+      }
+      get_card_requests: {
+        Args: {
+          _admin?: boolean
+          _from?: string
+          _page?: number
+          _search?: string
+          _status?: string
+          _to?: string
+        }
+        Returns: Json
+      }
       get_circle_entries: {
         Args: never
         Returns: {
@@ -702,6 +863,10 @@ export type Database = {
         Returns: undefined
       }
       resolve_username: { Args: { _username: string }; Returns: string }
+      submit_card_request: {
+        Args: { _customer_id: string; _key: string; _payload: Json }
+        Returns: string
+      }
       switch_profile_type: {
         Args: { _next: Database["public"]["Enums"]["account_type"] }
         Returns: {

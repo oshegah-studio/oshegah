@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { cardReturnPath } from "@/features/cards/intent";
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -22,9 +23,13 @@ export default function Login() {
   const [busy, setBusy] = useState(false);
 
   const addingAccount = Boolean(location.state?.addAccount);
+  const returnPath = cardReturnPath(location.state?.from);
+  useEffect(() => {
+    if (location.state?.from === "/get-your-card") sessionStorage.setItem("oshegah-card-return", "/get-your-card");
+  }, [location.state?.from]);
 
   if (user && !addingAccount) {
-    return <Navigate to={location.state?.from || homeRouteFor(profile, isAdmin)} replace />;
+    return <Navigate to={returnPath || location.state?.from || homeRouteFor(profile, isAdmin)} replace />;
   }
 
   const submit = async (e: React.FormEvent) => {
@@ -71,7 +76,7 @@ export default function Login() {
         </div>
         <p className="mt-5 text-center text-sm text-muted-foreground">
           {t("auth.noAccount")}{" "}
-          <Link to="/signup" className="font-medium text-primary hover:underline">{t("auth.createOne")}</Link>
+          <Link to="/signup" state={{ from: returnPath || location.state?.from }} className="font-medium text-primary hover:underline">{t("auth.createOne")}</Link>
         </p>
       </div>
     </main>
