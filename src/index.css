@@ -257,6 +257,26 @@
 .animate-card-sheen { animation: card-sheen 6s ease-in-out infinite; }
 .animate-nfc-wave { animation: nfc-wave 2.2s ease-in-out infinite; }
 
+@media print {
+  body:has(.card-production) #root,
+  body:has(.card-production) [data-radix-popper-content-wrapper],
+  body:has(.card-production) [data-state="open"][data-aria-hidden="true"] { display: none !important; }
+  body:has(.card-production) > div:not(:has(.card-production)) { display: none !important; }
+  .card-production {
+    position: static !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    background: hsl(var(--oshegah-white)) !important;
+    color: hsl(var(--oshegah-navy)) !important;
+  }
+  .card-production .production-controls,
+  .card-production > button { display: none !important; }
+}
+
 
 /* Premium button/press feel across primitives */
 button:not(:disabled),

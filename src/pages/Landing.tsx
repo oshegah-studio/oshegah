@@ -1,4 +1,7 @@
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { cardReturnPath } from "@/features/cards/intent";
 import { ArrowRight, BarChart3, Nfc, QrCode, Smartphone, Palette, ShieldCheck, Trophy } from "lucide-react";
 import { Wordmark } from "@/components/Brand";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -28,6 +31,13 @@ const features = [
 
 export default function Landing() {
   const { user, profile, isAdmin } = useAuth();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (user && cardReturnPath()) {
+      sessionStorage.removeItem("oshegah-card-return");
+      navigate("/get-your-card", { replace: true });
+    }
+  }, [user?.id, navigate]);
   const { t } = useI18n();
   const home = homeRouteFor(profile, isAdmin);
   const { data: topProfiles } = useLeaderboard("all_time", 1);

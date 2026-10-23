@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate, Navigate } from "react-router-dom";
+import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
+import { cardReturnPath } from "@/features/cards/intent";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +17,8 @@ import { OAuthButtons } from "@/components/OAuthButtons";
 export default function Signup() {
   const { user, profile, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnPath = cardReturnPath(location.state?.from);
   const { t } = useI18n();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,7 +26,7 @@ export default function Signup() {
   const [accountType, setAccountType] = useState<"personal" | "business">("personal");
   const [busy, setBusy] = useState(false);
 
-  if (user) return <Navigate to={homeRouteFor(profile, isAdmin)} replace />;
+  if (user) return <Navigate to={returnPath || homeRouteFor(profile, isAdmin)} replace />;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,7 +107,7 @@ export default function Signup() {
         </div>
         <p className="mt-5 text-center text-sm text-muted-foreground">
           {t("auth.haveAccount")}{" "}
-          <Link to="/login" className="font-medium text-primary hover:underline">{t("auth.loginTitle")}</Link>
+          <Link to="/login" state={{ from: returnPath }} className="font-medium text-primary hover:underline">{t("auth.loginTitle")}</Link>
         </p>
       </div>
     </main>
