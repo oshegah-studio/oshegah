@@ -12,3 +12,4 @@
 - Leaderboard pages come from a server-side paginated database function returning global ranks and a total count, so pages stay consistent without downloading every profile.
 - App-served video ships as both H.264 MP4 and VP9 WebM sources from CDN assets; homepage uses a stable 16:9 frame with object-contain so the recording is never cropped or stretched.
 - Homepage reuses PrimaryNavigation inside one desktop header and MobileHeaderMenu below lg; its existing bottom navigation remains the only mobile primary bar.
+- Physical cards use serial_cards (unique OSH- serial, one current owner, separate assignment/activation states) changed only via SECURITY DEFINER RPCs that lock rows and append serial_card_events; NFC/QR /s/<serial> resolves through resolve_serial so only active cards linked to the current owner's profile open it.
