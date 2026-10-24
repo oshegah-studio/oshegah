@@ -106,6 +106,13 @@
       "when": 1792781847800,
       "tag": "0014_serial_public_claim",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1792863412922,
+      "tag": "0015_card_request_multiline_address",
+      "breakpoints": true
     }
   ]
 }

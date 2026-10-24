@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {Link,useNavigate} from 'react-router-dom';
 import {Loader2,CheckCircle2} from 'lucide-react';
 import {useAuth} from '@/hooks/useAuth';
@@ -14,6 +14,7 @@ import {useCardConfig} from '@/features/cards/api';
 import {CardShell,ProfileSummary,PriceSummary,RequestError} from '@/features/cards/ui';
 import {requestSchema,useCardText,requestNumber,type RequestForm} from '@/features/cards/model';
 import {governorates,orderAmounts,settingsText} from '@/features/cards/settings';
+import {confirmCardSubmission,logSubmissionError,submissionError} from '@/features/cards/submission';
 
 export default function GetYourCard(){
  const {text,lang}=useCardText();const deliveryText=settingsText[lang==='ar'?'ar':'en'];const [reviewVersion,setReviewVersion]=useState<number|null>(null);const {user,profile}=useAuth();const navigate=useNavigate();const customerQuery=useMyCustomer();const configQuery=useCardConfig();const customer=customerQuery.data;const config=configQuery.data;
@@ -24,7 +25,29 @@ export default function GetYourCard(){
  const profileValid=customer&&customer.active&&customer.full_name.trim()&&/^[a-z0-9][a-z0-9._-]{1,28}[a-z0-9]$/.test(customer.username);
  const update=(name:keyof RequestForm,value:string|number|boolean)=>setForm(f=>({...f,[name]:value}));
  const validate=(consent:boolean)=>{if(!config)return null;if(!Number.isInteger(form.quantity)||form.quantity<1||form.quantity>config.max_quantity){setInvalid(['quantity']);setError(`${deliveryText.quantityError} ${config.max_quantity}.`);return null;}if(!governorates.some(g=>g[0]===form.governorate)){setInvalid(['governorate']);setError(deliveryText.select);return null;}if(!orderAmounts(config,form.quantity,form.governorate).available){setInvalid(['governorate']);setError(deliveryText.unavailable);return null;}const p=requestSchema.safeParse({...form,consent});if(!p.success){setInvalid(p.error.issues.map(i=>String(i.path[0])));setError(lang==='ar'?'راجع الحقول المحددة واستخدم رقم محمول مصري صحيح.':'Check the highlighted fields and use a valid Egyptian mobile number.');return null;}setInvalid([]);setError('');return p.data;};
- const submit=async()=>{const payload=validate(form.consent);if(!payload||!customer||!profileValid)return;setBusy(true);try{const latest=await configQuery.refetch();if(latest.error||!latest.data)throw Error('SETTINGS_UNAVAILABLE');if(latest.data.version!==reviewVersion){setReviewVersion(latest.data.version);setError(deliveryText.changed);return;}const {data,error}=await supabase.rpc('submit_card_request',{_customer_id:customer.id,_key:key,_payload:{...payload,settings_version:latest.data.version}});if(error)throw error;const details=await supabase.rpc('get_card_request',{_id:String(data)});if(details.error)throw details.error;const r=(details.data as unknown as {request:{id:string;request_number:number;created_at:string}}).request;setResult({id:r.id,number:r.request_number,date:r.created_at});setStep('success');}catch(e){const code=e&&typeof e==='object'&&'message' in e?String(e.message):'';setError(code.includes('QUANTITY_EXCEEDS_LIMIT')?`${deliveryText.quantityError} ${code.split(':').pop()?.trim()}.`:code.includes('DELIVERY_UNAVAILABLE')?deliveryText.unavailable:code.includes('SETTINGS_CHANGED')?deliveryText.changed:text.failed);void configQuery.refetch();}finally{setBusy(false);}};
+ const submitting=useRef(false);
+ const submit=async()=>{
+  if(submitting.current)return;
+  const payload=validate(form.consent);if(!payload||!customer||!profileValid)return;
+  submitting.current=true;setBusy(true);let operation:'session'|'settings'|'submit'='session';
+  try{
+   const identity=await supabase.auth.getUser();
+   if(identity.error||!identity.data.user||identity.data.user.id!==user?.id)throw Error('AUTH_REQUIRED');
+   operation='settings';const latest=await configQuery.refetch();if(latest.error||!latest.data)throw latest.error||Error('SETTINGS_UNAVAILABLE');
+   if(latest.data.version!==reviewVersion){setReviewVersion(latest.data.version);setError(deliveryText.changed);return;}
+   operation='submit';const confirmed=await confirmCardSubmission({
+    submit:()=>supabase.rpc('submit_card_request',{_customer_id:customer.id,_key:key,_payload:{...payload,settings_version:latest.data.version}}),
+    readback:id=>supabase.rpc('get_card_request',{_id:id}),
+   });
+   if(confirmed.summary){setResult(confirmed.summary);setStep('success');}
+   else navigate('/my-cards/'+confirmed.id,{replace:true});
+  }catch(e){
+   logSubmissionError(operation,e);
+   const code=e&&typeof e==='object'&&'message' in e?String(e.message):'';
+   setError(code.includes('QUANTITY_EXCEEDS_LIMIT')?`${deliveryText.quantityError} ${config?.max_quantity}.`:code.includes('DELIVERY_UNAVAILABLE')?deliveryText.unavailable:code.includes('SETTINGS_CHANGED')?deliveryText.changed:submissionError(e,lang));
+   void configQuery.refetch();
+  }finally{submitting.current=false;setBusy(false);}
+ };
  const field=(name:'full_name'|'phone'|'email'|'governorate'|'city'|'address'|'instructions'|'notes',required=false,large=false)=><div className="min-w-0 space-y-1.5"><Label htmlFor={'card-'+name}>{text[name]}</Label>{large?<Textarea id={'card-'+name} value={String(form[name])} maxLength={name==='notes'?1000:500} required={required} aria-invalid={invalid.includes(name)} onChange={e=>update(name,e.target.value)}/>:<Input id={'card-'+name} type={name==='email'?'email':name==='phone'?'tel':'text'} dir={name==='phone'||name==='email'?'ltr':undefined} value={String(form[name])} maxLength={name==='email'?254:100} required={required} aria-invalid={invalid.includes(name)} onChange={e=>update(name,e.target.value)}/>}</div>;
  if(customerQuery.isLoading||configQuery.isLoading)return <CardShell title={text.title}><p>{text.loading}</p></CardShell>;
  if(customerQuery.isError||configQuery.isError)return <CardShell title={text.title}><RequestError retry={()=>{void customerQuery.refetch();void configQuery.refetch();}}/></CardShell>;

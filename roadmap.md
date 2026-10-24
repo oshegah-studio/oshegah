@@ -1,4 +1,6 @@
 # OSHEGAH updates
+- [x] Reproduce INVALID_FIELD: address from line breaks; fix server/client address validation and safe submission/readback errors. Verify real 390px/1280px submission/reload, consent/missing fields, delayed/repeated taps, lost responses and same-key retries; 9 submission, 24 isolated pricing and 19 live card tests passed.
+- [ ] Verify card-request entries visually in the authorized live admin dashboard — blocked by the existing additional admin verification. Stored rows and unique idempotency keys can be checked directly; no security bypass performed. Physical-device Safari/Chrome checks remain manual.
 - [x] Add database-backed admin Card & Delivery Settings, protected audited saves and trusted submission snapshots.
 - [x] Update customer quantities, governorate selection, delivery availability and transparent totals from active settings.
 - [x] Verify 20 isolated database acceptance tests, 16 live card regressions, 7 My Circle regressions, real customer submission/readback/reload/cancellation, real admin denial, and EN/AR 320/390/768/1280 layouts; admin layout checks used simulated responses only, production settings remain unchanged and temporary orders removed.
