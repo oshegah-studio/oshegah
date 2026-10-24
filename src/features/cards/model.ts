@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { useI18n } from '@/i18n';
 import type {DeliveryConfig} from './settings';
+import {deliveryAddressSchema} from './submission';
 
 export const statuses = ['submitted','under_review','approved','in_preparation','ready_for_delivery','shipped','delivered','rejected','cancelled'] as const;
 export type CardStatus = typeof statuses[number];
@@ -16,7 +17,7 @@ export function normalizePhone(value: string) {
 }
 const short=z.string().trim().min(1).max(100).refine(v=>!/[\x00-\x1f]/.test(v));
 export const requestSchema=z.object({
- full_name:short,phone:z.string().transform(normalizePhone).refine(v=>/^\+201[0125]\d{8}$/.test(v)),contact_method:z.enum(['phone','whatsapp','email']),email:z.union([z.literal(''),z.string().trim().email().max(254)]),country:z.literal('EG'),governorate:short,city:short,address:z.string().trim().min(1).max(500),instructions:z.string().trim().max(500),notes:z.string().trim().max(1000),quantity:z.number().int().min(1),consent:z.boolean().refine(v=>v),
+ full_name:short,phone:z.string().transform(normalizePhone).refine(v=>/^\+201[0125]\d{8}$/.test(v)),contact_method:z.enum(['phone','whatsapp','email']),email:z.union([z.literal(''),z.string().trim().email().max(254)]),country:z.literal('EG'),governorate:short,city:short,address:deliveryAddressSchema,instructions:z.string().trim().max(500),notes:z.string().trim().max(1000),quantity:z.number().int().min(1),consent:z.boolean().refine(v=>v),
 }).refine(v=>v.contact_method!=='email'||Boolean(v.email),{path:['email']});
 export type RequestForm=z.input<typeof requestSchema>;
 export interface CardConfig extends DeliveryConfig {product_name:string;currency:string;country:string}

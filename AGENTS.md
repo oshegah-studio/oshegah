@@ -1,6 +1,7 @@
 # Architecture rules
 - Card requests use authenticated RPCs and a singleton versioned Card & Delivery Settings record; the insert trigger derives immutable financial snapshots under a shared configuration lock, while step-up-only saves lock the record and audit each changed setting to prevent tampering and conflicting updates.
 - Card request translations and validation live in the cards feature module; existing DashboardShell navigation carries customer request destinations without adding another primary bar.
+- Card submission retains one idempotency key across retries and separates confirmed creation from details readback; diagnostics contain only allowlisted error codes/fields to avoid leaking customer data.
 - My Circle uses one unique user/customer row with separate saved/viewed timestamps; auth-scoped RPCs validate active targets and reject ownership, while RLS keeps lists private and returns only direct-profile display fields.
 - Shared AuthHeader uses a dedicated desktop settings row because authentication panels stay narrow even on wide screens; mobile reuses MobileHeaderMenu.
 - Home/My Circle/Profile destinations share PrimaryNavigation; DashboardShell replaces its existing mobile bar rather than stacking a second bar.
