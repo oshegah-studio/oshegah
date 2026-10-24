@@ -1,4 +1,5 @@
 # OSHEGAH updates
+- [ ] Reproduce and fix the card request submission failure; verify real mobile/desktop submission, safe errors, retry deduplication and financial/privacy regressions.
 - [x] Add database-backed admin Card & Delivery Settings, protected audited saves and trusted submission snapshots.
 - [x] Update customer quantities, governorate selection, delivery availability and transparent totals from active settings.
 - [x] Verify 20 isolated database acceptance tests, 16 live card regressions, 7 My Circle regressions, real customer submission/readback/reload/cancellation, real admin denial, and EN/AR 320/390/768/1280 layouts; admin layout checks used simulated responses only, production settings remain unchanged and temporary orders removed.
