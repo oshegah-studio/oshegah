@@ -71,4 +71,12 @@ class CardRules(unittest.TestCase):
   self.assertEqual(s['governorate'],self.payload['governorate']);self.assertEqual(s['settings_version'],self.config['version']);self.assertTrue(s['submitted_at'])
  def test_stale_review_version_rejected(self):
   self.assertEqual(self.submit({'settings_version':self.config['version']-1}).status_code,400)
+ def test_multiline_delivery_address_is_preserved(self):
+  address='Building 10\nFloor 2\r\nApartment\t4'
+  r=self.submit({'address':address});self.assertEqual(r.status_code,200)
+  self.assertEqual(self.rpc('get_card_request',{'_id':r.json()}).json()['request']['delivery']['address'],address)
+ def test_unsafe_address_control_character_rejected(self):
+  r=self.submit({'address':'Building\u0001hidden'});self.assertEqual(r.status_code,400);self.assertEqual(r.json()['message'],'INVALID_FIELD: address')
+ def test_missing_required_address_rejected(self):
+  r=self.submit({'address':''});self.assertEqual(r.status_code,400);self.assertEqual(r.json()['message'],'INVALID_FIELD: address')
 if __name__=='__main__':unittest.main()

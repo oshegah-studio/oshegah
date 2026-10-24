@@ -16,7 +16,7 @@ await db.exec(`CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_
  INSERT INTO public.customers VALUES('11111111-1111-4111-8111-111111111111',true,'Test profile','settings_test',null);
  INSERT INTO public.admin_credentials VALUES('22222222-2222-4222-8222-222222222222','Isolated test admin');
  SET test.uid='22222222-2222-4222-8222-222222222222'; SET test.admin='true';`);
-for(const file of ['0004_card_request_storage.sql','0005_card_request_submit.sql','0006_card_request_retrieval.sql','0007_card_request_actions.sql','0008_card_request_validation_audit.sql','0009_card_request_rpc_only_writes.sql','0010_card_delivery_settings.sql','0011_lock_card_submission_configuration.sql','0012_card_settings_rpc_only_writes.sql'])await db.exec(readFileSync(`drizzle/migrations/${file}`,'utf8'));
+for(const file of ['0004_card_request_storage.sql','0005_card_request_submit.sql','0006_card_request_retrieval.sql','0007_card_request_actions.sql','0008_card_request_validation_audit.sql','0009_card_request_rpc_only_writes.sql','0010_card_delivery_settings.sql','0011_lock_card_submission_configuration.sql','0012_card_settings_rpc_only_writes.sql','0015_card_request_multiline_address.sql'])await db.exec(readFileSync(`drizzle/migrations/${file}`,'utf8'));
 await db.exec('INSERT INTO public.card_delivery_settings(id) VALUES(true)');
 let passed=0;
 async function test(name:string,fn:()=>Promise<void>|void){await fn();console.log(`PASS ${++passed}: ${name}`);}
@@ -29,6 +29,10 @@ async function request(id:string){return (await db.query<any>('SELECT * FROM pub
 await test('admin saves active database pricing',async()=>{await save(flat);assert.equal((await config()).unit_price,300);});
 let oldId='';let old:any;
 await test('flat fee: 300 × 2 + 50 = 650; client prices ignored',async()=>{oldId=await submit();old=await request(oldId);assert.equal(Number(old.subtotal),600);assert.equal(Number(old.delivery_charge),50);assert.equal(Number(old.total),650);assert.equal(Number(old.unit_price),300);});
+await test('multiline delivery address is preserved',async()=>{const address='Building 10\nFloor 2\r\nApartment\t4';const id=await submit({address});assert.equal((await request(id)).delivery.address,address);});
+await test('address unsafe control bytes remain rejected',async()=>{await assert.rejects(()=>submit({address:'Building\u0001hidden'}),/INVALID_FIELD: address/);});
+await test('single-line contact fields still reject newlines',async()=>{await assert.rejects(()=>submit({full_name:'Name\nInjected'}),/INVALID_FIELD: full_name/);});
+await test('empty address still rejects without creating an order',async()=>{const before=(await db.query<any>('SELECT count(*) n FROM public.card_requests')).rows[0].n;await assert.rejects(()=>submit({address:''}),/INVALID_FIELD: address/);assert.equal((await db.query<any>('SELECT count(*) n FROM public.card_requests')).rows[0].n,before);});
 await test('display calculations match server subtotal and total',async()=>{const a=orderAmounts(await config(),2,'Cairo');assert.equal(a.total,650);assert.equal(a.subtotal,600);});
 await test('configured quantity cap enforced when bypassing form',async()=>{await assert.rejects(()=>submit({quantity:6}),/QUANTITY_EXCEEDS_LIMIT/);});
 await test('zero, negative and fractional quantities rejected',async()=>{for(const quantity of [0,-1,1.5])await assert.rejects(()=>submit({quantity}));});
